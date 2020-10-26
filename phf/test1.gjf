@@ -1,0 +1,16 @@
+%subst l530 ../phf
+!%subst l601 .
+%nproc=1
+%mem=4GB
+!%oldchk=gauuhf.chk
+%chk=test.chk
+! 206: print level, 207: phf type, 216: turn on diis
+#p hf/3-21g scf=conver=4  extralink=l530 iop(5/206=9, 5/207=1, 5/216=1) pop=none 
+
+title
+
+0 1
+H 0.0 0.0 0.0
+H 0.0 0.0 2.0
+
+
