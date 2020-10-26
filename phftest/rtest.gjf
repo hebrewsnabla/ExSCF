@@ -1,0 +1,24 @@
+%chk=rtest.chk
+#p rhf/def2svp 
+
+ title 
+
+0 1
+H 0.0 0.0 0.0
+H 0.0 0.0 2.0
+
+--Link1--
+%subst l530 .
+%subst l601 .
+%nproc=1
+%mem=40GB
+%chk=rtest.chk
+#p rhf/def2svp guess=read extralink=l530 !iop( 5/7=3)  
+
+title
+
+0 1
+H 0.0 0.0 0.0
+H 0.0 0.0 2.0
+
+

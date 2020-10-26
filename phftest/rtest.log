@@ -1,0 +1,774 @@
+ Entering Gaussian System, Link 0=g09
+ Input=rtest.gjf
+ Output=rtest.log
+ Initial command:
+ /share/home/srwang/g09/l1.exe /share/home/srwang/gauscr/Gau-1419.inp -scrdir=/share/home/srwang/gauscr/
+ Entering Link 1 = /share/home/srwang/g09/l1.exe PID=      1420.
+  
+ Copyright (c) 1988,1990,1992,1993,1995,1998,2003,2009,2011,
+            Gaussian, Inc.  All Rights Reserved.
+  
+ This is part of the Gaussian(R) 09 program.  It is based on
+ the Gaussian(R) 03 system (copyright 2003, Gaussian, Inc.),
+ the Gaussian(R) 98 system (copyright 1998, Gaussian, Inc.),
+ the Gaussian(R) 94 system (copyright 1995, Gaussian, Inc.),
+ the Gaussian 92(TM) system (copyright 1992, Gaussian, Inc.),
+ the Gaussian 90(TM) system (copyright 1990, Gaussian, Inc.),
+ the Gaussian 88(TM) system (copyright 1988, Gaussian, Inc.),
+ the Gaussian 86(TM) system (copyright 1986, Carnegie Mellon
+ University), and the Gaussian 82(TM) system (copyright 1983,
+ Carnegie Mellon University). Gaussian is a federally registered
+ trademark of Gaussian, Inc.
+  
+ This software contains proprietary and confidential information,
+ including trade secrets, belonging to Gaussian, Inc.
+  
+ This software is provided under written license and may be
+ used, copied, transmitted, or stored only in accord with that
+ written license.
+  
+ The following legend is applicable only to US Government
+ contracts under FAR:
+  
+                    RESTRICTED RIGHTS LEGEND
+  
+ Use, reproduction and disclosure by the US Government is
+ subject to restrictions as set forth in subparagraphs (a)
+ and (c) of the Commercial Computer Software - Restricted
+ Rights clause in FAR 52.227-19.
+  
+ Gaussian, Inc.
+ 340 Quinnipiac St., Bldg. 40, Wallingford CT 06492
+  
+  
+ ---------------------------------------------------------------
+ Warning -- This program may not be used in any manner that
+ competes with the business of Gaussian, Inc. or will provide
+ assistance to any competitor of Gaussian, Inc.  The licensee
+ of this program is prohibited from giving any competitor of
+ Gaussian, Inc. access to this program.  By using this program,
+ the user acknowledges that Gaussian, Inc. is engaged in the
+ business of creating and licensing software in the field of
+ computational chemistry and represents and warrants to the
+ licensee that it is not a competitor of Gaussian, Inc. and that
+ it will not use this program in any manner prohibited above.
+ ---------------------------------------------------------------
+  
+
+ Cite this work as:
+ Gaussian 09, Revision C.01,
+ M. J. Frisch, G. W. Trucks, H. B. Schlegel, G. E. Scuseria, 
+ M. A. Robb, J. R. Cheeseman, G. Scalmani, V. Barone, B. Mennucci, 
+ G. A. Petersson, H. Nakatsuji, M. Caricato, X. Li, H. P. Hratchian, 
+ A. F. Izmaylov, J. Bloino, G. Zheng, J. L. Sonnenberg, M. Hada, 
+ M. Ehara, K. Toyota, R. Fukuda, J. Hasegawa, M. Ishida, T. Nakajima, 
+ Y. Honda, O. Kitao, H. Nakai, T. Vreven, J. A. Montgomery, Jr., 
+ J. E. Peralta, F. Ogliaro, M. Bearpark, J. J. Heyd, E. Brothers, 
+ K. N. Kudin, V. N. Staroverov, T. Keith, R. Kobayashi, J. Normand, 
+ K. Raghavachari, A. Rendell, J. C. Burant, S. S. Iyengar, J. Tomasi, 
+ M. Cossi, N. Rega, J. M. Millam, M. Klene, J. E. Knox, J. B. Cross, 
+ V. Bakken, C. Adamo, J. Jaramillo, R. Gomperts, R. E. Stratmann, 
+ O. Yazyev, A. J. Austin, R. Cammi, C. Pomelli, J. W. Ochterski, 
+ R. L. Martin, K. Morokuma, V. G. Zakrzewski, G. A. Voth, 
+ P. Salvador, J. J. Dannenberg, S. Dapprich, A. D. Daniels, 
+ O. Farkas, J. B. Foresman, J. V. Ortiz, J. Cioslowski, 
+ and D. J. Fox, Gaussian, Inc., Wallingford CT, 2010.
+ 
+ ******************************************
+ Gaussian 09:  EM64L-G09RevC.01 23-Sep-2011
+                28-Sep-2020 
+ ******************************************
+ %chk=rtest.chk
+ --------------
+ #p rhf/def2svp
+ --------------
+ 1/38=1/1;
+ 2/12=2,17=6,18=5,40=1/2;
+ 3/5=43,7=101,11=1,16=1,25=1,30=1,116=1/1,2,3;
+ 4//1;
+ 5/5=2,38=5/2;
+ 6/7=2,8=2,9=2,10=2,28=1/1;
+ 99/5=1,9=1/99;
+ Leave Link    1 at Mon Sep 28 18:20:26 2020, MaxMem=          0 cpu:       0.0
+ (Enter /share/home/srwang/g09/l101.exe)
+ -----
+ title
+ -----
+ Charge =  0 Multiplicity = 1
+ Symbolic Z-Matrix:
+ H                     0.        0.        0. 
+ H                     0.        0.        2. 
+ 
+ NAtoms=      2 NQM=        0 NQMF=       0 NMMI=      2 NMMIF=      0
+                NMic=       0 NMicF=      0.
+                    Isotopes and Nuclear Properties:
+ (Nuclear quadrupole moments (NQMom) in fm**2, nuclear magnetic moments (NMagM)
+  in nuclear magnetons)
+
+  Atom         1           2
+ IAtWgt=           1           1
+ AtmWgt=   1.0078250   1.0078250
+ NucSpn=           1           1
+ AtZEff=   0.0000000   0.0000000
+ NQMom=    0.0000000   0.0000000
+ NMagM=    2.7928460   2.7928460
+ Leave Link  101 at Mon Sep 28 18:20:26 2020, MaxMem=   33554432 cpu:       0.0
+ (Enter /share/home/srwang/g09/l202.exe)
+                          Input orientation:                          
+ ---------------------------------------------------------------------
+ Center     Atomic      Atomic             Coordinates (Angstroms)
+ Number     Number       Type             X           Y           Z
+ ---------------------------------------------------------------------
+      1          1           0        0.000000    0.000000    0.000000
+      2          1           0        0.000000    0.000000    2.000000
+ ---------------------------------------------------------------------
+ Stoichiometry    H2
+ Framework group  D*H[C*(H.H)]
+ Deg. of freedom     1
+ Full point group                 D*H     NOp   8
+ Largest Abelian subgroup         D2H     NOp   8
+ Largest concise Abelian subgroup C2      NOp   2
+                         Standard orientation:                         
+ ---------------------------------------------------------------------
+ Center     Atomic      Atomic             Coordinates (Angstroms)
+ Number     Number       Type             X           Y           Z
+ ---------------------------------------------------------------------
+      1          1           0        0.000000    0.000000    1.000000
+      2          1           0        0.000000    0.000000   -1.000000
+ ---------------------------------------------------------------------
+ Rotational constants (GHZ):      0.0000000    250.7275501    250.7275501
+ Leave Link  202 at Mon Sep 28 18:20:26 2020, MaxMem=   33554432 cpu:       0.0
+ (Enter /share/home/srwang/g09/l301.exe)
+ Standard basis: def2SVP (5D, 7F)
+ Ernie: Thresh=  0.10000D-02 Tol=  0.10000D-05 Strict=F.
+ There are     3 symmetry adapted basis functions of AG  symmetry.
+ There are     0 symmetry adapted basis functions of B1G symmetry.
+ There are     1 symmetry adapted basis functions of B2G symmetry.
+ There are     1 symmetry adapted basis functions of B3G symmetry.
+ There are     0 symmetry adapted basis functions of AU  symmetry.
+ There are     3 symmetry adapted basis functions of B1U symmetry.
+ There are     1 symmetry adapted basis functions of B2U symmetry.
+ There are     1 symmetry adapted basis functions of B3U symmetry.
+ Integral buffers will be    131072 words long.
+ Raffenetti 1 integral format.
+ Two-electron integral symmetry is turned on.
+    10 basis functions,    14 primitive gaussians,    10 cartesian basis functions
+     1 alpha electrons        1 beta electrons
+       nuclear repulsion energy         0.2645886043 Hartrees.
+ IExCor=    0 DFT=F Ex=HF Corr=None ExCW=0 ScaHFX=  1.000000
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000 ScalE2=  1.000000  1.000000
+ IRadAn=      0 IRanWt=     -1 IRanGd=            0 ICorTp=0
+ NAtoms=    2 NActive=    2 NUniq=    1 SFac= 4.00D+00 NAtFMM=   60 NAOKFM=F Big=F
+ Leave Link  301 at Mon Sep 28 18:20:26 2020, MaxMem=   33554432 cpu:       0.0
+ (Enter /share/home/srwang/g09/l302.exe)
+ NPDir=0 NMtPBC=     1 NCelOv=     1 NCel=       1 NClECP=     1 NCelD=      1
+         NCelK=      1 NCelE2=     1 NClLst=     1 CellRange=     0.0.
+ One-electron integrals computed using PRISM.
+ One-electron integral symmetry used in STVInt
+   8 Symmetry operations used in ECPInt.
+ ECPInt:  NShTT=      21 NPrTT=      61 LenC2=      22 LenP2D=      60.
+ LDataN:  DoStor=T MaxTD1= 2 Len=   12
+ NBasis=    10 RedAO= T  NBF=     3     0     1     1     0     3     1     1
+ NBsUse=    10 1.00D-06 NBFU=     3     0     1     1     0     3     1     1
+ Leave Link  302 at Mon Sep 28 18:20:26 2020, MaxMem=   33554432 cpu:       0.1
+ (Enter /share/home/srwang/g09/l303.exe)
+ DipDrv:  MaxL=1.
+ Leave Link  303 at Mon Sep 28 18:20:26 2020, MaxMem=   33554432 cpu:       0.0
+ (Enter /share/home/srwang/g09/l401.exe)
+ Harris functional with IExCor=  205 diagonalized for initial guess.
+ ExpMin= 1.22D-01 ExpMax= 1.30D+01 ExpMxC= 1.30D+01 IAcc=1 IRadAn=         1 AccDes= 0.00D+00
+ HarFok:  IExCor=  205 AccDes= 0.00D+00 IRadAn=         1 IDoV= 1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ FoFCou: FMM=F IPFlag=           0 FMFlag=      100000 FMFlg1=           0
+         NFxFlg=           0 DoJE=T BraDBF=F KetDBF=T FulRan=T
+         Omega=  0.000000  0.000000  1.000000  0.000000  0.000000 ICntrl=     500 IOpCl=  0
+         NMat0=    1 NMatS0=    1 NMatT0=    0 NMatD0=    1 NMtDS0=    0 NMtDT0=    0
+         I1Cent=           4 NGrid=           0.
+ Petite list used in FoFCou.
+ Harris En= -1.00896478400629    
+ Initial guess orbital symmetries:
+       Occupied  (SGG)
+       Virtual   (SGU) (SGU) (SGG) (SGG) (PIU) (PIU) (PIG) (PIG)
+                 (SGU)
+ The electronic state of the initial guess is 1-SGG.
+ Leave Link  401 at Mon Sep 28 18:20:27 2020, MaxMem=   33554432 cpu:       0.1
+ (Enter /share/home/srwang/g09/l502.exe)
+ Closed shell SCF:
+ Requested convergence on RMS density matrix=1.00D-08 within 128 cycles.
+ Requested convergence on MAX density matrix=1.00D-06.
+ Requested convergence on             energy=1.00D-06.
+ No special actions if energy rises.
+ Using DIIS extrapolation, IDIIS=  1040.
+ Integral symmetry usage will be decided dynamically.
+ Keep R1 ints in memory in canonical form, NReq=821347.
+ IEnd=       19793 IEndB=       19793 NGot=    33554432 MDV=    33550174
+ LenX=    33550174 LenY=    33549292
+ Symmetry not used in FoFDir.
+ MinBra= 0 MaxBra= 1 Meth= 1.
+ IRaf=       0 NMat=   1 IRICut=       1 DoRegI=T DoRafI=F ISym2E= 0 JSym2E=0.
+
+ Cycle   1  Pass 1  IDiag  1:
+ E=-0.919887813331407    
+ DIIS: error= 1.32D-02 at cycle   1 NSaved=   1.
+ NSaved= 1 IEnMin= 1 EnMin=-0.919887813331407     IErMin= 1 ErrMin= 1.32D-02
+ ErrMax= 1.32D-02 EMaxC= 1.00D-01 BMatC= 8.19D-04 BMatP= 8.19D-04
+ IDIUse=3 WtCom= 8.68D-01 WtEn= 1.32D-01
+ Coeff-Com:  0.100D+01
+ Coeff-En:   0.100D+01
+ Coeff:      0.100D+01
+ Gap=     0.353 Goal=   None    Shift=    0.000
+ GapD=    0.353 DampG=1.000 DampE=0.500 DampFc=0.5000 IDamp=-1.
+ Damping current iteration by 5.00D-01
+ RMSDP=4.29D-03 MaxDP=1.56D-02              OVMax= 2.61D-02
+
+ Cycle   2  Pass 1  IDiag  1:
+ E=-0.920708406654875     Delta-E=       -0.000820593323 Rises=F Damp=T
+ DIIS: error= 7.86D-03 at cycle   2 NSaved=   2.
+ NSaved= 2 IEnMin= 2 EnMin=-0.920708406654875     IErMin= 2 ErrMin= 7.86D-03
+ ErrMax= 7.86D-03 EMaxC= 1.00D-01 BMatC= 2.88D-04 BMatP= 8.19D-04
+ IDIUse=3 WtCom= 9.21D-01 WtEn= 7.86D-02
+ Coeff-Com: -0.146D+01 0.246D+01
+ Coeff-En:   0.000D+00 0.100D+01
+ Coeff:     -0.134D+01 0.234D+01
+ Gap=     0.350 Goal=   None    Shift=    0.000
+ RMSDP=3.09D-03 MaxDP=1.11D-02 DE=-8.21D-04 OVMax= 5.76D-03
+
+ Cycle   3  Pass 1  IDiag  1:
+ E=-0.921734045054110     Delta-E=       -0.001025638399 Rises=F Damp=F
+ DIIS: error= 1.28D-04 at cycle   3 NSaved=   3.
+ NSaved= 3 IEnMin= 3 EnMin=-0.921734045054110     IErMin= 3 ErrMin= 1.28D-04
+ ErrMax= 1.28D-04 EMaxC= 1.00D-01 BMatC= 6.88D-08 BMatP= 2.88D-04
+ IDIUse=3 WtCom= 9.99D-01 WtEn= 1.28D-03
+ Coeff-Com:  0.252D+00-0.443D+00 0.119D+01
+ Coeff-En:   0.000D+00 0.000D+00 0.100D+01
+ Coeff:      0.252D+00-0.442D+00 0.119D+01
+ Gap=     0.350 Goal=   None    Shift=    0.000
+ RMSDP=5.02D-05 MaxDP=1.75D-04 DE=-1.03D-03 OVMax= 3.05D-04
+
+ Cycle   4  Pass 1  IDiag  1:
+ E=-0.921734204759913     Delta-E=       -0.000000159706 Rises=F Damp=F
+ DIIS: error= 3.35D-07 at cycle   4 NSaved=   4.
+ NSaved= 4 IEnMin= 4 EnMin=-0.921734204759913     IErMin= 4 ErrMin= 3.35D-07
+ ErrMax= 3.35D-07 EMaxC= 1.00D-01 BMatC= 8.90D-13 BMatP= 6.88D-08
+ IDIUse=1 WtCom= 1.00D+00 WtEn= 0.00D+00
+ Coeff-Com: -0.179D-02 0.333D-02-0.175D-01 0.102D+01
+ Coeff:     -0.179D-02 0.333D-02-0.175D-01 0.102D+01
+ Gap=     0.350 Goal=   None    Shift=    0.000
+ RMSDP=1.43D-07 MaxDP=4.88D-07 DE=-1.60D-07 OVMax= 8.65D-07
+
+ Cycle   5  Pass 1  IDiag  1:
+ E=-0.921734204761606     Delta-E=       -0.000000000002 Rises=F Damp=F
+ DIIS: error= 2.61D-09 at cycle   5 NSaved=   5.
+ NSaved= 5 IEnMin= 5 EnMin=-0.921734204761606     IErMin= 5 ErrMin= 2.61D-09
+ ErrMax= 2.61D-09 EMaxC= 1.00D-01 BMatC= 3.55D-17 BMatP= 8.90D-13
+ IDIUse=1 WtCom= 1.00D+00 WtEn= 0.00D+00
+ Large coefficients: NSaved=  5 BigCof=    0.00 CofMax=   10.00 Det=-7.09D-25
+ Inversion failed.  Reducing to  4 matrices.
+ Coeff-Com: -0.727D-09 0.115D-04 0.871D-02 0.991D+00
+ Coeff:     -0.727D-09 0.115D-04 0.871D-02 0.991D+00
+ Gap=     0.350 Goal=   None    Shift=    0.000
+ RMSDP=6.95D-10 MaxDP=2.25D-09 DE=-1.69D-12 OVMax= 4.05D-09
+
+ SCF Done:  E(RHF) = -0.921734204762     A.U. after    5 cycles
+             Convg  =    0.6948D-09             -V/T =  2.3762
+ KE= 6.697805432587D-01 PE=-2.270626319866D+00 EE= 4.145229675509D-01
+ Leave Link  502 at Mon Sep 28 18:20:27 2020, MaxMem=   33554432 cpu:       0.0
+ (Enter /share/home/srwang/g09/l601.exe)
+ Copying SCF densities to generalized density rwf, IOpCl= 0 IROHF=0.
+
+ **********************************************************************
+
+            Population analysis using the SCF density.
+
+ **********************************************************************
+
+ Orbital symmetries:
+       Occupied  (SGG)
+       Virtual   (SGU) (SGU) (SGG) (SGG) (PIU) (PIU) (PIG) (PIG)
+                 (SGU)
+ The electronic state is 1-SGG.
+ Alpha  occ. eigenvalues --   -0.38590
+ Alpha virt. eigenvalues --   -0.03627   0.65283   0.66955   1.51595   1.60971
+ Alpha virt. eigenvalues --    1.60971   1.64603   1.64603   1.82073
+          Condensed to atoms (all electrons):
+              1          2
+     1  H    0.793152   0.206848
+     2  H    0.206848   0.793152
+ Mulliken atomic charges:
+              1
+     1  H   -0.000000
+     2  H   -0.000000
+ Sum of Mulliken atomic charges =  -0.00000
+ Mulliken charges with hydrogens summed into heavy atoms:
+              1
+ Sum of Mulliken charges with hydrogens summed into heavy atoms =  -0.00000
+ Electronic spatial extent (au):  <R**2>=             13.1731
+ Charge=             -0.0000 electrons
+ Dipole moment (field-independent basis, Debye):
+    X=             -0.0000    Y=             -0.0000    Z=             -0.0000  Tot=              0.0000
+ Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=             -3.3410   YY=             -3.3410   ZZ=             -1.4298
+   XY=             -0.0000   XZ=             -0.0000   YZ=              0.0000
+ Traceless Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=             -0.6371   YY=             -0.6371   ZZ=              1.2741
+   XY=             -0.0000   XZ=             -0.0000   YZ=              0.0000
+ Octapole moment (field-independent basis, Debye-Ang**2):
+  XXX=             -0.0000  YYY=              0.0000  ZZZ=             -0.0000  XYY=             -0.0000
+  XXY=              0.0000  XXZ=              0.0000  XZZ=             -0.0000  YZZ=              0.0000
+  YYZ=              0.0000  XYZ=              0.0000
+ Hexadecapole moment (field-independent basis, Debye-Ang**3):
+ XXXX=             -4.5901 YYYY=             -4.5901 ZZZZ=            -17.4671 XXXY=             -0.0000
+ XXXZ=              0.0000 YYYX=             -0.0000 YYYZ=              0.0000 ZZZX=              0.0000
+ ZZZY=              0.0000 XXYY=             -1.5300 XXZZ=             -4.0553 YYZZ=             -4.0553
+ XXYZ=              0.0000 YYXZ=              0.0000 ZZXY=             -0.0000
+ N-N= 2.645886042950D-01 E-N=-2.270626319069D+00  KE= 6.697805432587D-01
+ Symmetry AG   KE= 6.697805432587D-01
+ Symmetry B1G  KE= 0.000000000000D+00
+ Symmetry B2G  KE= 9.744902418784D-36
+ Symmetry B3G  KE= 9.744902418784D-36
+ Symmetry AU   KE= 0.000000000000D+00
+ Symmetry B1U  KE= 3.825189073676D-33
+ Symmetry B2U  KE= 4.878003746811D-36
+ Symmetry B3U  KE= 4.878003746811D-36
+ No NMR shielding tensors so no spin-rotation constants.
+ Leave Link  601 at Mon Sep 28 18:20:27 2020, MaxMem=   33554432 cpu:       0.1
+ (Enter /share/home/srwang/g09/l9999.exe)
+ 1\1\GINC-XCLUSTER\SP\RHF\def2SVP\H2\SRWANG\28-Sep-2020\0\\#p rhf/def2s
+ vp\\title\\0,1\H,0,0.,0.,0.\H,0,0.,0.,2.\\Version=EM64L-G09RevC.01\Sta
+ te=1-SGG\HF=-0.9217342\RMSD=6.948e-10\Dipole=0.,0.,0.\Quadrupole=-0.47
+ 36326,-0.4736326,0.9472651,0.,0.,0.\PG=D*H [C*(H1.H1)]\\@
+
+
+ ERROR IS A HARDY PLANT... IT FLOURISHETH IN EVERY SOIL.
+            MARTIN FARQUHAR TUPPER
+ Job cpu time:  0 days  0 hours  0 minutes  0.6 seconds.
+ File lengths (MBytes):  RWF=     72 Int=      0 D2E=      0 Chk=      2 Scr=      2
+ Normal termination of Gaussian 09 at Mon Sep 28 18:20:28 2020.
+ Initial command:
+ /share/home/srwang/g09/l1.exe /share/home/srwang/gauscr/Gau-1419.inp -scrdir=/share/home/srwang/gauscr/
+ Entering Link 1 = /share/home/srwang/g09/l1.exe PID=      1437.
+  
+ Copyright (c) 1988,1990,1992,1993,1995,1998,2003,2009,2011,
+            Gaussian, Inc.  All Rights Reserved.
+  
+ This is part of the Gaussian(R) 09 program.  It is based on
+ the Gaussian(R) 03 system (copyright 2003, Gaussian, Inc.),
+ the Gaussian(R) 98 system (copyright 1998, Gaussian, Inc.),
+ the Gaussian(R) 94 system (copyright 1995, Gaussian, Inc.),
+ the Gaussian 92(TM) system (copyright 1992, Gaussian, Inc.),
+ the Gaussian 90(TM) system (copyright 1990, Gaussian, Inc.),
+ the Gaussian 88(TM) system (copyright 1988, Gaussian, Inc.),
+ the Gaussian 86(TM) system (copyright 1986, Carnegie Mellon
+ University), and the Gaussian 82(TM) system (copyright 1983,
+ Carnegie Mellon University). Gaussian is a federally registered
+ trademark of Gaussian, Inc.
+  
+ This software contains proprietary and confidential information,
+ including trade secrets, belonging to Gaussian, Inc.
+  
+ This software is provided under written license and may be
+ used, copied, transmitted, or stored only in accord with that
+ written license.
+  
+ The following legend is applicable only to US Government
+ contracts under FAR:
+  
+                    RESTRICTED RIGHTS LEGEND
+  
+ Use, reproduction and disclosure by the US Government is
+ subject to restrictions as set forth in subparagraphs (a)
+ and (c) of the Commercial Computer Software - Restricted
+ Rights clause in FAR 52.227-19.
+  
+ Gaussian, Inc.
+ 340 Quinnipiac St., Bldg. 40, Wallingford CT 06492
+  
+  
+ ---------------------------------------------------------------
+ Warning -- This program may not be used in any manner that
+ competes with the business of Gaussian, Inc. or will provide
+ assistance to any competitor of Gaussian, Inc.  The licensee
+ of this program is prohibited from giving any competitor of
+ Gaussian, Inc. access to this program.  By using this program,
+ the user acknowledges that Gaussian, Inc. is engaged in the
+ business of creating and licensing software in the field of
+ computational chemistry and represents and warrants to the
+ licensee that it is not a competitor of Gaussian, Inc. and that
+ it will not use this program in any manner prohibited above.
+ ---------------------------------------------------------------
+  
+
+ Cite this work as:
+ Gaussian 09, Revision C.01,
+ M. J. Frisch, G. W. Trucks, H. B. Schlegel, G. E. Scuseria, 
+ M. A. Robb, J. R. Cheeseman, G. Scalmani, V. Barone, B. Mennucci, 
+ G. A. Petersson, H. Nakatsuji, M. Caricato, X. Li, H. P. Hratchian, 
+ A. F. Izmaylov, J. Bloino, G. Zheng, J. L. Sonnenberg, M. Hada, 
+ M. Ehara, K. Toyota, R. Fukuda, J. Hasegawa, M. Ishida, T. Nakajima, 
+ Y. Honda, O. Kitao, H. Nakai, T. Vreven, J. A. Montgomery, Jr., 
+ J. E. Peralta, F. Ogliaro, M. Bearpark, J. J. Heyd, E. Brothers, 
+ K. N. Kudin, V. N. Staroverov, T. Keith, R. Kobayashi, J. Normand, 
+ K. Raghavachari, A. Rendell, J. C. Burant, S. S. Iyengar, J. Tomasi, 
+ M. Cossi, N. Rega, J. M. Millam, M. Klene, J. E. Knox, J. B. Cross, 
+ V. Bakken, C. Adamo, J. Jaramillo, R. Gomperts, R. E. Stratmann, 
+ O. Yazyev, A. J. Austin, R. Cammi, C. Pomelli, J. W. Ochterski, 
+ R. L. Martin, K. Morokuma, V. G. Zakrzewski, G. A. Voth, 
+ P. Salvador, J. J. Dannenberg, S. Dapprich, A. D. Daniels, 
+ O. Farkas, J. B. Foresman, J. V. Ortiz, J. Cioslowski, 
+ and D. J. Fox, Gaussian, Inc., Wallingford CT, 2010.
+ 
+ ******************************************
+ Gaussian 09:  EM64L-G09RevC.01 23-Sep-2011
+                28-Sep-2020 
+ ******************************************
+ %subst l530 .
+ %subst l601 .
+ %nproc=1
+ Will use up to    1 processors via shared memory.
+ %mem=40GB
+ %chk=rtest.chk
+ ----------------------------------------
+ #p rhf/def2svp guess=read extralink=l530
+ ----------------------------------------
+ 1/38=1/1;
+ 2/12=2,17=6,18=5,40=1/2;
+ 3/5=43,7=101,11=1,16=1,25=1,30=1,116=1/1,2,3;
+ 4/5=1/1;
+ 5/5=2,38=6/2,30;
+ 6/7=2,8=2,9=2,10=2,28=1/1;
+ 99/5=1,9=1/99;
+ Leave Link    1 at Mon Sep 28 18:20:28 2020, MaxMem= 5368709120 cpu:       0.0
+ (Enter /share/home/srwang/g09/l101.exe)
+ -----
+ title
+ -----
+ Charge =  0 Multiplicity = 1
+ Symbolic Z-Matrix:
+ H                     0.        0.        0. 
+ H                     0.        0.        2. 
+ 
+ NAtoms=      2 NQM=        0 NQMF=       0 NMMI=      2 NMMIF=      0
+                NMic=       0 NMicF=      0.
+                    Isotopes and Nuclear Properties:
+ (Nuclear quadrupole moments (NQMom) in fm**2, nuclear magnetic moments (NMagM)
+  in nuclear magnetons)
+
+  Atom         1           2
+ IAtWgt=           1           1
+ AtmWgt=   1.0078250   1.0078250
+ NucSpn=           1           1
+ AtZEff=   0.0000000   0.0000000
+ NQMom=    0.0000000   0.0000000
+ NMagM=    2.7928460   2.7928460
+ Leave Link  101 at Mon Sep 28 18:20:28 2020, MaxMem= 5368709120 cpu:       0.0
+ (Enter /share/home/srwang/g09/l202.exe)
+                          Input orientation:                          
+ ---------------------------------------------------------------------
+ Center     Atomic      Atomic             Coordinates (Angstroms)
+ Number     Number       Type             X           Y           Z
+ ---------------------------------------------------------------------
+      1          1           0        0.000000    0.000000    0.000000
+      2          1           0        0.000000    0.000000    2.000000
+ ---------------------------------------------------------------------
+ Stoichiometry    H2
+ Framework group  D*H[C*(H.H)]
+ Deg. of freedom     1
+ Full point group                 D*H     NOp   8
+ Largest Abelian subgroup         D2H     NOp   8
+ Largest concise Abelian subgroup C2      NOp   2
+                         Standard orientation:                         
+ ---------------------------------------------------------------------
+ Center     Atomic      Atomic             Coordinates (Angstroms)
+ Number     Number       Type             X           Y           Z
+ ---------------------------------------------------------------------
+      1          1           0        0.000000    0.000000    1.000000
+      2          1           0        0.000000    0.000000   -1.000000
+ ---------------------------------------------------------------------
+ Rotational constants (GHZ):      0.0000000    250.7275501    250.7275501
+ Leave Link  202 at Mon Sep 28 18:20:28 2020, MaxMem= 5368709120 cpu:       0.0
+ (Enter /share/home/srwang/g09/l301.exe)
+ Standard basis: def2SVP (5D, 7F)
+ Ernie: Thresh=  0.10000D-02 Tol=  0.10000D-05 Strict=F.
+ There are     3 symmetry adapted basis functions of AG  symmetry.
+ There are     0 symmetry adapted basis functions of B1G symmetry.
+ There are     1 symmetry adapted basis functions of B2G symmetry.
+ There are     1 symmetry adapted basis functions of B3G symmetry.
+ There are     0 symmetry adapted basis functions of AU  symmetry.
+ There are     3 symmetry adapted basis functions of B1U symmetry.
+ There are     1 symmetry adapted basis functions of B2U symmetry.
+ There are     1 symmetry adapted basis functions of B3U symmetry.
+ Integral buffers will be    131072 words long.
+ Raffenetti 1 integral format.
+ Two-electron integral symmetry is turned on.
+    10 basis functions,    14 primitive gaussians,    10 cartesian basis functions
+     1 alpha electrons        1 beta electrons
+       nuclear repulsion energy         0.2645886043 Hartrees.
+ IExCor=    0 DFT=F Ex=HF Corr=None ExCW=0 ScaHFX=  1.000000
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000 ScalE2=  1.000000  1.000000
+ IRadAn=      0 IRanWt=     -1 IRanGd=            0 ICorTp=0
+ NAtoms=    2 NActive=    2 NUniq=    1 SFac= 4.00D+00 NAtFMM=   60 NAOKFM=F Big=F
+ Leave Link  301 at Mon Sep 28 18:20:28 2020, MaxMem= 5368709120 cpu:       0.1
+ (Enter /share/home/srwang/g09/l302.exe)
+ NPDir=0 NMtPBC=     1 NCelOv=     1 NCel=       1 NClECP=     1 NCelD=      1
+         NCelK=      1 NCelE2=     1 NClLst=     1 CellRange=     0.0.
+ One-electron integrals computed using PRISM.
+ One-electron integral symmetry used in STVInt
+   8 Symmetry operations used in ECPInt.
+ ECPInt:  NShTT=      21 NPrTT=      61 LenC2=      22 LenP2D=      60.
+ LDataN:  DoStor=T MaxTD1= 2 Len=   12
+ NBasis=    10 RedAO= T  NBF=     3     0     1     1     0     3     1     1
+ NBsUse=    10 1.00D-06 NBFU=     3     0     1     1     0     3     1     1
+ Leave Link  302 at Mon Sep 28 18:20:28 2020, MaxMem= 5368709120 cpu:       0.1
+ (Enter /share/home/srwang/g09/l303.exe)
+ DipDrv:  MaxL=1.
+ Leave Link  303 at Mon Sep 28 18:20:28 2020, MaxMem= 5368709120 cpu:       0.0
+ (Enter /share/home/srwang/g09/l401.exe)
+ Initial guess read from the checkpoint file:  rtest.chk
+ B after Tr=     0.000000    0.000000    0.000000
+         Rot=    1.000000    0.000000    0.000000    0.000000 Ang=   0.00 deg.
+ Guess basis will be translated and rotated to current coordinates.
+ Initial guess orbital symmetries:
+       Occupied  (SGG)
+       Virtual   (SGU) (SGU) (SGG) (SGG) (PIU) (PIU) (PIG) (PIG)
+                 (SGU)
+ The electronic state of the initial guess is 1-SGG.
+ Leave Link  401 at Mon Sep 28 18:20:28 2020, MaxMem= 5368709120 cpu:       0.1
+ (Enter /share/home/srwang/g09/l502.exe)
+ Closed shell SCF:
+ Requested convergence on RMS density matrix=1.00D-08 within 128 cycles.
+ Requested convergence on MAX density matrix=1.00D-06.
+ Requested convergence on             energy=1.00D-06.
+ No special actions if energy rises.
+ Using DIIS extrapolation, IDIIS=  1040.
+ Integral symmetry usage will be decided dynamically.
+ Keep R1 ints in memory in canonical form, NReq=821347.
+ IEnd=       19793 IEndB=       19793 NGot=  5368709120 MDV=  5368704862
+ LenX=  5368704862 LenY=  5368703980
+ Symmetry not used in FoFDir.
+ MinBra= 0 MaxBra= 1 Meth= 1.
+ IRaf=       0 NMat=   1 IRICut=       1 DoRegI=T DoRafI=F ISym2E= 0 JSym2E=0.
+
+ Cycle   1  Pass 1  IDiag  1:
+ E=-0.921734204761607    
+ DIIS: error= 6.14D-15 at cycle   1 NSaved=   1.
+ NSaved= 1 IEnMin= 1 EnMin=-0.921734204761607     IErMin= 1 ErrMin= 6.14D-15
+ ErrMax= 6.14D-15 EMaxC= 1.00D-01 BMatC= 1.56D-28 BMatP= 1.56D-28
+ IDIUse=1 WtCom= 1.00D+00 WtEn= 0.00D+00
+ Coeff-Com:  0.100D+01
+ Coeff:      0.100D+01
+ Gap=     0.350 Goal=   None    Shift=    0.000
+ RMSDP=1.90D-15 MaxDP=6.58D-15              OVMax= 1.13D-14
+
+ SCF Done:  E(RHF) = -0.921734204762     A.U. after    1 cycles
+             Convg  =    0.1904D-14             -V/T =  2.3762
+ KE= 6.697805432587D-01 PE=-2.270626319069D+00 EE= 4.145229667542D-01
+ Leave Link  502 at Mon Sep 28 18:20:28 2020, MaxMem= 5368709120 cpu:       0.0
+  
+  +-------------------------------------------+
+  |                                           |
+  |  LINK 530 - Projected Hartree-Fock (PHF)  |
+  |     Self-Consistent Field (SCF) Code      |
+  |                                           |
+  |                                           |
+  |         the Scuseria group, v0.2, 07.2011 |
+  +-------------------------------------------+
+  
+ (Enter ./l530.exe)
+
+ PHF SCF was invoked with the following options:
+
+   method selection:
+ iprint =  0
+ iphf   =  1, [ RHF + complex projection ]
+
+   general options:
+ maxcyc =    512
+
+   accuracy requested:
+ conv criterion (RMSDP, RMSDK) =     1.0000E-08
+ requested integral accuracy   =     1.0000E-10
+
+   use of symmetry:
+ two-electron integral symmetry not used
+
+   strategy options:
+ level shifting is turned off
+ istrat =      1, continue as usual if energy rises
+ modified PHF effective Fock matrix used
+
+   initial guess options:
+ igues1 =  1, read GDV guess
+
+
+ PHF SCF - preparing initial guess
+
+
+ PHF SCF - starting SCF procedure
+
+ Symmetry not used in FoFDir.
+ MinBra= 0 MaxBra= 1 Meth= 1.
+ IRaf=       1 NMat=   2 IRICut=       1 DoRegI=T DoRafI=F ISym2E= 0 JSym2E=0.
+ End hffock
+ End copy in hfdmdg
+ End diag1 in hfdmdg
+ End diag in hfdmdg
+ End hfdmdg
+ Start formgg
+ Start erictr
+ End erictr
+ End formgg
+ End mem in smt
+ End tstcor in smt
+ End fileio in smt
+ End copy in smt
+ End transform in smt
+ End extract C in smt
+ End det C in smt
+ End C in smt
+ End Smt
+ End build CI
+
+ *** SCF Done after    1 cycles ***
+
+        E =      -0.921734204762    conv =           4.1269E-16
+      Hsp =      -1.600845775811     Hph =       0.414522966754
+   <S**2> =      -0.000000000000
+
+ **********************************
+
+
+ PHF SCF - quitting the program
+
+ Leave Link  530 at Mon Sep 28 18:20:29 2020, MaxMem= 5368709120 cpu:       0.1
+ (Enter ./l601.exe)
+ Copying SCF densities to generalized density rwf, IOpCl= 2 IROHF=0.
+ End DenSto
+ End Endif
+ Operation on file out of range.
+FileIO: IOper= 2 IFilNo(1)=  -571 Len=         110 IPos=           0 Q=   47612733353512
+
+
+ dumping /fiocom/, unit = 1 NFiles =    72 SizExt =    524288 WInBlk =    131072
+                   defal = T LstWrd =    10092544 FType=2 FMxFil=10000
+
+ Number           0          0          0        501        502        503        507        508
+ Base       9306112    8388608    9699328     917504    1441792    1835008    1966080    4456448
+ End        9437184    8781824   10092544     918504    1445912    1835015    1966115    4456478
+ End1       9437184    8781824   10092544    1048576    1572864    1966080    2097152    4587520
+ Wr Pntr    9306112    8388608    9699328     917504    1441792    1835008    1966080    4456448
+ Rd Pntr    9306552    8388808    9699328     917504    1445912    1835008    1966080    4456448
+ Length      131072     393216     393216       1000       4120          7         35         30
+
+ Number         512        514        515        516        517        518        520        521
+ Base       3145728    7077888    5373952    7208960    6029312    5767168    4980736    3276800
+ End        3145774    7077943    5374172    7209015    6029332    5767223    4980746    3276835
+ End1       3276800    7208960    5505024    7340032    6160384    5898240    5111808    3407872
+ Wr Pntr    3145728    7077943    5374172    7209015    6029312    5767223    4980736    3276800
+ Rd Pntr    3145728    7077888    5373952    7208960    6029312    5767168    4980736    3276800
+ Length          46         55        220         55         20         55         10         35
+
+ Number         522        523        524        525        526        528        529        530
+ Base       9437184    6160384    5898240    6291456    6422528    9043968    9175040    6946816
+ End        9437194    6160404    5898340    6291556    6422628    9044023    9175095    6946871
+ End1       9568256    6291456    6029312    6422528    6553600    9175040    9306112    7077888
+ Wr Pntr    9437184    6160384    5898340    6291556    6422528    9044023    9175095    6946816
+ Rd Pntr    9437184    6160384    5898240    6291456    6422528    9043968    9175040    6946816
+ Length          10         20        100        100        100         55         55         55
+
+ Number         532        534        536        538        551        552        559        561
+ Base       7471104    7602176    6684672    6815744    2621440    2359296    3670016    2752512
+ End        7471159    7602231    6684727    6815799    2621478    2359316    3670018    2752513
+ End1       7602176    7733248    6815744    6946816    2752512    2490368    3801088    2883584
+ Wr Pntr    7471104    7602176    6684672    6815744    2621440    2359296    3670016    2752512
+ Rd Pntr    7471104    7602176    6684672    6815744    2621440    2359296    3670016    2752512
+ Length          55         55         55         55         38         20          2          1
+
+ Number         562        563        565        571        577        579        580        581
+ Base       2228224    7340032    4325376    8912896    4063232    2490368    3538944    4194304
+ End        2234308    7340042    4325424    8912951    4063284    2490384    3539104    4194448
+ End1       2359296    7471104    4456448    9043968    4194304    2621440    3670016    4325376
+ Wr Pntr    2228224    7340032    4325376    8912896    4063232    2490368    3538944    4194304
+ Rd Pntr    2228224    7340032    4325376    8912896    4063232    2490368    3538944    4194304
+ Length        6084         10         48         55         52         16        160        144
+
+ Number         582        583        584        598        603        605        606        619
+ Base       3932160    3801088    4587520    1572864    5111808    5242880    6553600    4718592
+ End        3932190    3801091    4587532    1572866    5111919    5242881    6553610    4718933
+ End1       4063232    3932160    4718592    1703936    5242880    5373952    6684672    4849664
+ Wr Pntr    3932160    3801088    4587520    1572864    5111919    5242880    6553600    4718592
+ Rd Pntr    3932160    3801088    4587520    1572864    5111809    5242880    6553600    4718592
+ Length          30          3         12          2        111          1         10        341
+
+ Number         634        670        674        685        695        698        739        761
+ Base       8781824    3407872    2097152    5636096    4849664    3014656    5505024    2883584
+ End        8782210    3408012    2097202    5636196    4849754    3014668    5505244    2883585
+ End1       8912896    3538944    2228224    5767168    4980736    3145728    5636096    3014656
+ Wr Pntr    8781824    3407872    2097152    5636196    4849664    3014656    5505244    2883584
+ Rd Pntr    8781824    3408012    2097152    5636096    4849664    3014656    5505024    2883584
+ Length         386        140         50        100         90         12        220          1
+
+ Number         801        802        803        804        805        806        989        991
+ Base       7733248    7864320    7995392    8126464    8257536    9568256    1048576    1310720
+ End        7733358    7864430    7995592    8126474    8257736    9568260    1068576    1317282
+ End1       7864320    7995392    8126464    8257536    8388608    9699328    1179648    1441792
+ Wr Pntr    7733248    7864320    7995392    8126464    8257536    9568256    1048576    1310720
+ Rd Pntr    7733248    7864320    7995392    8126464    8257536    9568256    1048576    1317282
+ Length         110        110        200         10        200          4      20000       6562
+
+ Number         992        993        994        995        996        997        998        999
+ Base       1179648     786432     131072     655360     393216     524288     262144    1703936
+ End        1179657     786632     131102     655380     393416     524398     262344    1806440
+ End1       1310720     917504     262144     786432     524288     655360     393216    1835008
+ Wr Pntr    1179648     786432     131072     655360     393216     524288     262144    1703936
+ Rd Pntr    1179657     786632     131102     655380     393416     524393     262344    1706440
+ Length           9        200         30         20        200        110        200     102504
+
+
+ dumping /fiocom/, unit = 2 NFiles =    32 SizExt =         0 WInBlk =    131072
+                   defal = F LstWrd =      262144 FType=2 FMxFil=10000
+
+ Number           0          0        501        502        503        507        508        512
+ Base        131805     164431     131918     132918     164412     131708     131072     131743
+ End         131808     262144     132918     137038     164419     131743     131102     131789
+ End1        131808     262144     132918     137038     164419     131743     131102     131789
+ Wr Pntr     131805     164431     131918     132918     164412     131708     131072     131743
+ Rd Pntr     131805     164431     131918     132918     164412     131708     131072     131743
+ Length           3      97713       1000       4120          7         35         30         46
+
+ Number         520        521        522        524        526        536        538        551
+ Base        163662     163730     131302     163765     163865     131808     131863     163692
+ End         163672     163765     131322     163865     163965     131863     131918     163730
+ End1        163672     163765     131322     163865     163965     131863     131918     163730
+ Wr Pntr     163662     163730     131302     163765     163865     131808     131863     163692
+ Rd Pntr     163662     163730     131302     163765     163865     131808     131863     163692
+ Length          10         35         20        100        100         55         55         38
+
+ Number         552        561        562        584        603        605        619        634
+ Base        163672     131801     157578     131789     164306     131802     163965     131322
+ End         163692     131802     163662     131801     164362     131805     164306     131708
+ End1        163692     131802     163662     131801     164362     131805     164306     131708
+ Wr Pntr     163672     131801     157578     131789     164306     131802     163965     131322
+ Rd Pntr     163672     131801     157578     131789     164306     131802     163965     131322
+ Length          20          1       6084         12         56          3        341        386
+
+ Number         670        674        695        698        989        993        997        998
+ Base        137038     164362     137178     164419     137268     157268     157468     131102
+ End         137178     164412     137268     164431     157268     157468     157578     131302
+ End1        137178     164412     137268     164431     157268     157468     157578     131302
+ Wr Pntr     137038     164362     137178     164419     137268     157268     157468     131102
+ Rd Pntr     137038     164362     137178     164419     137268     157268     157468     131102
+ Length         140         50         90         12      20000        200        110        200
+
+
+ dumping /fiocom/, unit = 3 NFiles =     1 SizExt =    524288 WInBlk =    131072
+                   defal = T LstWrd =      262144 FType=2 FMxFil=10000
+
+ Number           0
+ Base        131072
+ End         262144
+ End1        262144
+ Wr Pntr     131072
+ Rd Pntr     131072
+ Length      131072
+ Error termination in NtrErr:
+ NtrErr Called from FileIO.

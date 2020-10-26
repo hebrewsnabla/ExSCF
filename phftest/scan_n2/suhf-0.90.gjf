@@ -1,0 +1,14 @@
+%subst l530 /share/home/srwang/phf
+%nproc=1
+%mem=4GB
+%oldchk=uhf-1.30.chk
+%chk=suhf-0.90.chk
+#p uhf/cc-pvdz guess=read scf=conver=4  extralink=l530 iop(5/206=9, 5/207=4, 5/216=1, 5/218=100) pop=none 
+
+title
+
+0 1
+N 0.0 0.0 0.0
+N 0.0 0.0 0.90
+
+

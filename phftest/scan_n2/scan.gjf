@@ -1,0 +1,14 @@
+%nproc=8
+%mem=14GB
+%chk=scan.chk
+#p uhf/cc-pvdz guess=mix scan nosymm pop=none 
+
+title
+
+0 1
+N 
+N 1 B1
+
+B1 1.30 12 0.10
+
+

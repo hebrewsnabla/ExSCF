@@ -1,0 +1,12 @@
+%nproc=1
+%mem=4GB
+%chk=uhf-dis.chk
+#p uhf/cc-pvdz guess=mix pop=none 
+
+title
+
+0 1
+H 0.0 0.0 0.0
+H 0.0 0.0 dis
+
+
