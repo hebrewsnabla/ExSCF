@@ -1,7 +1,41 @@
 import numpy as np
 import sympy as sym
 import scipy
-from pyscf import scf
+from pyscf import gto, scf
+from fch2py import fch2py
+
+
+def guess_from_fchk(xyz, bas, fch):
+    mol = gto.Mole()
+    #mol.atom = '''H 0. 0. 0.; H 0. 0. 2.'''
+    with open(xyz, 'r') as f:
+        mol.atom = f.read()
+    print(mol.atom)
+    mol.basis = bas
+    mol.output = 'test.pylog'
+    mol.verbose = 4
+    mol.build()
+    
+    mf = scf.UHF(mol)
+    #mf.init_guess = '1e'
+    mf.init_guess_breaksym = True
+    mf.max_cycle = 1
+    mf.kernel()
+    
+    # read MOs from .fch(k) file
+    nbf = mf.mo_coeff[0].shape[0]
+    nif = mf.mo_coeff[0].shape[1]
+    S = mol.intor_symmetric('int1e_ovlp')
+    Sdiag = S.diagonal()
+    alpha_coeff = fch2py(fch, nbf, nif, Sdiag, 'a')
+    beta_coeff  = fch2py(fch, nbf, nif, Sdiag, 'b')
+    mf.mo_coeff = (alpha_coeff, beta_coeff)
+    # read done
+    
+    dm = mf.make_rdm1()
+    mf.max_cycle = 0
+    mf.kernel(dm)
+    return mf
 
 def get_beta(n):
     # Gauss-Legendre quadrature
@@ -273,7 +307,7 @@ def get_S2(suhf, Pg_ortho):
         My = -0.5j * (pgab - pgba)
         #print(My)
         Mx = 0.5 * (pgab + pgba)
-        print(Pc)
+        #print(Pc)
         trPc, trMx, trMy, trMz = list(map(np.trace, [Pc, Mx, My, Mz]))
         print(trPc, trMx, trMy, trMz)
         Pc2 = np.dot(Pc, Pc)
@@ -413,6 +447,7 @@ class SUHF():
     '''
 
     def __init__(self, guesshf):
+        self.guesshf = guesshf
         self.mol = guesshf.mol
         S = guesshf.get_ovlp()
         Ca, Cb = guesshf.mo_coeff
@@ -471,5 +506,69 @@ class SUHF():
             return integr_beta(q, self.d, self.grids, self.weights, 'xg', self.xg, self.ciS)
         else:
             return integr_beta(q, self.d, self.grids, self.weights)
+
+    
+    def kernel(self):
+        np.set_printoptions(precision=8, linewidth=160, suppress=True)
+        if self.debug:
+            np.set_printoptions(precision=15, linewidth=200, suppress=False)
+        X = self.X
+        na, nb = self.nelec
+        mf = self.guesshf
+        
+        max_cycle = self.max_cycle
+        cyc = 0
+        conv = False
+        
+        hcore = mf.get_hcore()
+        hcore_ortho = np.einsum('ji,jk,kl->il', X, hcore, X)
+        while(not conv):
+            print('**** Cycle %d ****' % (cyc+1))
+            old_suhf = self.E_suhf
+            #print(hcore_ortho)
+            
+            #if cyc==0:
+            #    veff = mf.get_veff(dm = dm)
+            #else:
+            dm_reg = np.einsum('ij,tjk,lk->til', X, self.dm_ortho, X)
+            veff = mf.get_veff(dm = dm_reg)
+            veff_ortho = np.einsum('ji,tjk,kl->til', X, veff, X)
+            print('dm (ortho)')
+            print(self.dm_ortho)
+            #print(veff)
+            #Fa, Fb = hcore + veff
+            #Fa_ortho = np.einsum('ji,jk,kl->il', X, Fa, X)
+            #Fb_ortho = np.einsum('ji,jk,kl->il', X, Fb, X)
+            Fa_ortho, Fb_ortho = hcore_ortho + veff_ortho
+            print('Fock (ortho)',Fa_ortho, Fb_ortho)
+            F_ortho = Fa_ortho, Fb_ortho
+        
+            e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, hcore_ortho, veff_ortho)
+            print('E(UHF) = %12.6f' % e_uhf)
+        
+            dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, na, nb)
+            Dg, Ng, Pg = get_Ng(self.grids, no, dm_no, na+nb)
+            Gg, Pg_ortho = get_Gg(self.mol, Pg, no, X)
+            xg, yg, ciS = get_xg(self, no, na, nb, Ng)
+            self.xg, self.ciS = xg, ciS
+            #yg, ciS = util.get_yg(self, xg)
+            trHg, ciH = get_H(self, hcore_ortho, no, Pg, Gg, xg)
+            S2 = get_S2(self, Pg_ortho)
+            Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, dm_no, na+nb)
+            Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, dm_no, Dg, na+nb, Yg, Xg, no, F_ortho, self.dm_ortho)
+            E_suhf = mf.energy_nuc() + H_suhf
+            self.E_suhf = E_suhf
+            print('E(SUHF) = %15.8f' % E_suhf)
+            mo_e, self.dm_ortho = Diag_Feff(F_mod_ortho, na, nb)
+        
+            if old_suhf is not None:
+                if abs(E_suhf - old_suhf)<1e-8:
+                    conv = True
+                    print('SCf converged at cycle %d' %cyc)
+            
+            cyc += 1
+            if cyc >= max_cycle:
+                break
+
 
         

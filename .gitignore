@@ -1,6 +1,7 @@
 core.*
 tmp*
-/phftest/*/*.log
+/test/*/*.log
+/phf/
 .vscode/
 
 # Prerequisites
