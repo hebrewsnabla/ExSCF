@@ -2,7 +2,6 @@
 from pyscf import gto, scf
 import scipy
 import numpy as np
-np.set_printoptions(precision=8, linewidth=160, suppress=True)
 from fch2py import fch2py
 import sys
 
@@ -10,13 +9,21 @@ import util
 
 xyz = sys.argv[1]
 fch = sys.argv[2]
+bas = xyz[:-3] + 'bas'
+
+debug = False
+cut_no = False
+
+np.set_printoptions(precision=8, linewidth=160, suppress=True)
+if debug:
+    np.set_printoptions(precision=15, linewidth=200, suppress=False)
 
 mol = gto.Mole()
 #mol.atom = '''H 0. 0. 0.; H 0. 0. 2.'''
 with open(xyz, 'r') as f:
     mol.atom = f.read()
 print(mol.atom)
-mol.basis = '3-21g'
+mol.basis = bas
 mol.output = 'test.pylog'
 mol.verbose = 4
 mol.build()
@@ -58,14 +65,17 @@ mf.kernel(dm)
 #S = mf.get_ovlp()
 
 mf2 = util.SUHF(mf)
+mf2.cut_no = cut_no
 
 X = mf2.X
 na, nb = mf2.nelec
 
 max_cycle = 15
 cyc = 0
-while(True):
+conv = False
+while(not conv):
     print('**** Cycle %d ****' % (cyc+1))
+    old_suhf = mf2.E_suhf
     hcore = mf.get_hcore()
     hcore_ortho = np.einsum('ji,jk,kl->il', X, hcore, X)
     #print(hcore_ortho)
@@ -89,7 +99,7 @@ while(True):
     e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, mf2.dm_ortho, hcore_ortho, veff_ortho)
     print('E(UHF) = %12.6f' % e_uhf)
 
-    dm_no, dm_expanded, no = util.find_NO(mf2.dm_ortho, na, nb)
+    dm_no, dm_expanded, no = util.find_NO(mf2, mf2.dm_ortho, na, nb)
     Dg, Ng, Pg = util.get_Ng(mf2.grids, no, dm_no, na+nb)
     Gg, Pg_ortho = util.get_Gg(mf2.mol, Pg, no, X)
     xg, yg, ciS = util.get_xg(mf2, no, na, nb, Ng)
@@ -100,8 +110,15 @@ while(True):
     Xg, Xg_int, Yg = util.get_Yg(mf2, Dg, Ng, dm_no, na+nb)
     Feff_ortho, H_suhf, F_mod_ortho = util.get_Feff(mf2, trHg, Gg, Ng, Pg, dm_no, Dg, na+nb, Yg, Xg, no, F_ortho, mf2.dm_ortho)
     E_suhf = mf.energy_nuc() + H_suhf
-    print('E(SUHF) = %12.6f' % E_suhf)
+    mf2.E_suhf = E_suhf
+    print('E(SUHF) = %15.8f' % E_suhf)
     mo_e, mf2.dm_ortho = util.Diag_Feff(F_mod_ortho, na, nb)
+
+    if old_suhf is not None:
+        if abs(E_suhf - old_suhf)<1e-8:
+            conv = True
+            print('SCf converged at cycle %d' %cyc)
+        
     
     cyc += 1
     if cyc >= max_cycle:

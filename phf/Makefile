@@ -105,7 +105,8 @@ OBJ530 = aobstf.o  binom.o   bldngg.o  bldpgg.o  cnvtst.o  detmat.o  \
 	 gauleg.o  hfdmdg.o  hffock.o  iguess.o  indgrd.o  mltdg.o   \
 	 phfcyc.o  phfdis.o  phfdm.o   phfdm1.o  phfdmx.o  phfdrv.o  \
 	 prtdmt.o  prtocc.o  rtfact.o  solvci.o  sptblk.o  sptmat.o  \
-	 trpgrd.o  trprct.o  wigarr.o  wignerd.o clgord.o
+	 trpgrd.o  trprct.o  wigarr.o  wignerd.o clgord.o \
+         ltoutx.o ltoutc.o outmtc.o
 
 l530.exe: $(MAIN530) $(OBJ530) $(NUTILM)
 	$(FC0) -g -o l530.exe $(MAIN530) $(OBJ530) $(NUTIL) \

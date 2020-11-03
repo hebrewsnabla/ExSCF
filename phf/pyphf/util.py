@@ -59,10 +59,11 @@ def eig(A):
     return np.linalg.eigh(A)
     #return scipy.linalg.eigh(A)
 
-def find_NO(dm, na, nb):
+def find_NO(suhf, dm, na, nb):
+    cut_no = suhf.cut_no
     #dm = dm*(-1)
-    np.set_printoptions(precision=16, linewidth=200, suppress=False)
-    print(dm)
+    #np.set_printoptions(precision=16, linewidth=200, suppress=False)
+    #print(dm)
     ev_a, v_a = eig(dm[0]*(-1))
     ev_b, v_b = eig(dm[1]*(-1))
     pa = count0(ev_a)
@@ -81,7 +82,8 @@ def find_NO(dm, na, nb):
     #print(v_a1, v_a2, v_b1, v_b2)
 
     v = np.hstack((v_a1, v_b1, v_a2, v_b2))
-    #v = np.hstack((v_a1, v_b1, v_a2, v_b2))[:,:pa+pb]
+    if cut_no:
+        v = np.hstack((v_a1, v_b1, v_a2, v_b2))[:,:pa+pb]
     #v = np.hstack((v, np.zeros((v.shape[0], v.shape[0]-pa-pb))))
     print('NO vec')
     print(v)
@@ -93,7 +95,7 @@ def find_NO(dm, na, nb):
     dm_no = np.einsum('ji,jk,kl->il', v, dm_expd, v)
     print('dm(NO)')
     print(dm_no)
-    np.set_printoptions(precision=6, linewidth=160, suppress=True)
+    #np.set_printoptions(precision=6, linewidth=160, suppress=True)
     return dm_no, dm_expd, v
 
 def get_Ng(grids, no, dm, occ):
@@ -130,17 +132,20 @@ def get_Ng(grids, no, dm, occ):
     print(Ng[0])
     print('...')
     print('P(g) (NO)')
+    #for p in Pg: print(p)
     print(Pg[0])
     print('...')
     return Dg, Ng, Pg
 
 def get_Gg(mol, Pg, no, X):
-    Pg = np.array(Pg)
-    Pg_ortho = np.einsum('ij,hjk,lk->hil', no, Pg, no)
-    #print(Pg.shape)
+    Gg = []
+    Pg_ortho = []
+    for pg in Pg:
+        pg_ortho = np.einsum('ij,jk,lk->il', no, pg, no)
+        #print(pg_ortho)
+        Pg_ortho.append(pg_ortho)
     print('Pg_ortho')
     print(Pg_ortho[0])
-    Gg = []
     norb = int(Pg_ortho[0].shape[0]/2)
     for pg in Pg_ortho:
         pgaa = pg[:norb, :norb] # ortho ao
@@ -268,6 +273,7 @@ def get_S2(suhf, Pg_ortho):
         My = -0.5j * (pgab - pgba)
         #print(My)
         Mx = 0.5 * (pgab + pgba)
+        print(Pc)
         trPc, trMx, trMy, trMz = list(map(np.trace, [Pc, Mx, My, Mz]))
         print(trPc, trMx, trMy, trMz)
         Pc2 = np.dot(Pc, Pc)
@@ -314,7 +320,7 @@ def get_Feff(suhf, trHg, Gg, Ng, Pg, dm_no, Dg, occ, Yg, Xg,  no, F_ortho, dm_or
         feff0 = Yg[i] * trHg[i]
         #print(feff0)
         fg = hcore_no + Gg[i]
-        feff1 = np.einsum('ij,jk,kl,lm->im', Ng[i], dm_no[:occ,:], np.eye(norb)-pg, Dg[i])
+        feff1 = np.einsum('ij,jk,kl,lm,mn->in', Ng[i], dm_no[:occ,:], fg, np.eye(norb)-pg, Dg[i])
         #print(feff1)
         feff1 = np.vstack((feff1, np.zeros((vir, norb))))
         feff2 = np.einsum('ij,jk,kl,lm,mn->in', np.eye(norb)-pg, fg, Dg[i], dm_no[:, :occ], Ng[i])
@@ -458,6 +464,7 @@ class SUHF():
             d[g] = Wignerd(self.grids[g])
         print('value :', d)
         self.d_expr, self.d_func, self.d = Wignerd_expr, Wignerd, d
+        self.E_suhf = None
 
     def integr_beta(self, q, fac='normal'):
         if fac=='xg':

@@ -101,6 +101,7 @@ C     other variables
       integer     jz1, jz2, jz3
       integer     ind1, ind2, ind3, ind4, ind5, ind6, ind7, ind8
       logical     icmplx, ispuhf, ispghf, useno
+      integer     ijvec, jjvec
 
 C     constants
 
@@ -296,6 +297,12 @@ c$$$          call ltoutx (iout, 0, 2, 1, 0, 'density diag', norbs, norbs,
 c$$$     $         v(jp), v(jp), 0)
 c$$$
 c$$$        elseif ( itype .eq. 2 .or. ispuhf ) then
+c          DO ijvec = 0, 3
+c           WRITE(*,665) v(jp)
+c           WRITE(*,665) v(jp+2), v(jp+8)
+c           WRITE(*,665) v(jp+4), v(jp+10), v(jp+14)
+c           WRITE(*,665) v(jp+6), v(jp+12), v(jp+16), v(jp+18)
+c          END DO
           write (iout, *) ' '
           call ltoutx (iout, 0, 3, 1, 0, 'dm to be diaged', norbs,norbs,
      $         v(jp), v(jp+2*ntto), 0)
@@ -426,13 +433,16 @@ C       print eigenvectors of density matrix
 
         elseif ( itype .eq. 2 .or. ispuhf ) then
           write (iout, *) ' '
-
           call ltoutx (iout, 1, 3, 1, 0, 'eigenvectors', norbs, norbs,
      $         v(jvec), v(jvec+2*nosq), 0)
+c          DO ijvec = 0, 3
+c           WRITE(*,665) ( v(jvec + ijvec*8 + jjvec ), jjvec = 0, 7, 2 )
+c          END DO
+665   FORMAT( 11(:,1X,E23.15) )
           write(iout, 667) v(jval), v(jval+1), v(jval+2), v(jval+3)
           write(iout, 667) v(jval+4), v(jval+5), v(jval+6), v(jval+7)
 666   format('eigenvalues ', F12.6, F12.6, F12.6, F12.6) 
-667   format('eigenvalues ', 4E16.8) 
+667   format('eigenvalues ', 4E23.15) 
 C          write (iout, *) ' '
 C          call ltoutx (iout, 0, 3, 1, 0, 'dm', norbs, norbs,
 C     $         v(jp), v(jp+2*ntto), 0)
