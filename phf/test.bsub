@@ -1,7 +1,0 @@
-#BSUB -J test
-#BSUB -n 2
-#BSUB -R span[ptile=2]
-#BSUB -q small
-#BSUB -o test.output
-
-g09 test.gjf
