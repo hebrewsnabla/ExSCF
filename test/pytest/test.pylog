@@ -7,8 +7,8 @@ import sys
 
 from pyphf import util
 
-xyz = sys.argv[1]
-fch = sys.argv[2]
+xyz = 'h2.xyz' #sys.argv[1]
+fch = '../test_carlos/test_uhf.fchk' #sys.argv[2]
 bas = xyz[:-3] + 'bas'
 
 
@@ -26,7 +26,7 @@ System: uname_result(system='Linux', node='xcluster', release='3.10.0-693.el7.x8
 Python 3.7.4 (default, Aug 13 2019, 20:35:49) 
 [GCC 7.3.0]
 numpy 1.17.2  scipy 1.4.1
-Date: Tue Nov  3 20:50:03 2020
+Date: Tue Nov 10 19:57:02 2020
 PySCF version 1.7.3
 PySCF path  /share/apps/Python/Anaconda3-2019/lib/python3.7/site-packages/pyscf
 
@@ -47,7 +47,7 @@ number of NR pGTOs = 6
 number of NR cGTOs = 4
 basis = h2.bas
 ecp = {}
-CPU time:         0.89
+CPU time:         1.19
 
 
 ******** <class 'pyscf.scf.uhf.UHF'> ********
@@ -63,13 +63,13 @@ SCF conv_tol_grad = None
 SCF max_cycles = 1
 direct_scf = True
 direct_scf_tol = 1e-13
-chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/tmptzju4fb8
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/tmp5t04m5xe
 max_memory 4000 MB (current use 92 MB)
 number electrons alpha = 1  beta = 1
 Set gradient conv threshold to 3.16228e-05
 init E= -0.644800894941738
-  alpha nocc = 1  HOMO = -0.248574003043426  LUMO = -0.0900508471637464
-  beta  nocc = 1  HOMO = -0.241945730776492  LUMO = -0.0916003506261901
+  alpha nocc = 1  HOMO = -0.248574003043426  LUMO = -0.0900508471637462
+  beta  nocc = 1  HOMO = -0.241945730776492  LUMO = -0.09160035062619
 cycle= 1 E= -0.90763782954924  delta_E= -0.263  |g|= 0.0146  |ddm|= 0.599
 SCF not converged.
 SCF energy = -0.90763782954924 after 1 cycles  <S^2> = 6.5933669e-07  2S+1 = 1.0000013
@@ -88,7 +88,7 @@ SCF conv_tol_grad = None
 SCF max_cycles = 0
 direct_scf = True
 direct_scf_tol = 1e-13
-chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/tmptzju4fb8
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/tmp5t04m5xe
 max_memory 4000 MB (current use 109 MB)
 number electrons alpha = 1  beta = 1
 Set gradient conv threshold to 3.16228e-05

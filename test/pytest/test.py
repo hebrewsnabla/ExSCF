@@ -6,8 +6,8 @@ import sys
 
 from pyphf import util
 
-xyz = sys.argv[1]
-fch = sys.argv[2]
+xyz = 'h2.xyz' #sys.argv[1]
+fch = '../test_carlos/test_uhf.fchk' #sys.argv[2]
 bas = xyz[:-3] + 'bas'
 
 

@@ -564,7 +564,10 @@ class SUHF():
             if old_suhf is not None:
                 if abs(E_suhf - old_suhf)<1e-8:
                     conv = True
-                    print('SCf converged at cycle %d' %cyc)
+                    print('\n***************')
+                    print('SCF converged at cycle %d' %cyc)
+                    print('Final E(SUHF) = %15.8f, delta E = %10.6g' % (E_suhf,E_suhf-old_suhf))
+                    
             
             cyc += 1
             if cyc >= max_cycle:
