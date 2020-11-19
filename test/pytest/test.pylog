@@ -1,11 +1,11 @@
-#INFO: **** input file is /share/home/srwang/ExSCF/test/pytest/test.py ****
+#INFO: **** input file is /share/home/srwang/ExSCF/test/pytest/test_dft.py ****
 #import phf
 from pyscf import gto, scf
 #import scipy
 #import numpy as np
 import sys
 
-from pyphf import util
+from pyphf import util, sudft
 
 xyz = 'h2.xyz' #sys.argv[1]
 fch = '../test_carlos/test_uhf.fchk' #sys.argv[2]
@@ -17,8 +17,11 @@ mf = util.guess_from_fchk(xyz, bas, fch)
 mf2 = util.SUHF(mf)
 mf2.cut_no = False
 mf2.debug = False
-mf2.max_cycle = 15
-mf2.kernel()
+mf2.max_cycle = 50
+#mf2.kernel()
+
+mf3 = sudft.SUDFT(mf2)
+mf3.kernel()
 #INFO: ******************** input file end ********************
 
 
@@ -26,7 +29,7 @@ System: uname_result(system='Linux', node='xcluster', release='3.10.0-693.el7.x8
 Python 3.7.4 (default, Aug 13 2019, 20:35:49) 
 [GCC 7.3.0]
 numpy 1.17.2  scipy 1.4.1
-Date: Tue Nov 10 19:57:02 2020
+Date: Wed Nov 18 15:46:47 2020
 PySCF version 1.7.3
 PySCF path  /share/apps/Python/Anaconda3-2019/lib/python3.7/site-packages/pyscf
 
@@ -47,7 +50,7 @@ number of NR pGTOs = 6
 number of NR cGTOs = 4
 basis = h2.bas
 ecp = {}
-CPU time:         1.19
+CPU time:         0.88
 
 
 ******** <class 'pyscf.scf.uhf.UHF'> ********
@@ -63,13 +66,13 @@ SCF conv_tol_grad = None
 SCF max_cycles = 1
 direct_scf = True
 direct_scf_tol = 1e-13
-chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/tmp5t04m5xe
-max_memory 4000 MB (current use 92 MB)
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/tmpwmvgnozu
+max_memory 4000 MB (current use 98 MB)
 number electrons alpha = 1  beta = 1
 Set gradient conv threshold to 3.16228e-05
 init E= -0.644800894941738
-  alpha nocc = 1  HOMO = -0.248574003043426  LUMO = -0.0900508471637462
-  beta  nocc = 1  HOMO = -0.241945730776492  LUMO = -0.09160035062619
+  alpha nocc = 1  HOMO = -0.248574003043426  LUMO = -0.0900508471637464
+  beta  nocc = 1  HOMO = -0.241945730776492  LUMO = -0.0916003506261901
 cycle= 1 E= -0.90763782954924  delta_E= -0.263  |g|= 0.0146  |ddm|= 0.599
 SCF not converged.
 SCF energy = -0.90763782954924 after 1 cycles  <S^2> = 6.5933669e-07  2S+1 = 1.0000013
@@ -88,8 +91,8 @@ SCF conv_tol_grad = None
 SCF max_cycles = 0
 direct_scf = True
 direct_scf_tol = 1e-13
-chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/tmp5t04m5xe
-max_memory 4000 MB (current use 109 MB)
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/tmpwmvgnozu
+max_memory 4000 MB (current use 111 MB)
 number electrons alpha = 1  beta = 1
 Set gradient conv threshold to 3.16228e-05
 init E= -0.99701150589175
@@ -97,3 +100,4 @@ init E= -0.99701150589175
   beta  nocc = 1  HOMO = -0.49432997422898  LUMO = 0.120177073282419
 SCF not converged.
 SCF energy = -0.99701150589175 after 0 cycles  <S^2> = 0.91048114  2S+1 = 2.1545126
+tot grids = 20048

@@ -4,15 +4,16 @@ import scipy
 from pyscf import gto, scf
 from fch2py import fch2py
 
+import os, sys
 
 def guess_from_fchk(xyz, bas, fch):
     mol = gto.Mole()
-    #mol.atom = '''H 0. 0. 0.; H 0. 0. 2.'''
-    with open(xyz, 'r') as f:
-        mol.atom = f.read()
-    print(mol.atom)
+    mol.atom = xyz
+    #with open(xyz, 'r') as f:
+    #    mol.atom = f.read()
+    #print(mol.atom)
     mol.basis = bas
-    mol.output = 'test.pylog'
+    #mol.output = 'test.pylog'
     mol.verbose = 4
     mol.build()
     
@@ -238,9 +239,10 @@ def get_xg(suhf, no, na, nb, Ng):
     detNg = []
     for ng in Ng:
         detng = np.linalg.det(ng)
-        print(detng)
+        #print(detng)
         detNg.append(detng)
     detNg = np.array(detNg)
+    print('detNg', detNg)
     xg = 1.0 / (detC * detNg * detC)
     print('xg', xg)
     #sinbeta = np.sin(grids)
@@ -286,7 +288,7 @@ def get_H(suhf, hcore_ortho, no, Pg, Gg, xg):
         H = np.trace(np.dot(hcore_no, pg)) + 0.5 * np.trace(np.dot(Gg[i], pg))
         #H = H * xg[i]
         trHg[i] = H
-        print(i, H*xg[i])
+        #print(i, H*xg[i])
     #sinbeta = np.sin(grids)
     #ciH = np.einsum('i,i,i,i->', weights, sinbeta, Hg, d)
     ciH = suhf.integr_beta(trHg*xg)
@@ -309,13 +311,13 @@ def get_S2(suhf, Pg_ortho):
         Mx = 0.5 * (pgab + pgba)
         #print(Pc)
         trPc, trMx, trMy, trMz = list(map(np.trace, [Pc, Mx, My, Mz]))
-        print(trPc, trMx, trMy, trMz)
+        if suhf.debug: print(trPc, trMx, trMy, trMz)
         Pc2 = np.dot(Pc, Pc)
         Mz2 = np.dot(Mz, Mz)
         My2 = np.dot(My, My).real
         Mx2 = np.dot(Mx, Mx)
         trPc2, trMx2, trMy2, trMz2 = list(map(np.trace, [Pc2, Mx2, My2, Mz2]))
-        print(trPc2, trMx2, trMy2, trMz2)
+        if suhf.debug: print(trPc2, trMx2, trMy2, trMz2)
         S2g[i] = trMx**2 + (trMy**2).real + trMz**2 + 0.5*(trMx2 + trMy2 + trMz2) + 1.5*(trPc - trPc2)
     S2 = suhf.integr_beta(S2g, fac='xg')
     print('S2 = %.6f'% S2)
@@ -368,12 +370,10 @@ def get_Feff(suhf, trHg, Gg, Ng, Pg, dm_no, Dg, occ, Yg, Xg,  no, F_ortho, dm_or
     #Feff0 = suhf.integr_beta(np.array(Feff0), fac='xg')
     #print(Feff0)
     Feff = suhf.integr_beta(Feff_g, fac='xg')
-    print('Feff')
-    print(Feff)
+    if suhf.debug: print('Feff\n', Feff)
     Feff_ortho = np.einsum('ij,jk,lk->il', no, Feff, no)
     Feff_ortho = 0.5 * (Feff_ortho + Feff_ortho.T)
-    print('Feff (ortho)')
-    print(Feff_ortho)
+    if suhf.debug: print('Feff (ortho)\n', Feff_ortho)
     H = suhf.integr_beta(trHg, fac='xg')
     print('Hsp + Hph = ', H)
     #F_ortho = np.vstack((
@@ -426,7 +426,7 @@ def Diag_Feff(Feff_ortho, na, nb):
     print('e_a, e_b')
     print(e_a, e_b)
     print('P_a, P_b')
-    print(P_a, P_b)
+    print(P_a,'\n', P_b)
     return [e_a, e_b], [P_a, P_b]
 
 class SUHF():
@@ -449,28 +449,44 @@ class SUHF():
     def __init__(self, guesshf):
         self.guesshf = guesshf
         self.mol = guesshf.mol
-        S = guesshf.get_ovlp()
-        Ca, Cb = guesshf.mo_coeff
+
+        self.cut_no = False
+        self.debug = False
+        self.output = None
+        self.max_cycle = 50
+
+        self.built = False
+
+    def build(self):
+        print('\n******** %s ********' % self.__class__)
+        #if self.output is not None:
+        #    os.system("echo '' > %s" % self.output)
+        #    sys.stdout = open(self.output, 'a')
+        S = self.guesshf.get_ovlp()
+        Ca, Cb = self.guesshf.mo_coeff
         #S_sqrt = scipy.linalg.sqrtm(S)
-        print(S)
+        if self.debug:
+            print('S')
+            print(S)
         #Se, Svec = scipy.linalg.eigh(S)
         #Se_msq = Se.real**(-0.5)
         #print(Se_msq)
         #S_msq2 = np.einsum('ji,j,jk->ik',Svec,Se_msq, Svec)
         #S_msq = scipy.linalg.fractional_matrix_power(S, -0.5)
-        print('SVD: S^(-1/2)')
         
         Su, Ss, Sv = scipy.linalg.svd(S)
         #print('SVD')
         #print(Su,Ss,Sv)
         X = np.einsum('ij,j->ij', Su, Ss**(-0.5))
         #Xd = np.einsum('i,ij->ij', Ss**(-0.5), Sv)
+        print('SVD: S^(-1/2)')
         print(X)
         self.X = X
         #print(Xd)
-        print('S^(1/2)')
         XS = np.dot(X.T,S)
-        print(XS)
+        if self.debug:
+            print('S^(1/2)')
+            print(XS)
         
         print('C (ortho)')
         Ca_ortho = np.dot(XS, Ca)
@@ -479,19 +495,20 @@ class SUHF():
         print(Cb_ortho)
         
         self.mo_ortho = Ca_ortho, Cb_ortho
-        self.dm_ortho = scf.uhf.make_rdm1(self.mo_ortho, guesshf.mo_occ)
-        print('density matrix (ortho)')
-        print(self.dm_ortho)
+        self.dm_ortho = scf.uhf.make_rdm1(self.mo_ortho, self.guesshf.mo_occ)
+        if self.debug:
+            print('density matrix (ortho)')
+            print(self.dm_ortho)
 
         self.nbeta = 8
         self.grids, self.weights = get_beta(self.nbeta)
-        print(self.grids, self.weights)
+        print('grids: ', self.grids, '\nweights: ', self.weights)
         spin = self.mol.spin
-        na, nb = guesshf.nelec
+        na, nb = self.guesshf.nelec
         self.nelec = na, nb
         sz = (na-nb)/2
         print('S = %.1f, Sz = %.1f' % (spin/2, sz))
-        self.S, self.Sz = S, sz
+        self.S, self.Sz = spin/2, sz
         Wignerd_expr, Wignerd = WignerSmall(int(spin), int(2*sz))
         print('Wigner small d: ', Wignerd_expr)
         d = np.zeros(self.nbeta)
@@ -500,6 +517,7 @@ class SUHF():
         print('value :', d)
         self.d_expr, self.d_func, self.d = Wignerd_expr, Wignerd, d
         self.E_suhf = None
+        self.built = True
 
     def integr_beta(self, q, fac='normal'):
         if fac=='xg':
@@ -509,6 +527,8 @@ class SUHF():
 
     
     def kernel(self):
+        if not self.built:
+            self.build()
         np.set_printoptions(precision=8, linewidth=160, suppress=True)
         if self.debug:
             np.set_printoptions(precision=15, linewidth=200, suppress=False)
@@ -523,7 +543,7 @@ class SUHF():
         hcore = mf.get_hcore()
         hcore_ortho = np.einsum('ji,jk,kl->il', X, hcore, X)
         while(not conv):
-            print('**** Cycle %d ****' % (cyc+1))
+            print('**** Start Cycle %d ****' % (cyc+1))
             old_suhf = self.E_suhf
             #print(hcore_ortho)
             
@@ -540,8 +560,8 @@ class SUHF():
             #Fa_ortho = np.einsum('ji,jk,kl->il', X, Fa, X)
             #Fb_ortho = np.einsum('ji,jk,kl->il', X, Fb, X)
             Fa_ortho, Fb_ortho = hcore_ortho + veff_ortho
-            print('Fock (ortho)',Fa_ortho, Fb_ortho)
             F_ortho = Fa_ortho, Fb_ortho
+            print('Fock (ortho)\n', F_ortho)
         
             e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, hcore_ortho, veff_ortho)
             print('E(UHF) = %12.6f' % e_uhf)

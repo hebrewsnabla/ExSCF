@@ -1,0 +1,80 @@
+#INFO: **** input file is /share/home/srwang/ExSCF/test/pytest/scan_h2/scan_dft.py ****
+#import phf
+from pyscf import gto, scf
+#import scipy
+#import numpy as np
+import sys
+
+from pyphf import util, sudft
+
+#xyz = 'h2.xyz' #sys.argv[1]
+fch = '../test_carlos/test_uhf.fchk' #sys.argv[2]
+bas = '../h2.bas'
+
+for r in [0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0]:
+    xyz = '''H 0.0 0.0 0.0; H 0.0 0.0 %f'''%r
+    mf = util.guess_from_fchk(xyz, bas, fch)
+    
+    mf2 = util.SUHF(mf)
+    mf2.cut_no = False
+    mf2.debug = False
+    mf2.max_cycle = 50
+    mf2.output = 'sudft_%.1f.out'%r
+    #mf2.kernel()
+    
+    mf3 = sudft.SUDFT(mf2)
+    mf3.kernel()
+    #INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='xcluster', release='3.10.0-693.el7.x86_64', version='#1 SMP Thu Jul 6 19:56:57 EDT 2017', machine='x86_64', processor='x86_64')  Threads 16
+Python 3.7.4 (default, Aug 13 2019, 20:35:49) 
+[GCC 7.3.0]
+numpy 1.17.2  scipy 1.4.1
+Date: Thu Nov 19 15:02:05 2020
+PySCF version 1.7.3
+PySCF path  /share/apps/Python/Anaconda3-2019/lib/python3.7/site-packages/pyscf
+
+[CONFIG] conf_file None
+[INPUT] verbose = 4
+[INPUT] num. atoms = 2
+[INPUT] num. electrons = 2
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = angstrom
+[INPUT]  1 H      0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr
+[INPUT]  2 H      0.000000000000   0.000000000000   0.600000000000 AA    0.000000000000   0.000000000000   1.133835674739 Bohr
+
+nuclear repulsion = 0.8819620182
+number of shells = 4
+number of NR pGTOs = 6
+number of NR cGTOs = 4
+basis = ../h2.bas
+ecp = {}
+CPU time:         0.84
+
+
+******** <class 'pyscf.scf.uhf.UHF'> ********
+method = UHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 1
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/scan_h2/tmpqs_13e4f
+max_memory 4000 MB (current use 98 MB)
+number electrons alpha = 1  beta = 1
+Set gradient conv threshold to 3.16228e-05
+init E= -0.802172379177992
+  alpha nocc = 1  HOMO = -0.638807232234297  LUMO = 0.242710944473543
+  beta  nocc = 1  HOMO = -0.629292266785914  LUMO = 0.24469792301466
+cycle= 1 E= -1.10404611456518  delta_E= -0.302  |g|= 0.0294  |ddm|= 0.444
+SCF not converged.
+SCF energy = -1.10404611456518 after 1 cycles  <S^2> = 8.5933109e-06  2S+1 = 1.0000172
