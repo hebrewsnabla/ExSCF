@@ -3,6 +3,8 @@ tmp*
 /test/*/*.log
 /phf/
 .vscode/
+__pycache__/
+*.pyc
 
 # Prerequisites
 *.d
