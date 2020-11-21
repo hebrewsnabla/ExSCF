@@ -13,8 +13,8 @@ class SUDFT():
 
     def kernel(self):
         self.suhf.kernel()
-        if self.output is not None:
-            sys.stdout = open(self.output, 'a')
+        #if self.output is not None:
+        #    sys.stdout = open(self.output, 'a')
         print('***** Start DFT Correlation for SUHF+DFT **********')
         E_suhf = self.suhf.E_suhf
         dm_ortho = self.suhf.dm_ortho
