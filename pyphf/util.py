@@ -286,7 +286,7 @@ def integr_beta(q, d, grids, weights, fac='normal', xg=None, ciS=None):
         #print(weights)
     elif fac=='ci':
         weights = weights / ciS
-        
+
     if q.ndim==1:
         int_q = einsum('i,i,i,i->', weights, sinbeta, q, d)
     elif q.ndim==2: 
@@ -514,6 +514,7 @@ class SUHF():
         if self.debug:
             print('S^(1/2)')
             print(XS)
+        self.XS = XS
         
         print('C (ortho)')
         Ca_ortho = np.dot(XS, Ca)
@@ -634,7 +635,10 @@ class SUHF():
                 break
 
         if self.makedm:
-            sudm.make_1pdm(self, Dg, dm_no, na, nb, C_no, no)
+            suhf_dm = sudm.make_1pdm(self, Dg, dm_no, na, nb, C_no, no)
+            natocc, natorb = sudm.natorb(self,suhf_dm)
+
+        return E_suhf, conv, natorb, natocc
 
 
         
