@@ -1,0 +1,16 @@
+%subst l530 ../../phf
+!%subst l601 .
+%nproc=1
+%mem=4GB
+%oldchk=../scan_n2/uhf-1.30.chk
+%chk=test_n2_qz.chk
+! 206: print level, 207: phf type, 216: turn on diis
+#p uhf/cc-pvqz nosymm guess=read scf=conver=4 
+# extralink=l530 iop(5/206=6, 5/207=4, 5/216=1, 5/218=100) pop=none 
+
+title
+
+0 1
+N 0.0 0.0 0.0
+N 0.0 0.0 0.9
+

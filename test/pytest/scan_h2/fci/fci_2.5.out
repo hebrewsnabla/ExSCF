@@ -1,0 +1,148 @@
+
+
+#INFO: **** input file is /share/home/srwang/ExSCF/test/pytest/scan_h2/scan_fci.py ****
+#import phf
+from pyscf import lib, fci
+#import scipy
+import numpy as np
+import sys, os, contextlib
+
+from pyphf import util, sudft
+
+#xyz = 'h2.xyz' #sys.argv[1]
+fch = 'test_uhf.fchk' #sys.argv[2]
+#bas = '../h2.bas'
+bas = 'cc-pvtz'
+
+lib.num_threads(16)
+
+for r in np.arange(0.5, 2.55, 0.1):
+    output = 'fci/fci_%.1f.out' % r
+    os.system("echo '\n' > %s" % output)
+    with open(output, 'a', encoding='utf-8') as f:
+        with contextlib.redirect_stdout(f):
+            xyz = '''H 0.0 0.0 0.0; H 0.0 0.0 %f'''%r
+            mf = util.guess_from_fchk(xyz, bas, fch)
+            #mf = util.guess(xyz, bas)
+            mf.max_cycle = 50
+            mf.kernel()
+            ci = fci.FCI(mf)
+            print('E(FCI) = %15.8f' % ci.kernel()[0])#INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='xc02n18', release='3.10.0-693.el7.x86_64', version='#1 SMP Thu Jul 6 19:56:57 EDT 2017', machine='x86_64', processor='x86_64')  Threads 16
+Python 3.7.4 (default, Aug 13 2019, 20:35:49) 
+[GCC 7.3.0]
+numpy 1.17.2  scipy 1.4.1
+Date: Tue Nov 24 04:45:04 2020
+PySCF version 1.7.5
+PySCF path  /share/home/srwang/pyscf-1.7.5/pyscf
+
+[CONFIG] conf_file None
+[INPUT] verbose = 4
+[INPUT] num. atoms = 2
+[INPUT] num. electrons = 2
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = angstrom
+[INPUT]  1 H      0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr
+[INPUT]  2 H      0.000000000000   0.000000000000   2.500000000000 AA    0.000000000000   0.000000000000   4.724315311413 Bohr
+
+nuclear repulsion = 0.211670884368
+number of shells = 12
+number of NR pGTOs = 32
+number of NR cGTOs = 28
+basis = cc-pvtz
+ecp = {}
+CPU time:        97.01
+
+
+******** <class 'pyscf.scf.uhf.UHF'> ********
+method = UHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 1
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/scan_h2/tmp9s6065ta
+max_memory 4000 MB (current use 215 MB)
+number electrons alpha = 1  beta = 1
+Set gradient conv threshold to 3.16228e-05
+init E= -0.646700926845351
+  alpha nocc = 1  HOMO = -0.221311519885192  LUMO = -0.141213558571272
+  beta  nocc = 1  HOMO = -0.220137379647341  LUMO = -0.141198757274923
+cycle= 1 E= -0.868563401086861  delta_E= -0.222  |g|= 0.0301  |ddm|= 0.478
+SCF not converged.
+SCF energy = -0.868563401086861 after 1 cycles  <S^2> = 2.0416086e-07  2S+1 = 1.0000004
+
+
+******** <class 'pyscf.scf.uhf.UHF'> ********
+method = UHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 1
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/scan_h2/tmp9s6065ta
+max_memory 4000 MB (current use 215 MB)
+number electrons alpha = 1  beta = 1
+Set gradient conv threshold to 3.16228e-05
+init E= -0.840094878579984
+  alpha nocc = 1  HOMO = -0.492871857587343  LUMO = -0.0537265882752795
+  beta  nocc = 1  HOMO = -0.492871857587344  LUMO = -0.0537265882752812
+cycle= 1 E= -0.992249757588291  delta_E= -0.152  |g|= 0.0545  |ddm|= 0.145
+SCF not converged.
+SCF energy = -0.992249757588291 after 1 cycles  <S^2> = 0.87560705  2S+1 = 2.1218926
+
+
+******** <class 'pyscf.scf.uhf.UHF'> ********
+method = UHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pytest/scan_h2/tmp9s6065ta
+max_memory 4000 MB (current use 215 MB)
+number electrons alpha = 1  beta = 1
+Set gradient conv threshold to 3.16228e-05
+init E= -0.646700926845351
+  alpha nocc = 1  HOMO = -0.221311519885192  LUMO = -0.141213558571271
+  beta  nocc = 1  HOMO = -0.220137379647341  LUMO = -0.141198757274923
+cycle= 1 E= -0.868563401086861  delta_E= -0.222  |g|= 0.0301  |ddm|= 0.478
+  alpha nocc = 1  HOMO = -0.352900106937039  LUMO = -0.0904523750989357
+  beta  nocc = 1  HOMO = -0.352949986015588  LUMO = -0.0905251553199096
+cycle= 2 E= -0.869605345043575  delta_E= -0.00104  |g|= 0.00573  |ddm|= 0.0298
+  alpha nocc = 1  HOMO = -0.353534652774792  LUMO = -0.0897580467913742
+  beta  nocc = 1  HOMO = -0.353555521708393  LUMO = -0.0897869747065687
+cycle= 3 E= -0.869648173091792  delta_E= -4.28e-05  |g|= 0.000213  |ddm|= 0.00828
+  alpha nocc = 1  HOMO = -0.353564145779612  LUMO = -0.0898249983429958
+  beta  nocc = 1  HOMO = -0.353573225764762  LUMO = -0.0898378578209093
+cycle= 4 E= -0.86964822024302  delta_E= -4.72e-08  |g|= 2.28e-05  |ddm|= 0.000493
+  alpha nocc = 1  HOMO = -0.353588488179281  LUMO = -0.0898493013960061
+  beta  nocc = 1  HOMO = -0.353591752217026  LUMO = -0.0898538771338858
+cycle= 5 E= -0.869648221100157  delta_E= -8.57e-10  |g|= 3.75e-06  |ddm|= 6.86e-05
+  alpha nocc = 1  HOMO = -0.353587687894184  LUMO = -0.0898496377865766
+  beta  nocc = 1  HOMO = -0.353589320733658  LUMO = -0.0898519346016757
+Extra cycle  E= -0.869648221124987  delta_E= -2.48e-11  |g|= 1.88e-06  |ddm|= 7.04e-06
+converged SCF energy = -0.869648221124987  <S^2> = 4.1989079e-11  2S+1 = 1
+E(FCI) =     -1.00467984

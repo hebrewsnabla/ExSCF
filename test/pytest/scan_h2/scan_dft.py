@@ -13,8 +13,8 @@ bas = 'cc-pvtz'
 
 lib.num_threads(4)
 
-for r in np.arange(0.5, 1.4, 0.1):
-    output = 'sudft_%.1f_diis.out' % r
+for r in np.arange(0.5, 2.55, 0.1):
+    output = 'tpss_mod/sudft_%.1f_diis_mod.out' % r
     os.system("echo '\n' > %s" % output)
     with open(output, 'a', encoding='utf-8') as f:
         with contextlib.redirect_stdout(f):
@@ -31,5 +31,6 @@ for r in np.arange(0.5, 1.4, 0.1):
             #mf2.kernel()
             
             mf3 = sudft.SUDFT(mf2)
+            mf3.suxc = 'TPSS'
             mf3.kernel()
                     

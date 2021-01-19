@@ -3,7 +3,7 @@ import sympy as sym
 import scipy
 from pyscf import gto, scf
 from fch2py import fch2py
-
+from pyphf import sudm, util2
 import os, sys
 from functools import partial
 
@@ -231,16 +231,14 @@ def get_Gg(mol, Pg, no, X):
         ggab = einsum('ji,jk,kl->il', X, ggab_ao, X) 
         ggba = einsum('ji,jk,kl->il', X, ggba_ao, X) 
         ggbb = einsum('ji,jk,kl->il', X, ggbb_ao, X) 
-        gg = np.vstack((
-            np.hstack((ggaa, ggab)),
-            np.hstack((ggba, ggbb))
-        ))
+        gg = util2.stack22(ggaa, ggab, ggba, ggbb)
         gg_no = einsum('ji,jk,kl->il', no, gg, no)
         Gg.append(gg_no)
     print('G(g) (NO)' )
     print(Gg[0])
     print('...')
     return Gg, Pg_ortho
+
 
 def get_xg(suhf, no, na, nb, Ng):
     C_a, C_b = suhf.mo_ortho
@@ -277,17 +275,18 @@ def get_xg(suhf, no, na, nb, Ng):
     #print(weights, xg, d)
     print('ciS', ciS)
     yg = xg / ciS
-    return xg, yg, ciS
+    return xg, yg, ciS, C_no
 
 def integr_beta(q, d, grids, weights, fac='normal', xg=None, ciS=None):
     sinbeta = np.sin(grids)
     if fac=='xg':
-        #print(xg[0], d[0], 1/ciS, weights[0]*sinbeta[0])
-        #print(weights)
         weights = weights * xg / ciS
         #print(xg, ciS, xg/ciS**2)
         #weights *= (xg / ciS**2)
         #print(weights)
+    elif fac=='ci':
+        weights = weights / ciS
+        
     if q.ndim==1:
         int_q = einsum('i,i,i,i->', weights, sinbeta, q, d)
     elif q.ndim==2: 
@@ -464,12 +463,14 @@ class SUHF():
         self.max_cycle = 70
         self.diis_on = False 
         self.diis_start_cyc = None
+        self.makedm = True
+
         self.built = False
 
     def build(self):
         print('\n******** %s ********' % self.__class__)
         print('max_cycle = %d' % self.max_cycle)
-        if debug:
+        if self.debug:
             print('verbose: debug')
         else:
             print('verbose: normal')
@@ -550,6 +551,8 @@ class SUHF():
     def integr_beta(self, q, fac='normal'):
         if fac=='xg':
             return integr_beta(q, self.d, self.grids, self.weights, 'xg', self.xg, self.ciS)
+        elif fac=='ci':
+            return integr_beta(q, self.d, self.grids, self.weights, 'ci', None, self.ciS)
         else:
             return integr_beta(q, self.d, self.grids, self.weights)
 
@@ -598,7 +601,7 @@ class SUHF():
             dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, na, nb)
             Dg, Ng, Pg = get_Ng(self.grids, no, dm_no, na+nb)
             Gg, Pg_ortho = get_Gg(self.mol, Pg, no, X)
-            xg, yg, ciS = get_xg(self, no, na, nb, Ng)
+            xg, yg, ciS, C_no = get_xg(self, no, na, nb, Ng)
             self.xg, self.ciS = xg, ciS
             #yg, ciS = util.get_yg(self, xg)
             trHg, ciH = get_H(self, hcore_ortho, no, Pg, Gg, xg)
@@ -624,12 +627,14 @@ class SUHF():
                     print('\n***************')
                     print('SUHF converged at cycle %d' %cyc)
                     print('Final E(SUHF) = %15.8f, delta E = %10.6g' % (E_suhf,E_suhf-old_suhf))
-                    
             
             cyc += 1
             if cyc >= max_cycle:
                 print('SUHF not converged')
                 break
+
+        if self.makedm:
+            sudm.make_1pdm(self, Dg, dm_no, na, nb, C_no, no)
 
 
         

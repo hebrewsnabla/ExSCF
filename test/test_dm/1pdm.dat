@@ -1,0 +1,43 @@
+ !
+ ! 1pdm.dat - prepared by PHF-SCF 
+ !
+ ! This file contains the one-particle density 
+ ! matrix associated with the PHF state of 
+ ! interest. 
+ !
+ ! The first line contains the number of basis 
+ ! functions (in the basis selected) and the 
+ ! type of the density matrix printed: 
+ !
+ !    type = 1,  RHF 
+ !         = 2,  UHF 
+ !         = 3,  GHF 
+ !
+ ! The one-particle density matrix is then 
+ ! printed with the format: 
+ !
+ !   i, j, real( ), imag ( ) 
+ !
+ ! which stands for the matrix element: 
+ !
+ !   < i! j > 
+ !
+     4   2
+ !
+     1a     1a         0.756421521748542E+00         0.727535601159233E-17
+     1a     3a        -0.823796959468578E-01        -0.792338132784328E-18
+     2a     2a         0.227528929786473E+00        -0.713955495305356E-17
+     2a     4a        -0.401298774402256E-01         0.125922213721426E-17
+     3a     1a        -0.823796959468579E-01        -0.792338132784327E-18
+     3a     3a         0.897173614072918E-02         0.862912709239025E-19
+     4a     2a        -0.401298774402256E-01         0.125922213721426E-17
+     4a     4a         0.707781232425623E-02        -0.222092329462675E-18
+     1b     1b         0.756421521748542E+00         0.727535601159233E-17
+     1b     3b        -0.823796959468578E-01        -0.792338132784328E-18
+     2b     2b         0.227528929786473E+00        -0.713955495305356E-17
+     2b     4b        -0.401298774402256E-01         0.125922213721426E-17
+     3b     1b        -0.823796959468579E-01        -0.792338132784327E-18
+     3b     3b         0.897173614072918E-02         0.862912709239025E-19
+     4b     2b        -0.401298774402256E-01         0.125922213721426E-17
+     4b     4b         0.707781232425623E-02        -0.222092329462675E-18
+ !
