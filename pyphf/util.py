@@ -6,6 +6,7 @@ from fch2py import fch2py
 from pyphf import sudm, util2
 import os, sys
 from functools import partial
+import time
 
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
@@ -129,8 +130,9 @@ def find_NO(suhf, dm, na, nb):
     ev_b, v_b = eig(dm[1]*(-1))
     pa = count0(ev_a)
     pb = count0(ev_b)
-    print('NO eigenvalue')
-    print(ev_a, ev_b)
+    if suhf.debug:
+        print('NO eigenvalue')
+        print(ev_a, '\n', ev_b)
     v_a1 = v_a[:,:na]
     v_a2 = v_a[:,na:]
     v_b1 = v_b[:,:nb]
@@ -146,22 +148,22 @@ def find_NO(suhf, dm, na, nb):
     if cut_no:
         v = np.hstack((v_a1, v_b1, v_a2, v_b2))[:,:pa+pb]
     #v = np.hstack((v, np.zeros((v.shape[0], v.shape[0]-pa-pb))))
-    print('NO vec')
-    print(v)
+    if suhf.debug:
+        print('NO vec')
+        print(v)
     dm_expd = np.hstack(
         (np.vstack((dm[0], np.zeros(dm[0].shape))), 
         np.vstack((np.zeros(dm[1].shape), dm[1])))
         )
     #print(dm_expd)
     dm_no = einsum('ji,jk,kl->il', v, dm_expd, v)
-    print('dm(NO)')
-    print(dm_no)
+    if suhf.debug:
+        print('dm(NO)')
+        print(dm_no)
     #np.set_printoptions(precision=6, linewidth=160, suppress=True)
     return dm_no, dm_expd, v
 
 def get_Ng(grids, no, dm, occ):
-    # for debugging:
-    #grids = grids[0:1]
     Dg = []
     Ng = []
     Pg = []
@@ -186,16 +188,6 @@ def get_Ng(grids, no, dm, occ):
         pg = einsum('ij,jk,kl,lm->im', dg_no, dm[:,:occ], ng, dm[:occ,:])
         #print(pg)
         Pg.append(pg)
-    print('D(g) (NO)')
-    print(Dg[0])
-    print('...')
-    print('N(g) (NO)')
-    print(Ng[0])
-    print('...')
-    print('P(g) (NO)')
-    #for p in Pg: print(p)
-    print(Pg[0])
-    print('...')
     return Dg, Ng, Pg
 
 def get_Gg(mol, Pg, no, X):
@@ -205,9 +197,11 @@ def get_Gg(mol, Pg, no, X):
         pg_ortho = einsum('ij,jk,lk->il', no, pg, no)
         #print(pg_ortho)
         Pg_ortho.append(pg_ortho)
-    print('Pg_ortho')
-    print(Pg_ortho[0])
     norb = int(Pg_ortho[0].shape[0]/2)
+    Pgaa_ao = []
+    Pgab_ao = []
+    Pgba_ao = []
+    Pgbb_ao = []
     for pg in Pg_ortho:
         pgaa = pg[:norb, :norb] # ortho ao
         #print(pgaa)
@@ -220,12 +214,35 @@ def get_Gg(mol, Pg, no, X):
         pgab_ao = einsum('ij,jk,lk->il', X, pgab, X)
         pgba_ao = einsum('ij,jk,lk->il', X, pgba, X)
         pgbb_ao = einsum('ij,jk,lk->il', X, pgbb, X)
-        ggaa_ao, ggbb_ao = scf.uhf.get_veff(mol, [pgaa_ao, pgbb_ao], hermi=0)
-        #print(ggaa_ao)
-        ggab_ao = scf.hf.get_jk(mol, pgab_ao, hermi=0)[1] *(-1)
-        ggba_ao = scf.hf.get_jk(mol, pgba_ao, hermi=0)[1] *(-1)
-        #ggbb_ao = scf.uhf.get_veff(mol, [pgaa_ao, pgbb_ao], hermi=0)[1]
+        Pgaa_ao.append(pgaa_ao)
+        Pgbb_ao.append(pgbb_ao)
+        Pgab_ao.append(pgab_ao)
+        Pgba_ao.append(pgba_ao)
+    Pgaabb_ao = Pgaa_ao + Pgbb_ao
+    #print(Pgaabb_ao.shape)
+    #nao = Pgaabb_ao.shape[-1]
+    ndm = len(Pgab_ao)
+    #Pgp = Pgaabb_ao.reshape(-1,nao,nao)
+    #print(Pgp.shape)
+    vj,vk = scf.hf.get_jk(mol, Pgaabb_ao, hermi=0)
+    print(vj.shape)
+    #vj = vj.reshape(Pgaabb_ao.shape)
+    #print(vj.shape)
+    #vk = vk.reshape(Pgaabb_ao.shape)
+    #print(vk.shape)
+    Ggaa_ao = vj[:ndm] + vj[ndm:] - vk[:ndm]
+    Ggbb_ao = vj[:ndm] + vj[ndm:] - vk[ndm:]
+    #Ggbb_ao = scf.hf.get_jk(mol, Pgbb_ao, hermi=0)
+    #print(ggaa_ao)
+    Ggab_ao = scf.hf.get_jk(mol, Pgab_ao, hermi=0)[1] *(-1)
+    Ggba_ao = scf.hf.get_jk(mol, Pgba_ao, hermi=0)[1] *(-1)
+    #ggbb_ao = scf.uhf.get_veff(mol, [pgaa_ao, pgbb_ao], hermi=0)[1]
         # X^H . G(g) . X
+    for i,ggab_ao in enumerate(Ggab_ao):
+        #ggab_ao = Ggab_ao[i]
+        ggba_ao = Ggba_ao[i]
+        ggaa_ao = Ggaa_ao[i]
+        ggbb_ao = Ggbb_ao[i]
         ggaa = einsum('ji,jk,kl->il', X, ggaa_ao, X)  # ortho ao
         #print(ggaa)
         ggab = einsum('ji,jk,kl->il', X, ggab_ao, X) 
@@ -234,9 +251,6 @@ def get_Gg(mol, Pg, no, X):
         gg = util2.stack22(ggaa, ggab, ggba, ggbb)
         gg_no = einsum('ji,jk,kl->il', no, gg, no)
         Gg.append(gg_no)
-    print('G(g) (NO)' )
-    print(Gg[0])
-    print('...')
     return Gg, Pg_ortho
 
 
@@ -254,8 +268,9 @@ def get_xg(suhf, no, na, nb, Ng):
     ))
     #print(C_org)
     C_no = einsum('ji,jk->ik', no, C_org)
-    print('C(NO)')
-    print(C_no)
+    if suhf.debug:
+        print('C(NO)')
+        print(C_no)
     occ = na+nb
     C_oo = C_no[:occ, :occ]
     detC = np.linalg.det(C_oo)
@@ -307,7 +322,8 @@ def get_H(suhf, hcore_ortho, no, Pg, Gg, xg):
     ))
     hcore_no = einsum('ji,jk,kl->il', no, hcore_ortho, no)
     suhf.hcore_no = hcore_no
-    print(hcore_no)
+    if suhf.debug2:
+        print(hcore_no)
     trHg = np.zeros(len(Pg))
     for i, pg in enumerate(Pg):
         H = np.trace(np.dot(hcore_no, pg)) + 0.5 * np.trace(np.dot(Gg[i], pg))
@@ -361,19 +377,23 @@ def get_Yg(suhf, Dg, Ng, dm_no, occ):
             + np.vstack((Xgi2, np.zeros((vir, norb)))) 
         #print(Xgi)
         Xg.append(Xgi)
-    print('X(g)')
-    print(Xg[0])
+    if suhf.debug:
+        print('X(g)')
+        print(Xg[0])
     Xg = np.array(Xg)
     Xg_int = suhf.integr_beta(Xg, fac='xg')
-    print('X(g) int')
-    print(Xg_int)
+    if suhf.debug:
+        print('X(g) int')
+        print(Xg_int)
     Yg = Xg - Xg_int
     #print(Yg.shape)
     return Xg, Xg_int, Yg
 
-def get_Feff(suhf, trHg, Gg, Ng, Pg, dm_no, Dg, occ, Yg, Xg,  no, F_ortho):
+def get_Feff(suhf, trHg, Gg, Ng, Pg, Dg, occ, Yg, Xg, F_ortho):
     hcore_no = suhf.hcore_no
     dm_ortho = suhf.dm_ortho
+    dm_no = suhf.dm_no
+    no = suhf.no
     norb = len(Pg[0])
     vir = norb - occ
     Feff_g = [] 
@@ -396,10 +416,10 @@ def get_Feff(suhf, trHg, Gg, Ng, Pg, dm_no, Dg, occ, Yg, Xg,  no, F_ortho):
     #Feff0 = suhf.integr_beta(np.array(Feff0), fac='xg')
     #print(Feff0)
     Feff = suhf.integr_beta(Feff_g, fac='xg')
-    if suhf.debug: print('Feff\n', Feff)
+    if suhf.debug2: print('Feff\n', Feff)
     Feff_ortho = einsum('ij,jk,lk->il', no, Feff, no)
     Feff_ortho = 0.5 * (Feff_ortho + Feff_ortho.T)
-    if suhf.debug: print('Feff (ortho)\n', Feff_ortho)
+    if suhf.debug2: print('Feff (ortho)\n', Feff_ortho)
     H = suhf.integr_beta(trHg, fac='xg')
     print('Hsp + Hph = ', H)
 
@@ -421,8 +441,9 @@ def get_Feff(suhf, trHg, Gg, Ng, Pg, dm_no, Dg, occ, Yg, Xg,  no, F_ortho):
         np.hstack((F_mod_ortho_a, np.zeros(F_mod_ortho_a.shape))),
         np.hstack((np.zeros(F_mod_ortho_b.shape), F_mod_ortho_b))
     ))
-    print('Feff (mod,ortho)')
-    print(F_mod_ortho)
+    if suhf.debug:
+        print('Feff (mod,ortho)')
+        print(F_mod_ortho)
     return Feff_ortho, H, F_mod_ortho
 
 def Diag_Feff(F, na, nb):
@@ -430,11 +451,7 @@ def Diag_Feff(F, na, nb):
     e_b, v_b = np.linalg.eigh(F[1])
     P_a = einsum('ij,kj->ik', v_a[:,:na], v_a[:,:na])
     P_b = einsum('ij,kj->ik', v_b[:,:nb], v_b[:,:nb])
-    print('e_a, e_b')
-    print(e_a, e_b)
-    print('P_a, P_b')
-    print(P_a,'\n', P_b)
-    return [e_a, e_b], np.array([P_a, P_b])
+    return [e_a, e_b], [v_a, v_b], np.array([P_a, P_b])
 
 class SUHF():
     '''
@@ -451,6 +468,10 @@ class SUHF():
         d_func: NumPy function for Wigner d
         d     : array
             current values of Wigner d, on given grids
+
+        E_suhf:
+        natocc: SUHF natural orbital occupation number
+        natorb: SUHF natural orbital (regular basis) 
     '''
 
     def __init__(self, guesshf):
@@ -458,22 +479,37 @@ class SUHF():
         self.mol = guesshf.mol
 
         self.cut_no = False
-        self.debug = False
+        self.verbose = 4
+        #self.debug = False
         self.output = None
         self.max_cycle = 70
         self.diis_on = False 
         self.diis_start_cyc = None
         self.makedm = True
+        self.tofch = False
+        self.oldfch = None
 
         self.built = False
 
     def build(self):
         print('\n******** %s ********' % self.__class__)
         print('max_cycle = %d' % self.max_cycle)
-        if self.debug:
-            print('verbose: debug')
+        self.debug = False
+        self.debug2 = False
+        if self.verbose <= 4:
+            print('verbose: %d, normal' % self.verbose)
+        elif self.verbose <= 6:
+            self.debug = True
+            print('verbose: %d, debug' % self.verbose)
         else:
-            print('verbose: normal')
+            self.debug = True
+            self.debug2 = True
+            print('verbose: %d, debug2' % self.verbose)
+
+        #if self.debug:
+        #    print('verbose: debug')
+        #else:
+        #    print('verbose: normal')
         if self.diis_on:
             #assert issubclass(mf.DIIS, lib.diis.DIIS)
             #DIIS = lib.diis.SCF_DIIS
@@ -506,8 +542,9 @@ class SUHF():
         #print(Su,Ss,Sv)
         X = einsum('ij,j->ij', Su, Ss**(-0.5))
         #Xd = einsum('i,ij->ij', Ss**(-0.5), Sv)
-        print('SVD: S^(-1/2)')
-        print(X)
+        if self.debug:
+            print('SVD: S^(-1/2)')
+            print(X)
         self.X = X
         #print(Xd)
         XS = np.dot(X.T,S)
@@ -516,11 +553,12 @@ class SUHF():
             print(XS)
         self.XS = XS
         
-        print('C (ortho)')
         Ca_ortho = np.dot(XS, Ca)
         Cb_ortho = np.dot(XS, Cb)
-        print(Ca_ortho)
-        print(Cb_ortho)
+        if self.debug:
+            print('C (ortho)')
+            print(Ca_ortho)
+            print(Cb_ortho)
         
         self.mo_ortho = Ca_ortho, Cb_ortho
         self.dm_ortho = scf.uhf.make_rdm1(self.mo_ortho, self.guesshf.mo_occ)
@@ -559,11 +597,12 @@ class SUHF():
 
     
     def kernel(self):
+        t_start = time.time()
         if not self.built:
             self.build()
-        np.set_printoptions(precision=8, linewidth=160, suppress=True)
+        np.set_printoptions(precision=6, linewidth=160, suppress=True)
         if self.debug:
-            np.set_printoptions(precision=15, linewidth=200, suppress=False)
+            np.set_printoptions(precision=10, linewidth=200, suppress=False)
         X = self.X
         na, nb = self.nelec
         norb = self.norb
@@ -575,43 +614,63 @@ class SUHF():
         
         hcore = mf.get_hcore()
         hcore_ortho = einsum('ji,jk,kl->il', X, hcore, X)
+        t_pre = time.time() 
+        print('time for Preparation before cyc: %.3f' % (t_pre-t_start))
         while(not conv):
             print('**** Start Cycle %d ****' % (cyc+1))
             old_suhf = self.E_suhf
+            old_dm = self.dm_ortho
             #print(hcore_ortho)
             
             #if cyc==0:
             #    veff = mf.get_veff(dm = dm)
             #else:
+            t01 = time.time()
             dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X)
             veff = mf.get_veff(dm = dm_reg)
             veff_ortho = einsum('ji,tjk,kl->til', X, veff, X)
-            print('dm (ortho)')
-            print(self.dm_ortho)
+            if self.debug:
+                print('dm (ortho)')
+                print(self.dm_ortho)
             #print(veff)
             #Fa, Fb = hcore + veff
             #Fa_ortho = einsum('ji,jk,kl->il', X, Fa, X)
             #Fb_ortho = einsum('ji,jk,kl->il', X, Fb, X)
             Fa_ortho, Fb_ortho = hcore_ortho + veff_ortho
             F_ortho = Fa_ortho, Fb_ortho
-            print('Fock (ortho)\n', F_ortho)
+            if self.debug:
+                print('Fock (ortho)\n', F_ortho)
         
             e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, hcore_ortho, veff_ortho)
-            print('E(UHF) = %12.6f' % e_uhf)
+            if self.debug:
+                print('E(UHF) = %12.6f' % e_uhf)
         
             dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, na, nb)
-            Dg, Ng, Pg = get_Ng(self.grids, no, dm_no, na+nb)
-            Gg, Pg_ortho = get_Gg(self.mol, Pg, no, X)
-            xg, yg, ciS, C_no = get_xg(self, no, na, nb, Ng)
+            self.dm_no = dm_no
+            self.no = no
+            Dg, Ng, Pg = get_Ng(self.grids, self.no, self.dm_no, na+nb)
+            if self.debug:
+                print('D(g) (NO)\n', Dg[0])
+                print('N(g) (NO)\n', Ng[0])
+                print('P(g) (NO)\n', Pg[0])
+            t05 = time.time()
+            print('time for NO, Ng: %.3f' % (t05-t01))
+            Gg, Pg_ortho = get_Gg(self.mol, Pg, self.no, X)
+            if self.debug:
+                print('Pg_ortho\n', Pg_ortho[0])
+                print('G(g) (NO)\n' , Gg[0])
+            t06 = time.time()
+            print('time for Gg: %.3f' % (t06-t05))
+            xg, yg, ciS, C_no = get_xg(self, self.no, na, nb, Ng)
             self.xg, self.ciS = xg, ciS
             #yg, ciS = util.get_yg(self, xg)
-            trHg, ciH = get_H(self, hcore_ortho, no, Pg, Gg, xg)
+            trHg, ciH = get_H(self, hcore_ortho, self.no, Pg, Gg, xg)
             S2 = get_S2(self, Pg_ortho)
-            Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, dm_no, na+nb)
-            Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, dm_no, Dg, na+nb, Yg, Xg, no, F_ortho)
+            Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
+            Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
             E_suhf = mf.energy_nuc() + H_suhf
             self.E_suhf = E_suhf
-            print('E(SUHF) = %15.8f' % E_suhf)
+            #print('E(SUHF) = %15.8f' % E_suhf)
 
             Faa = F_mod_ortho[:norb, :norb]
             Fbb = F_mod_ortho[norb:, norb:]
@@ -619,26 +678,53 @@ class SUHF():
             if self.diis_on and cyc >= self.diis_start_cyc:
                 s1e = np.eye(norb)
                 F_mod_ortho = self.diis.update(s1e, self.dm_ortho, F_mod_ortho)
-                print('F(mod,ortho) updated with CDIIS\n', F_mod_ortho)
-            mo_e, self.dm_ortho = Diag_Feff(F_mod_ortho, na, nb)
+                print('F(mod,ortho) updated with CDIIS')
+                if self.debug:
+                    print(F_mod_ortho)
+            mo_e, mo_ortho, dm_ortho = Diag_Feff(F_mod_ortho, na, nb)
+            print('e_a, e_b\n', mo_e[0], '\n', mo_e[1])
+            if self.debug:
+                print('v_a, v_b\n', mo_ortho[0], '\n', mo_ortho[1])
+                print('P_a, P_b\n', dm_ortho[0],'\n', dm_ortho[1])
+            self.dm_ortho = dm_ortho
+            self.mo_ortho = mo_ortho
+            t10 = time.time()
+            print('time for xg, H, S2, Yg, Feff: %.3f' % (t10-t06))
         
             if old_suhf is not None:
-                if abs(E_suhf - old_suhf)<1e-8:
+                dE = E_suhf - old_suhf
+                ddm = dm_ortho - old_dm
+                max_ddm = abs(ddm).max()
+                norm_ddm = np.linalg.norm(ddm)
+                if abs(dE)<1e-8 and max_ddm<1e-5 and norm_ddm<1e-7:
                     conv = True
                     print('\n***************')
                     print('SUHF converged at cycle %d' %cyc)
-                    print('Final E(SUHF) = %15.8f, delta E = %10.6g' % (E_suhf,E_suhf-old_suhf))
+                    print('Final E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
+                else:
+                    print(' E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
             
             cyc += 1
             if cyc >= max_cycle:
                 print('SUHF not converged')
                 break
+        t_aftercyc = time.time()
+        print('time for cyc: %.3f' % (t_aftercyc-t_pre))
+        dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
+        if self.debug:
+            print('dm_reg\n', dm_reg)
+        #no = find_NO()
 
         if self.makedm:
-            suhf_dm = sudm.make_1pdm(self, Dg, dm_no, na, nb, C_no, no)
-            natocc, natorb = sudm.natorb(self,suhf_dm)
+            suhf_dm = sudm.make_1pdm(self, Dg, self.dm_no, C_no)
+            self.suhf_dm = suhf_dm
+            self.natocc, self.natorb = sudm.natorb(self, suhf_dm, self.tofch, self.oldfch)
+            t_dm = time.time()
+            print('time for dm: %.3f' % (t_dm-t_aftercyc))
 
-        return E_suhf, conv, natorb, natocc
+        t_end = time.time()
+        print('time tot: %.3f' % (t_end-t_start))
+        return E_suhf, conv, self.natorb, self.natocc
 
 
         

@@ -1,6 +1,7 @@
 core.*
 tmp*
 /test/*/*.log
+/test/test_dm/Cr/
 /phf/
 .vscode/
 __pycache__/

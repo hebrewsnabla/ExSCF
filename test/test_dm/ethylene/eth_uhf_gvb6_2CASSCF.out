@@ -1,0 +1,256 @@
+
+
+******** <class 'pyscf.scf.hf.RHF'> ********
+method = RHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 1
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/test_dm/tmp3c1_ibqq
+max_memory 1000 MB (current use 66 MB)
+Set gradient conv threshold to 3.16228e-05
+init E= -77.8066889984151
+
+WARN: HOMO -0.102183596122587 == LUMO -0.102178425812632
+
+cycle= 1 E= -77.7787400895485  delta_E= 0.0279  |g|= 0.236  |ddm|= 2.26
+SCF not converged.
+SCF energy = -77.7787400895485
+
+Orthonormality check: j=  22 i=  22 maxv= 3.26251358E-07
+
+******** <class 'pyscf.mcscf.mc1step.CASSCF'> ********
+CAS (1e+1e, 2o), ncore = 7, nvir = 39
+max_cycle_macro = 200
+max_cycle_micro = 4
+conv_tol = 1e-07
+conv_tol_grad = None
+orbital rotation max_stepsize = 0.02
+augmented hessian ah_max_cycle = 30
+augmented hessian ah_conv_tol = 1e-12
+augmented hessian ah_linear dependence = 1e-14
+augmented hessian ah_level shift = 0
+augmented hessian ah_start_tol = 2.5
+augmented hessian ah_start_cycle = 3
+augmented hessian ah_grad_trust_region = 3
+kf_trust_region = 3
+kf_interval = 4
+ci_response_space = 4
+ci_grad_trust_region = 3
+with_dep4 0
+natorb = True
+canonicalization = True
+sorting_mo_energy = False
+ao2mo_level = 2
+chkfile = /share/home/srwang/ExSCF/test/test_dm/tmp3c1_ibqq
+max_memory 500 MB (current use 80 MB)
+internal_rotation = False
+******** <class 'pyscf.fci.direct_spin1.FCISolver'> ********
+max. cycles = 50
+conv_tol = 1e-08
+davidson only = True
+linear dependence = 1e-10
+level shift = 0.001
+max iter space = 12
+max_memory 500 MB
+nroots = 1
+pspace_size = 400
+spin = 0
+Start 1-step CASSCF
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = -76.8779207864702
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 0.0808  e= [-0.70608006]  max|de|= -0.706  lindep= 0.858
+davidson 1 2  |r|= 1.14e-05  e= [-0.78691762]  max|de|= -0.0808  lindep=    1
+davidson 2 3  |r|= 0.00313  e= [-1.02294472]  max|de|= -0.236  lindep=    1
+davidson 3 4  |r|= 7.86e-16  e= [-1.02298576]  max|de|= -4.1e-05  lindep=    1
+Linear dependency in trial subspace. |r| for each state [7.859552661117396e-16]
+    CPU time for FCI solver      0.01 sec, wall time      0.01 sec
+CAS space CI energy = -1.02298576219381
+CASCI E = -77.900906548664  S^2 = 0.0000000
+Set conv_tol_grad to 0.000316228
+    CPU time for Initializing 1-step CASSCF      0.05 sec, wall time      0.05 sec
+    CPU time for CAS DM      0.00 sec, wall time      0.00 sec
+    |g|=0.0509
+    CPU time for gen h_op      0.01 sec, wall time      0.01 sec
+    imic 1(3)  |g[o]|=0.00226  |dxi|=0.0252  max(|x|)=0.00652  |dr|=0.0252  eig=-0.00085  seig=0.00221
+    CPU time for aug_hess in 1 inner iters      0.03 sec, wall time      0.03 sec
+    CPU time for orbital rotation      0.04 sec, wall time      0.04 sec
+    CPU time for update CAS DM      0.02 sec, wall time      0.02 sec
+micro 1  |u-1|=0.0356  |g[o]|=0.0509  |g[c]|=0.000679  |ddm|=3.56e-06
+    CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
+    |g|=0.00228 (keyframe), |g-correction|=0.000117
+    CPU time for gen h_op      0.02 sec, wall time      0.02 sec
+    imic 2(4)  |g[o]|=0.000584  |dxi|=0.00137  max(|x|)=0.000393  |dr|=0.00137  eig=-1.87e-06  seig=0.0022
+    CPU time for aug_hess in 2 inner iters      0.01 sec, wall time      0.01 sec
+    CPU time for orbital rotation      0.03 sec, wall time      0.03 sec
+    CPU time for update CAS DM      0.02 sec, wall time      0.02 sec
+micro 2  |u-1|=0.0361  |g[o]|=0.00228  |g[c]|=0.000676  |ddm|=4.02e-06
+    CPU time for micro iter 2      0.00 sec, wall time      0.00 sec
+    |g|=0.00058 (keyframe), |g-correction|=1.8e-05
+    CPU time for gen h_op      0.02 sec, wall time      0.02 sec
+    imic 3(5)  |g[o]|=0.000217  |dxi|=0.000473  max(|x|)=0.000189  |dr|=0.000473  eig=-1.94e-07  seig=0.00219
+    imic 4(6)  |g[o]|=5.16e-05  |dxi|=9e-05  max(|x|)=2.25e-05  |dr|=0.00052  eig=-1.24e-08  seig=0.00219
+    CPU time for aug_hess in 4 inner iters      0.02 sec, wall time      0.02 sec
+    CPU time for orbital rotation      0.04 sec, wall time      0.04 sec
+    CPU time for update CAS DM      0.02 sec, wall time      0.02 sec
+micro 3  |u-1|=0.0362  |g[o]|=0.00058  |g[c]|=0.000677  |ddm|=5.26e-06
+    CPU time for micro iter 3      0.00 sec, wall time      0.00 sec
+    |g|=5.15e-05 (keyframe), |g-correction|=3.88e-06
+    CPU time for gen h_op      0.02 sec, wall time      0.02 sec
+    imic 5(7)  |g[o]|=1.3e-05  |dxi|=1.83e-05  max(|x|)=6.98e-06  |dr|=1.83e-05  eig=-7.86e-10  seig=0.00219
+    CPU time for orbital rotation      0.03 sec, wall time      0.03 sec
+micro 4  |u-1|=0.0362  |g[o]|=5.15e-05
+Active space overlap to initial guess, SVD = [0.99989509 0.99989506]
+Active space overlap to last step, SVD = [0.99989507 0.99989505]
+    CPU time for update eri      0.03 sec, wall time      0.03 sec
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = -76.8774005431209
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 3.17e-08  e= [-1.02435873]  max|de|= -1.02  lindep=    1
+Linear dependency in trial subspace. |r| for each state [3.171705847608882e-08]
+    CPU time for FCI solver      0.00 sec, wall time      0.00 sec
+CAS space CI energy = -1.02435872684373
+macro iter 1 (10 JK  4 micro), CASSCF E = -77.9017592699646  dE = -0.0008527213  S^2 = 0.0000000
+               |grad[o]|=0.0509  |grad[c]|= 0.0006770644656729617  |ddm|=5.26e-06
+    CPU time for CASCI solver      0.01 sec, wall time      0.01 sec
+    CPU time for macro iter 1      0.24 sec, wall time      0.24 sec
+    |g|=3.64e-05
+    CPU time for gen h_op      0.01 sec, wall time      0.01 sec
+    imic 1(3)  |g[o]|=4.91e-06  |dxi|=6.32e-05  max(|x|)=1.89e-05  |dr|=6.32e-05  eig=-2.07e-09  seig=3.21e-10
+    CPU time for orbital rotation      0.05 sec, wall time      0.05 sec
+    CPU time for update CAS DM      0.02 sec, wall time      0.02 sec
+micro 1  |u-1|=8.94e-05  |g[o]|=3.64e-05  |g[c]|=5.95e-08  |ddm|=7.04e-07
+    CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
+Active space overlap to initial guess, SVD = [0.99989455 0.99989453]
+Active space overlap to last step, SVD = [1. 1.]
+    CPU time for update eri      0.03 sec, wall time      0.03 sec
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = -76.8774115162287
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 1e-10  e= [-1.02434776]  max|de|= -1.02  lindep=    1
+Linear dependency in trial subspace. |r| for each state [1.0025208603124605e-10]
+    CPU time for FCI solver      0.00 sec, wall time      0.00 sec
+CAS space CI energy = -1.02434775581028
+macro iter 2 (3 JK  1 micro), CASSCF E = -77.901759272039  dE = -2.0743727e-09  S^2 = 0.0000000
+               |grad[o]|=3.64e-05  |grad[c]|= 5.948387045133714e-08  |ddm|=7.04e-07
+    CPU time for CASCI solver      0.01 sec, wall time      0.01 sec
+    CPU time for macro iter 2      0.10 sec, wall time      0.10 sec
+1-step CASSCF converged in 2 macro (13 JK 5 micro) steps
+CASSCF canonicalization
+where_natorb [0, 1]
+Natural occ [1.00004811 0.99995189]
+Natural orbital (expansion on meta-Lowdin AOs) in CAS space
+               #1        #2       
+ 0 C1 1s       0.00000   0.00000
+ 0 C1 2s       0.00005   0.00004
+ 0 C1 3s       0.00001   0.00001
+ 0 C1 2px      0.00002   0.00002
+ 0 C1 2py     -0.48331  -0.48973
+ 0 C1 2pz     -0.48975  -0.48333
+ 0 C1 3px      0.00000   0.00000
+ 0 C1 3py     -0.04754  -0.05173
+ 0 C1 3pz     -0.05173  -0.04754
+ 0 C1 3dxy    -0.01315   0.00971
+ 0 C1 3dyz     0.00000   0.00000
+ 0 C1 3dz^2    0.00000   0.00000
+ 0 C1 3dxz     0.00971  -0.01315
+0 C1 3dx2-y2  -0.00000  -0.00000
+ 1 H1 1s       0.10169  -0.10171
+ 1 H1 2s       0.00383  -0.00382
+ 1 H1 2px     -0.00126   0.00126
+ 1 H1 2py     -0.00878  -0.01548
+ 1 H1 2pz     -0.01548  -0.00878
+ 2 H2 1s      -0.10171   0.10169
+ 2 H2 2s      -0.00383   0.00383
+ 2 H2 2px      0.00126  -0.00126
+ 2 H2 2py     -0.00878  -0.01548
+ 2 H2 2pz     -0.01548  -0.00879
+ 3 C2 1s      -0.00000   0.00000
+ 3 C2 2s      -0.00005   0.00004
+ 3 C2 3s      -0.00001   0.00001
+ 3 C2 2px      0.00002  -0.00002
+ 3 C2 2py      0.48331  -0.48973
+ 3 C2 2pz     -0.48975   0.48333
+ 3 C2 3px      0.00000  -0.00000
+ 3 C2 3py      0.04754  -0.05173
+ 3 C2 3pz     -0.05173   0.04754
+ 3 C2 3dxy    -0.01315  -0.00971
+ 3 C2 3dyz     0.00000  -0.00000
+ 3 C2 3dz^2   -0.00000   0.00000
+ 3 C2 3dxz    -0.00971  -0.01315
+3 C2 3dx2-y2   0.00000  -0.00000
+ 4 H3 1s      -0.10169  -0.10171
+ 4 H3 2s      -0.00383  -0.00382
+ 4 H3 2px     -0.00126  -0.00126
+ 4 H3 2py      0.00878  -0.01548
+ 4 H3 2pz     -0.01548   0.00878
+ 5 H4 1s       0.10171   0.10169
+ 5 H4 2s       0.00383   0.00383
+ 5 H4 2px      0.00126   0.00126
+ 5 H4 2py      0.00878  -0.01548
+ 5 H4 2pz     -0.01548   0.00879
+<CAS-nat-orb|mo-hf>  8  8    0.99989455
+<CAS-nat-orb|mo-hf>  9  9    0.99989453
+i = 1  <i|F|i> = -11.23159991
+i = 2  <i|F|i> = -11.23091680
+i = 3  <i|F|i> =  -0.97678179
+i = 4  <i|F|i> =  -0.78804268
+i = 5  <i|F|i> =  -0.57773328
+i = 6  <i|F|i> =  -0.57773037
+i = 7  <i|F|i> =  -0.56016809
+i = 8  <i|F|i> =  -0.09887978
+i = 9  <i|F|i> =  -0.09886000
+i = 10  <i|F|i> =   0.21921556
+i = 11  <i|F|i> =   0.22170977
+i = 12  <i|F|i> =   0.27081636
+i = 13  <i|F|i> =   0.27081766
+i = 14  <i|F|i> =   0.43971844
+i = 15  <i|F|i> =   0.60440046
+i = 16  <i|F|i> =   0.66975266
+i = 17  <i|F|i> =   0.69734864
+i = 18  <i|F|i> =   0.73821720
+i = 19  <i|F|i> =   0.73821931
+i = 20  <i|F|i> =   0.78995762
+i = 21  <i|F|i> =   0.78996492
+i = 22  <i|F|i> =   0.85184649
+i = 23  <i|F|i> =   0.89938565
+i = 24  <i|F|i> =   0.93679707
+i = 25  <i|F|i> =   0.93679722
+i = 26  <i|F|i> =   0.99500434
+i = 27  <i|F|i> =   1.44133227
+i = 28  <i|F|i> =   1.48381991
+i = 29  <i|F|i> =   1.76645062
+i = 30  <i|F|i> =   1.76645705
+i = 31  <i|F|i> =   1.87189949
+i = 32  <i|F|i> =   1.89901490
+i = 33  <i|F|i> =   1.89901665
+i = 34  <i|F|i> =   1.94139521
+i = 35  <i|F|i> =   2.14152388
+i = 36  <i|F|i> =   2.14152680
+i = 37  <i|F|i> =   2.19413460
+i = 38  <i|F|i> =   2.38500139
+i = 39  <i|F|i> =   2.41273065
+i = 40  <i|F|i> =   2.61102416
+i = 41  <i|F|i> =   2.61102834
+i = 42  <i|F|i> =   2.63305413
+i = 43  <i|F|i> =   2.64735320
+i = 44  <i|F|i> =   3.03501569
+i = 45  <i|F|i> =   3.20100252
+i = 46  <i|F|i> =   3.26144708
+i = 47  <i|F|i> =   3.33278880
+i = 48  <i|F|i> =   3.33279771
+    CPU time for 1-step CASSCF      0.49 sec, wall time      0.60 sec
+CASSCF energy = -77.901759272039
+CASCI E = -77.901759272039  E(CI) = -1.02434775581028  S^2 = 0.0000000
+Overwritten attributes  contract_2e  of <class 'pyscf.fci.direct_spin1.FCISolver'>

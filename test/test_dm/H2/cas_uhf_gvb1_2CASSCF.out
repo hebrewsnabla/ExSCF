@@ -1,0 +1,119 @@
+
+
+******** <class 'pyscf.scf.hf.RHF'> ********
+method = RHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 1
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/test_dm/tmpefrjigmd
+max_memory 4000 MB (current use 66 MB)
+Set gradient conv threshold to 3.16228e-05
+init E= -0.648815913128119
+  HOMO = -0.244674878016949  LUMO = -0.0864460505777443
+cycle= 1 E= -0.907663592245963  delta_E= -0.259  |g|= 0.019  |ddm|= 0.828
+SCF not converged.
+SCF energy = -0.907663592245963
+
+Orthonormality check: j=   2 i=   2 maxv= 4.72031247E-08
+
+******** <class 'pyscf.mcscf.mc1step.CASSCF'> ********
+CAS (1e+1e, 2o), ncore = 0, nvir = 2
+max_cycle_macro = 200
+max_cycle_micro = 4
+conv_tol = 1e-07
+conv_tol_grad = None
+orbital rotation max_stepsize = 0.02
+augmented hessian ah_max_cycle = 30
+augmented hessian ah_conv_tol = 1e-12
+augmented hessian ah_linear dependence = 1e-14
+augmented hessian ah_level shift = 0
+augmented hessian ah_start_tol = 2.5
+augmented hessian ah_start_cycle = 3
+augmented hessian ah_grad_trust_region = 3
+kf_trust_region = 3
+kf_interval = 4
+ci_response_space = 4
+ci_grad_trust_region = 3
+with_dep4 0
+natorb = True
+canonicalization = True
+sorting_mo_energy = False
+ao2mo_level = 2
+chkfile = /share/home/srwang/ExSCF/test/test_dm/tmpefrjigmd
+max_memory 2000 MB (current use 73 MB)
+internal_rotation = False
+******** <class 'pyscf.fci.direct_spin1.FCISolver'> ********
+max. cycles = 50
+conv_tol = 1e-08
+davidson only = True
+linear dependence = 1e-10
+level shift = 0.001
+max iter space = 12
+max_memory 2000 MB
+nroots = 1
+pspace_size = 400
+spin = 0
+Start 1-step CASSCF
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = 0.264588604137057
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 0.196  e= [-1.16616317]  max|de|= -1.17  lindep= 0.00514
+davidson 1 2  |r|= 3.68e-15  e= [-1.27453355]  max|de|= -0.108  lindep=    1
+Linear dependency in trial subspace. |r| for each state [3.677917342528803e-15]
+    CPU time for FCI solver      0.01 sec, wall time      0.01 sec
+CAS space CI energy = -1.27453354729448
+CASCI E = -1.00994494315742  S^2 = 0.0000000
+Set conv_tol_grad to 0.000316228
+    CPU time for Initializing 1-step CASSCF      0.01 sec, wall time      0.01 sec
+    CPU time for CAS DM      0.00 sec, wall time      0.00 sec
+    |g|=5.03e-05
+    CPU time for gen h_op      0.00 sec, wall time      0.00 sec
+    imic 1(3)  |g[o]|=8.11e-14  |dxi|=4.34e-05  max(|x|)=3.42e-05  |dr|=4.34e-05  eig=-1.87e-09  seig=2.39e-09
+    CPU time for orbital rotation      0.01 sec, wall time      0.01 sec
+    CPU time for update CAS DM      0.01 sec, wall time      0.01 sec
+micro 1  |u-1|=6.14e-05  |g[o]|=5.03e-05  |g[c]|=1.71e-06  |ddm|=8.87e-06
+    CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
+Active space overlap to initial guess, SVD = [1.00000005 0.99999997]
+Active space overlap to last step, SVD = [1. 1.]
+    CPU time for update eri      0.00 sec, wall time      0.00 sec
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = 0.264588604137057
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 2.68e-15  e= [-1.27453355]  max|de|= -1.27  lindep=    1
+Linear dependency in trial subspace. |r| for each state [2.6832645516543893e-15]
+    CPU time for FCI solver      0.00 sec, wall time      0.00 sec
+CAS space CI energy = -1.27453354916787
+macro iter 1 (3 JK  1 micro), CASSCF E = -1.00994494503081  dE = -1.8733881e-09  S^2 = 0.0000000
+               |grad[o]|=5.03e-05  |grad[c]|= 1.7097664346603104e-06  |ddm|=8.87e-06
+    CPU time for CASCI solver      0.01 sec, wall time      0.01 sec
+    CPU time for macro iter 1      0.02 sec, wall time      0.02 sec
+1-step CASSCF converged in 1 macro (3 JK 1 micro) steps
+CASSCF canonicalization
+where_natorb [0, 1]
+Natural occ [1.53078582 0.46921418]
+Natural orbital (expansion on meta-Lowdin AOs) in CAS space
+               #1        #2       
+ 0 H1 1s       0.70547   0.70645
+ 0 H1 2s       0.04815   0.03049
+ 1 H2 1s       0.70547  -0.70645
+ 1 H2 2s       0.04815  -0.03049
+<CAS-nat-orb|mo-hf>  1  1    0.99999997
+<CAS-nat-orb|mo-hf>  2  2    1.00000005
+i = 1  <i|F|i> =  -0.29876024
+i = 2  <i|F|i> =  -0.04361806
+i = 3  <i|F|i> =   1.15318713
+i = 4  <i|F|i> =   1.19446683
+    CPU time for 1-step CASSCF      0.09 sec, wall time      0.16 sec
+CASSCF energy = -1.00994494503081
+CASCI E = -1.00994494503081  E(CI) = -1.27453354916787  S^2 = 0.0000000
+Overwritten attributes  contract_2e  of <class 'pyscf.fci.direct_spin1.FCISolver'>
