@@ -222,14 +222,8 @@ def get_Gg(mol, Pg, no, X):
     #print(Pgaabb_ao.shape)
     #nao = Pgaabb_ao.shape[-1]
     ndm = len(Pgab_ao)
-    #Pgp = Pgaabb_ao.reshape(-1,nao,nao)
-    #print(Pgp.shape)
     vj,vk = scf.hf.get_jk(mol, Pgaabb_ao, hermi=0)
-    print(vj.shape)
-    #vj = vj.reshape(Pgaabb_ao.shape)
     #print(vj.shape)
-    #vk = vk.reshape(Pgaabb_ao.shape)
-    #print(vk.shape)
     Ggaa_ao = vj[:ndm] + vj[ndm:] - vk[:ndm]
     Ggbb_ao = vj[:ndm] + vj[ndm:] - vk[ndm:]
     #Ggbb_ao = scf.hf.get_jk(mol, Pgbb_ao, hermi=0)
@@ -556,10 +550,7 @@ class SUHF():
         Ca_ortho = np.dot(XS, Ca)
         Cb_ortho = np.dot(XS, Cb)
         if self.debug:
-            print('C (ortho)')
-            print(Ca_ortho)
-            print(Cb_ortho)
-        
+            print('C (ortho)\n', Ca_ortho, '\n', Cb_ortho)
         self.mo_ortho = Ca_ortho, Cb_ortho
         self.dm_ortho = scf.uhf.make_rdm1(self.mo_ortho, self.guesshf.mo_occ)
         if self.debug:
@@ -620,8 +611,6 @@ class SUHF():
             print('**** Start Cycle %d ****' % (cyc+1))
             old_suhf = self.E_suhf
             old_dm = self.dm_ortho
-            #print(hcore_ortho)
-            
             #if cyc==0:
             #    veff = mf.get_veff(dm = dm)
             #else:
@@ -688,6 +677,7 @@ class SUHF():
                 print('P_a, P_b\n', dm_ortho[0],'\n', dm_ortho[1])
             self.dm_ortho = dm_ortho
             self.mo_ortho = mo_ortho
+            self.mo_e = mo_e
             t10 = time.time()
             print('time for xg, H, S2, Yg, Feff: %.3f' % (t10-t06))
         
@@ -708,17 +698,25 @@ class SUHF():
             if cyc >= max_cycle:
                 print('SUHF not converged')
                 break
+
         t_aftercyc = time.time()
         print('time for cyc: %.3f' % (t_aftercyc-t_pre))
         dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
+        mo_ortho = np.array(self.mo_ortho)
+        mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
         if self.debug:
             print('dm_reg\n', dm_reg)
+            print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
         #no = find_NO()
 
         if self.makedm:
             suhf_dm = sudm.make_1pdm(self, Dg, self.dm_no, C_no)
             self.suhf_dm = suhf_dm
-            self.natocc, self.natorb = sudm.natorb(self, suhf_dm, self.tofch, self.oldfch)
+            self.natorb, self.natocc = sudm.natorb(self, suhf_dm)
+            if self.tofch:
+                S = self.mol.intor_symmetric('int1e_ovlp')
+                util2.tofch(self.oldfch, self.natorb, self.natocc, S, 'SUHFNO')
+                util2.tofch(self.oldfch, mo_reg, self.mo_e, S, 'SUHFMO')
             t_dm = time.time()
             print('time for dm: %.3f' % (t_dm-t_aftercyc))
 

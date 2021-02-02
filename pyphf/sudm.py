@@ -2,7 +2,6 @@ import numpy as np
 from pyphf import util2
 import sympy
 from sympy.physics.quantum.cg import CG
-from py2fch import py2fch
 import os
 
 
@@ -60,7 +59,7 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
     print('SUHF DM alpha\n', int1pdm_a, '\nSUHF DM beta\n', int1pdm_b)
     return [int1pdm_a, int1pdm_b]
 
-def natorb(suhf, dm, tofch, oldfch):
+def natorb(suhf, dm):
     #print(type(dm[0]), dm[0].dtype)
     XS = suhf.XS
     X = suhf.X
@@ -75,17 +74,6 @@ def natorb(suhf, dm, tofch, oldfch):
     natocc_b = -1 * natocc_b
     print('SUHF natural orbitals alpha\n', natorb_a, '\nSUHF NO occ alpha\n', natocc_a)
     print('SUHF natural orbitals beta\n', natorb_b, '\nSUHF NO occ beta\n', natocc_b)
-    if tofch:
-        fch = oldfch.split('.fch')[0] + '_SUHFNO.fch'
-        os.system('cp %s %s' % (oldfch, fch))
-        S = suhf.mol.intor_symmetric('int1e_ovlp')
-        Sdiag = S.diagonal()
-        nbfa = natorb_a.shape[0]
-        nifa = natorb_a.shape[1]
-        py2fch(fch, nbfa, nifa, natorb_a, Sdiag, 'a', natocc_a)
-        nbfb = natorb_b.shape[0]
-        nifb = natorb_b.shape[1]
-        py2fch(fch, nbfb, nifb, natorb_b, Sdiag, 'b', natocc_b)
     return [natorb_a, natorb_b], [natocc_a, natocc_b]
 
 

@@ -1,6 +1,7 @@
 core.*
 tmp*
 /test/*/*.log
+/test/*/*.chk
 /test/test_dm/Cr/
 /test/test_dm/B3/
 /phf/
