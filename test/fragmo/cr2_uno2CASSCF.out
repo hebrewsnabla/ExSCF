@@ -1,0 +1,838 @@
+
+
+******** <class 'pyscf.scf.hf.RHF'> ********
+method = RHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 1
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /home/wsr/ExSCF/test/fragmo/tmph6i0nu2t
+max_memory 1000 MB (current use 88 MB)
+Set gradient conv threshold to 3.16228e-05
+init E= -2085.22029005019
+  HOMO = -0.25074109339125  LUMO = -0.204721638792723
+cycle= 1 E= -2085.57162113843  delta_E= -0.351  |g|= 0.758  |ddm|= 2.53
+SCF not converged.
+SCF energy = -2085.57162113843
+
+Orthonormality check: j=  84 i=  33 maxv= 3.16362708E-08
+
+******** <class 'pyscf.mcscf.mc1step.CASSCF'> ********
+CAS (6e+6e, 12o), ncore = 18, nvir = 60
+max_cycle_macro = 200
+max_cycle_micro = 4
+conv_tol = 1e-07
+conv_tol_grad = None
+orbital rotation max_stepsize = 0.02
+augmented hessian ah_max_cycle = 30
+augmented hessian ah_conv_tol = 1e-12
+augmented hessian ah_linear dependence = 1e-14
+augmented hessian ah_level shift = 0
+augmented hessian ah_start_tol = 2.5
+augmented hessian ah_start_cycle = 3
+augmented hessian ah_grad_trust_region = 3
+kf_trust_region = 3
+kf_interval = 4
+ci_response_space = 4
+ci_grad_trust_region = 3
+with_dep4 0
+natorb = True
+canonicalization = True
+sorting_mo_energy = False
+ao2mo_level = 2
+chkfile = /home/wsr/ExSCF/test/fragmo/tmph6i0nu2t
+max_memory 500 MB (current use 167 MB)
+internal_rotation = False
+******** <class 'pyscf.fci.direct_spin1.FCISolver'> ********
+max. cycles = 50
+conv_tol = 1e-08
+davidson only = True
+linear dependence = 1e-10
+level shift = 0.2
+max iter space = 100
+max_memory 500 MB
+nroots = 1
+pspace_size = 1200
+spin = 0
+Start 1-step CASSCF
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = -2056.88380298974
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+Overwritten attributes  contract_2e  of <class 'pyscf.fci.direct_spin1.FCISolver'>
+davidson 0 1  |r|= 1.14  e= [-28.07732533]  max|de|= -28.1  lindep=    1
+davidson 1 2  |r|= 0.813  e= [-28.61136825]  max|de|= -0.534  lindep= 0.999
+davidson 2 3  |r|= 0.81  e= [-28.61272408]  max|de|= -0.00136  lindep= 0.998
+davidson 3 4  |r|= 0.81  e= [-28.61274483]  max|de|= -2.08e-05  lindep= 0.0826
+davidson 4 5  |r|= 0.779  e= [-28.62684629]  max|de|= -0.0141  lindep= 0.997
+davidson 5 6  |r|= 0.728  e= [-28.65461508]  max|de|= -0.0278  lindep= 0.986
+davidson 6 7  |r|= 0.638  e= [-28.72531418]  max|de|= -0.0707  lindep= 0.969
+davidson 7 8  |r|= 0.623  e= [-28.72996996]  max|de|= -0.00466  lindep= 0.859
+davidson 8 9  |r|= 0.593  e= [-28.7539862]  max|de|= -0.024  lindep= 0.98
+davidson 9 10  |r|= 0.593  e= [-28.75398783]  max|de|= -1.63e-06  lindep= 0.121
+davidson 10 11  |r|= 0.591  e= [-28.75612549]  max|de|= -0.00214  lindep= 0.994
+davidson 11 12  |r|= 0.591  e= [-28.75650041]  max|de|= -0.000375  lindep= 0.71
+davidson 12 13  |r|= 0.581  e= [-28.76124176]  max|de|= -0.00474  lindep= 0.573
+davidson 13 14  |r|= 0.581  e= [-28.76414715]  max|de|= -0.00291  lindep= 0.895
+davidson 14 15  |r|= 0.573  e= [-28.77087604]  max|de|= -0.00673  lindep= 0.96
+davidson 15 16  |r|= 0.577  e= [-28.774345]  max|de|= -0.00347  lindep= 0.645
+davidson 16 17  |r|= 0.575  e= [-28.77979611]  max|de|= -0.00545  lindep= 0.994
+davidson 17 18  |r|= 0.575  e= [-28.77980822]  max|de|= -1.21e-05  lindep= 0.63
+davidson 18 19  |r|= 0.573  e= [-28.78405011]  max|de|= -0.00424  lindep= 0.959
+davidson 19 20  |r|= 0.573  e= [-28.78450456]  max|de|= -0.000454  lindep= 0.929
+davidson 20 21  |r|= 0.573  e= [-28.7862721]  max|de|= -0.00177  lindep= 0.851
+davidson 21 22  |r|= 0.572  e= [-28.7871246]  max|de|= -0.000853  lindep= 0.602
+davidson 22 23  |r|= 0.568  e= [-28.7988303]  max|de|= -0.0117  lindep= 0.994
+davidson 23 24  |r|= 0.568  e= [-28.79924113]  max|de|= -0.000411  lindep= 0.215
+davidson 24 25  |r|= 0.547  e= [-28.81092807]  max|de|= -0.0117  lindep= 0.878
+davidson 25 26  |r|= 0.493  e= [-28.85109982]  max|de|= -0.0402  lindep= 0.999
+davidson 26 27  |r|= 0.492  e= [-28.85194996]  max|de|= -0.00085  lindep= 0.787
+davidson 27 28  |r|= 0.466  e= [-28.90559556]  max|de|= -0.0536  lindep= 0.595
+davidson 28 29  |r|= 0.465  e= [-28.90888835]  max|de|= -0.00329  lindep= 0.786
+davidson 29 30  |r|= 0.466  e= [-28.9092292]  max|de|= -0.000341  lindep= 0.676
+davidson 30 31  |r|= 0.465  e= [-28.90938673]  max|de|= -0.000158  lindep= 0.101
+davidson 31 32  |r|= 0.456  e= [-28.93039045]  max|de|= -0.021  lindep= 0.964
+davidson 32 33  |r|= 0.456  e= [-28.93040309]  max|de|= -1.26e-05  lindep= 0.0419
+davidson 33 34  |r|= 0.457  e= [-28.93099364]  max|de|= -0.000591  lindep= 0.463
+davidson 34 35  |r|= 0.457  e= [-28.9310138]  max|de|= -2.02e-05  lindep= 0.0452
+davidson 35 36  |r|= 0.458  e= [-28.93119262]  max|de|= -0.000179  lindep= 0.0758
+davidson 36 37  |r|= 0.459  e= [-28.93147823]  max|de|= -0.000286  lindep= 0.251
+davidson 37 38  |r|= 0.459  e= [-28.93149014]  max|de|= -1.19e-05  lindep= 0.116
+davidson 38 39  |r|= 0.459  e= [-28.93155745]  max|de|= -6.73e-05  lindep= 0.0941
+davidson 39 40  |r|= 0.458  e= [-28.93166663]  max|de|= -0.000109  lindep= 0.254
+davidson 40 41  |r|= 0.458  e= [-28.9317051]  max|de|= -3.85e-05  lindep= 0.0686
+davidson 41 42  |r|= 0.456  e= [-28.93263999]  max|de|= -0.000935  lindep= 0.598
+davidson 42 43  |r|= 0.451  e= [-28.93501178]  max|de|= -0.00237  lindep= 0.179
+davidson 43 44  |r|= 0.439  e= [-28.94261389]  max|de|= -0.0076  lindep= 0.481
+davidson 44 45  |r|= 0.406  e= [-28.98517193]  max|de|= -0.0426  lindep= 0.993
+davidson 45 46  |r|= 0.406  e= [-28.9852186]  max|de|= -4.67e-05  lindep= 0.93
+davidson 46 47  |r|= 0.406  e= [-28.9852229]  max|de|= -4.29e-06  lindep= 0.0457
+davidson 47 48  |r|= 0.405  e= [-28.98651104]  max|de|= -0.00129  lindep= 0.433
+davidson 48 49  |r|= 0.404  e= [-28.99145474]  max|de|= -0.00494  lindep= 0.298
+davidson 49 50  |r|= 0.383  e= [-28.99682327]  max|de|= -0.00537  lindep= 0.894
+    CPU time for FCI solver     55.48 sec, wall time     55.84 sec
+CAS space CI energy = -28.9968232684237
+CASCI E = -2085.88062625817  S^2 = 1.2401425
+Set conv_tol_grad to 0.000316228
+    CPU time for Initializing 1-step CASSCF     55.96 sec, wall time     56.32 sec
+    CPU time for CAS DM      0.76 sec, wall time      0.76 sec
+    |g|=0.178
+    CPU time for gen h_op      0.04 sec, wall time      0.09 sec
+    imic 1(3)  |g[o]|=0.137  |dxi|=0.0361  max(|x|)=0.0833  |dr|=0.0361  eig=-0.0152  seig=0.0207
+    imic 2(4)  |g[o]|=0.107  |dxi|=0.0361  max(|x|)=0.0886  |dr|=0.0712  eig=-0.012  seig=0.0206
+    imic 3(5)  |g[o]|=0.0842  |dxi|=0.0331  max(|x|)=0.0926  |dr|=0.102  eig=-0.00874  seig=0.0199
+    imic 4(6)  |g[o]|=0.064  |dxi|=0.0355  max(|x|)=0.0826  |dr|=0.135  eig=-0.00641  seig=0.0198
+    CPU time for aug_hess in 4 inner iters      0.46 sec, wall time      0.59 sec
+    CPU time for orbital rotation      0.50 sec, wall time      0.68 sec
+    CPU time for update CAS DM      3.23 sec, wall time      3.23 sec
+micro 1  |u-1|= 0.19  |g[o]|=0.178  |g[c]|=0.384  |ddm|=0.0389
+    CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
+    |g|=0.0626 (keyframe), |g-correction|=0.013
+    CPU time for gen h_op      0.85 sec, wall time      0.85 sec
+    imic 5(7)  |g[o]|=0.0451  |dxi|=0.0378  max(|x|)=0.0642  |dr|=0.0378  eig=-0.00348  seig=0.0195
+    imic 6(8)  |g[o]|=0.0285  |dxi|=0.0378  max(|x|)=0.0495  |dr|=0.0751  eig=-0.00197  seig=0.0193
+    imic 7(9)  |g[o]|=0.0144  |dxi|=0.0386  max(|x|)=0.0305  |dr|=0.113  eig=-0.000774  seig=0.0193
+    CPU time for aug_hess in 7 inner iters      0.23 sec, wall time      0.23 sec
+    CPU time for orbital rotation      1.07 sec, wall time      1.08 sec
+    CPU time for update CAS DM      3.21 sec, wall time      3.21 sec
+micro 2  |u-1|=0.337  |g[o]|=0.0626  |g[c]|=0.391  |ddm|=0.0436
+    CPU time for micro iter 2      0.00 sec, wall time      0.00 sec
+    |g|=0.0155 (keyframe), |g-correction|=0.0146
+    CPU time for gen h_op      0.85 sec, wall time      0.85 sec
+    imic 8(10)  |g[o]|=0.0149  |dxi|=0.0153  max(|x|)=0.00481  |dr|=0.0153  eig=-0.000142  seig=0.0192
+    imic 9(11)  |g[o]|=0.0079  |dxi|=0.00913  max(|x|)=0.00476  |dr|=0.0204  eig=-7.11e-05  seig=0.0184
+    imic 10(12)  |g[o]|=0.00683  |dxi|=0.00741  max(|x|)=0.00367  |dr|=0.0239  eig=-3.32e-05  seig=0.0181
+    imic 11(13)  |g[o]|=0.0034  |dxi|=0.00375  max(|x|)=0.00155  |dr|=0.0254  eig=-1.07e-05  seig=0.0177
+    CPU time for aug_hess in 11 inner iters      0.30 sec, wall time      0.30 sec
+    CPU time for orbital rotation      1.15 sec, wall time      1.15 sec
+    CPU time for update CAS DM      3.14 sec, wall time      3.14 sec
+micro 3  |u-1|=0.333  |g[o]|=0.0155  |g[c]|=0.384  |ddm|=0.157
+    CPU time for micro iter 3      0.00 sec, wall time      0.00 sec
+    |g|=0.0184 (keyframe), |g-correction|=0.0175
+    CPU time for gen h_op      0.84 sec, wall time      0.84 sec
+    imic 12(14)  |g[o]|=0.0115  |dxi|=0.0258  max(|x|)=0.013  |dr|=0.0258  eig=-0.000292  seig=0.0177
+    imic 13(15)  |g[o]|=0.00809  |dxi|=0.00745  max(|x|)=0.00305  |dr|=0.0274  eig=-4.47e-05  seig=0.0177
+    imic 14(16)  |g[o]|=0.00507  |dxi|=0.00599  max(|x|)=0.0021  |dr|=0.0295  eig=-2.24e-05  seig=0.0176
+    CPU time for aug_hess in 14 inner iters      0.23 sec, wall time      0.23 sec
+    CPU time for orbital rotation      1.07 sec, wall time      1.07 sec
+micro 4  |u-1|= 0.32  |g[o]|=0.0184
+Active space overlap to initial guess, SVD = [0.99996232 0.99993723 0.99993695 0.9998991  0.99988498 0.99985694
+ 0.99979287 0.99965438 0.99963644 0.9996272  0.99955382 0.9767429 ]
+Active space overlap to last step, SVD = [0.99996231 0.99993723 0.99993695 0.9998991  0.99988497 0.99985694
+ 0.99979287 0.99965438 0.99963644 0.9996272  0.99955382 0.9767429 ]
+    CPU time for update eri      0.35 sec, wall time      0.37 sec
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = -2056.90858320369
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 0.28  e= [-29.35507022]  max|de|= -29.4  lindep=    1
+davidson 1 2  |r|= 0.217  e= [-29.37439053]  max|de|= -0.0193  lindep= 0.996
+davidson 2 3  |r|= 0.184  e= [-29.3975441]  max|de|= -0.0232  lindep= 0.986
+davidson 3 4  |r|= 0.247  e= [-29.41729186]  max|de|= -0.0197  lindep= 0.994
+davidson 4 5  |r|= 0.297  e= [-29.46545112]  max|de|= -0.0482  lindep= 0.982
+davidson 5 6  |r|= 0.198  e= [-29.49847712]  max|de|= -0.033  lindep= 0.99
+davidson 6 7  |r|= 0.158  e= [-29.5154964]  max|de|= -0.017  lindep= 0.987
+davidson 7 8  |r|= 0.151  e= [-29.52803388]  max|de|= -0.0125  lindep= 0.976
+davidson 8 9  |r|= 0.24  e= [-29.55323903]  max|de|= -0.0252  lindep= 0.991
+davidson 9 10  |r|= 0.182  e= [-29.57916003]  max|de|= -0.0259  lindep= 0.996
+davidson 10 11  |r|= 0.163  e= [-29.59530244]  max|de|= -0.0161  lindep= 0.991
+davidson 11 12  |r|= 0.166  e= [-29.60751376]  max|de|= -0.0122  lindep= 0.994
+davidson 12 13  |r|= 0.176  e= [-29.62297856]  max|de|= -0.0155  lindep= 0.993
+davidson 13 14  |r|= 0.158  e= [-29.63627085]  max|de|= -0.0133  lindep= 0.989
+davidson 14 15  |r|= 0.14  e= [-29.64870837]  max|de|= -0.0124  lindep= 0.988
+davidson 15 16  |r|= 0.136  e= [-29.65564833]  max|de|= -0.00694  lindep= 0.98
+davidson 16 17  |r|= 0.105  e= [-29.66244768]  max|de|= -0.0068  lindep= 0.993
+davidson 17 18  |r|= 0.116  e= [-29.6676243]  max|de|= -0.00518  lindep= 0.991
+davidson 18 19  |r|= 0.12  e= [-29.67254889]  max|de|= -0.00492  lindep= 0.985
+davidson 19 20  |r|= 0.103  e= [-29.67836667]  max|de|= -0.00582  lindep= 0.986
+davidson 20 21  |r|= 0.101  e= [-29.68328052]  max|de|= -0.00491  lindep= 0.99
+davidson 21 22  |r|= 0.0922  e= [-29.68846566]  max|de|= -0.00519  lindep= 0.993
+davidson 22 23  |r|= 0.0795  e= [-29.69228056]  max|de|= -0.00381  lindep= 0.995
+davidson 23 24  |r|= 0.0625  e= [-29.69494842]  max|de|= -0.00267  lindep= 0.994
+davidson 24 25  |r|= 0.0512  e= [-29.69685734]  max|de|= -0.00191  lindep= 0.996
+davidson 25 26  |r|= 0.0406  e= [-29.69797863]  max|de|= -0.00112  lindep= 0.991
+davidson 26 27  |r|= 0.0301  e= [-29.6986801]  max|de|= -0.000701  lindep= 0.993
+davidson 27 28  |r|= 0.0227  e= [-29.69902451]  max|de|= -0.000344  lindep= 0.991
+davidson 28 29  |r|= 0.0171  e= [-29.69921072]  max|de|= -0.000186  lindep= 0.988
+davidson 29 30  |r|= 0.0131  e= [-29.69932047]  max|de|= -0.00011  lindep= 0.987
+davidson 30 31  |r|= 0.0101  e= [-29.69938833]  max|de|= -6.79e-05  lindep= 0.991
+davidson 31 32  |r|= 0.00802  e= [-29.69942703]  max|de|= -3.87e-05  lindep= 0.991
+davidson 32 33  |r|= 0.00617  e= [-29.69944976]  max|de|= -2.27e-05  lindep= 0.992
+davidson 33 34  |r|= 0.00579  e= [-29.69946298]  max|de|= -1.32e-05  lindep= 0.988
+davidson 34 35  |r|= 0.00378  e= [-29.69947133]  max|de|= -8.35e-06  lindep= 0.986
+davidson 35 36  |r|= 0.00275  e= [-29.69947688]  max|de|= -5.55e-06  lindep= 0.991
+davidson 36 37  |r|= 0.00223  e= [-29.69947999]  max|de|= -3.11e-06  lindep= 0.993
+davidson 37 38  |r|= 0.00161  e= [-29.69948166]  max|de|= -1.68e-06  lindep= 0.994
+davidson 38 39  |r|= 0.00121  e= [-29.69948253]  max|de|= -8.64e-07  lindep= 0.992
+davidson 39 40  |r|= 0.000859  e= [-29.69948301]  max|de|= -4.85e-07  lindep= 0.988
+davidson 40 41  |r|= 0.000643  e= [-29.69948327]  max|de|= -2.56e-07  lindep= 0.983
+davidson 41 42  |r|= 0.00047  e= [-29.69948342]  max|de|= -1.5e-07  lindep= 0.987
+davidson 42 43  |r|= 0.000352  e= [-29.6994835]  max|de|= -8.47e-08  lindep= 0.991
+davidson 43 44  |r|= 0.000223  e= [-29.69948355]  max|de|= -4.65e-08  lindep= 0.994
+davidson 44 45  |r|= 0.000165  e= [-29.69948357]  max|de|= -2.25e-08  lindep= 0.993
+davidson 45 46  |r|= 0.000114  e= [-29.69948358]  max|de|= -1.07e-08  lindep= 0.995
+root 0 converged  |r|= 8.29e-05  e= -29.69948358846463  max|de|= -5.63e-09
+converged 46 47  |r|= 8.29e-05  e= [-29.69948359]  max|de|= -5.63e-09
+    CPU time for FCI solver     51.51 sec, wall time     52.55 sec
+CAS space CI energy = -29.6994835884648
+macro iter 1 (19 JK  4 micro), CASSCF E = -2086.60806679215  dE = -0.72744053  S^2 = 0.0000000
+               |grad[o]|=0.178  |grad[c]|= 0.3839774690320802  |ddm|=0.157
+    CPU time for CASCI solver     52.32 sec, wall time     53.37 sec
+    CPU time for macro iter 1     66.79 sec, wall time     68.06 sec
+    |g|=0.133
+    CPU time for gen h_op      0.03 sec, wall time      0.03 sec
+    imic 1(3)  |g[o]|= 0.11  |dxi|=0.0322  max(|x|)= 0.12  |dr|=0.0322  eig=-0.013  seig=3.53e-05
+    imic 2(4)  |g[o]|=0.0946  |dxi|=0.0308  max(|x|)=0.138  |dr|=0.0625  eig=-0.0105  seig=3.46e-05
+    imic 3(5)  |g[o]|=0.0795  |dxi|=0.0313  max(|x|)=0.131  |dr|=0.0933  eig=-0.00823  seig=3.45e-05
+    imic 4(6)  |g[o]|=0.0655  |dxi|=0.0326  max(|x|)=0.117  |dr|=0.125  eig=-0.00625  seig=3.43e-05
+    CPU time for aug_hess in 4 inner iters      0.46 sec, wall time      0.46 sec
+    CPU time for orbital rotation      0.50 sec, wall time      0.54 sec
+    CPU time for update CAS DM      3.19 sec, wall time      3.20 sec
+micro 1  |u-1|=0.177  |g[o]|=0.133  |g[c]|=0.0165  |ddm|=0.0478
+    CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
+    |g|=0.0701 (keyframe), |g-correction|=0.00755
+    CPU time for gen h_op      0.83 sec, wall time      0.83 sec
+    imic 5(7)  |g[o]|=0.057  |dxi|=0.0333  max(|x|)=0.107  |dr|=0.0333  eig=-0.00503  seig=3.43e-05
+    imic 6(8)  |g[o]|=0.0443  |dxi|=0.0342  max(|x|)=0.089  |dr|=0.0674  eig=-0.00346  seig=3.39e-05
+    imic 7(9)  |g[o]|=0.0323  |dxi|=0.0339  max(|x|)=0.0737  |dr|=0.101  eig=-0.00215  seig=3.38e-05
+    imic 8(10)  |g[o]|=0.0206  |dxi|=0.0339  max(|x|)=0.0563  |dr|=0.135  eig=-0.00117  seig=3.38e-05
+    CPU time for aug_hess in 8 inner iters      0.31 sec, wall time      0.31 sec
+    CPU time for orbital rotation      1.13 sec, wall time      1.13 sec
+    CPU time for update CAS DM      3.19 sec, wall time      3.20 sec
+micro 2  |u-1|=0.364  |g[o]|=0.0701  |g[c]|=0.0206  |ddm|=0.083
+    CPU time for micro iter 2      0.00 sec, wall time      0.00 sec
+    |g|=0.0254 (keyframe), |g-correction|=0.00763
+    CPU time for gen h_op      0.84 sec, wall time      0.84 sec
+    imic 9(11)  |g[o]|=0.0129  |dxi|=0.0328  max(|x|)=0.038  |dr|=0.0328  eig=-0.00058  seig=3.37e-05
+    imic 10(12)  |g[o]|=0.00439  |dxi|=0.0306  max(|x|)=0.0194  |dr|=0.0632  eig=-0.000146  seig=3.34e-05
+    CPU time for aug_hess in 10 inner iters      0.15 sec, wall time      0.15 sec
+    CPU time for orbital rotation      0.99 sec, wall time      0.99 sec
+    CPU time for update CAS DM      3.14 sec, wall time      3.15 sec
+micro 3  |u-1|=0.452  |g[o]|=0.0254  |g[c]|=0.0216  |ddm|= 0.11
+    CPU time for micro iter 3      0.00 sec, wall time      0.00 sec
+    |g|=0.00779 (keyframe), |g-correction|=0.00618
+    CPU time for gen h_op      0.85 sec, wall time      0.85 sec
+    imic 11(13)  |g[o]|=0.00522  |dxi|=0.00971  max(|x|)=0.00549  |dr|=0.00971  eig=-3.45e-05  seig=3.33e-05
+    imic 12(14)  |g[o]|=0.00225  |dxi|=0.00237  max(|x|)=0.000859  |dr|=0.0102  eig=-4.91e-06  seig=3.33e-05
+    CPU time for aug_hess in 12 inner iters      0.15 sec, wall time      0.15 sec
+    CPU time for orbital rotation      1.00 sec, wall time      1.00 sec
+micro 4  |u-1|= 0.46  |g[o]|=0.00779
+Active space overlap to initial guess, SVD = [0.99999779 0.99999602 0.99996928 0.99995788 0.99995459 0.9999235
+ 0.99973234 0.99973141 0.9997039  0.99932189 0.99932057 0.99577963]
+Active space overlap to last step, SVD = [0.99997892 0.99987508 0.99981499 0.99981111 0.99966432 0.99962252
+ 0.99924646 0.99923434 0.99909384 0.99907297 0.99855058 0.95326548]
+    CPU time for update eri      0.34 sec, wall time      0.34 sec
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = -2056.89741631307
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 0.0136  e= [-29.72775596]  max|de|= -29.7  lindep=    1
+davidson 1 2  |r|= 0.0135  e= [-29.72780744]  max|de|= -5.15e-05  lindep= 0.995
+davidson 2 3  |r|= 0.00856  e= [-29.72785717]  max|de|= -4.97e-05  lindep=    1
+davidson 3 4  |r|= 0.00993  e= [-29.72787907]  max|de|= -2.19e-05  lindep= 0.996
+davidson 4 5  |r|= 0.01  e= [-29.72792067]  max|de|= -4.16e-05  lindep= 0.993
+davidson 5 6  |r|= 0.00949  e= [-29.72795695]  max|de|= -3.63e-05  lindep= 0.997
+davidson 6 7  |r|= 0.00571  e= [-29.72797619]  max|de|= -1.92e-05  lindep= 0.998
+davidson 7 8  |r|= 0.00294  e= [-29.72798351]  max|de|= -7.32e-06  lindep= 0.998
+davidson 8 9  |r|= 0.00261  e= [-29.72798642]  max|de|= -2.91e-06  lindep= 0.998
+davidson 9 10  |r|= 0.00204  e= [-29.72798843]  max|de|= -2e-06  lindep= 0.996
+davidson 10 11  |r|= 0.00219  e= [-29.72798997]  max|de|= -1.55e-06  lindep= 0.993
+davidson 11 12  |r|= 0.00174  e= [-29.72799138]  max|de|= -1.4e-06  lindep= 0.992
+davidson 12 13  |r|= 0.00148  e= [-29.72799228]  max|de|= -9.04e-07  lindep= 0.986
+davidson 13 14  |r|= 0.00115  e= [-29.72799287]  max|de|= -5.86e-07  lindep= 0.991
+davidson 14 15  |r|= 0.000987  e= [-29.72799333]  max|de|= -4.62e-07  lindep= 0.996
+davidson 15 16  |r|= 0.000819  e= [-29.72799363]  max|de|= -3.03e-07  lindep= 0.996
+davidson 16 17  |r|= 0.000627  e= [-29.72799381]  max|de|= -1.76e-07  lindep= 0.996
+davidson 17 18  |r|= 0.000442  e= [-29.72799392]  max|de|= -1.14e-07  lindep= 0.996
+davidson 18 19  |r|= 0.000373  e= [-29.72799398]  max|de|= -6.41e-08  lindep= 0.996
+davidson 19 20  |r|= 0.000296  e= [-29.72799403]  max|de|= -4.35e-08  lindep= 0.997
+davidson 20 21  |r|= 0.000218  e= [-29.72799405]  max|de|= -2.45e-08  lindep= 0.997
+davidson 21 22  |r|= 0.000146  e= [-29.72799406]  max|de|= -1.22e-08  lindep= 0.995
+davidson 22 23  |r|= 0.000123  e= [-29.72799407]  max|de|= -8e-09  lindep= 0.995
+root 0 converged  |r|= 9.89e-05  e= -29.727994077062938  max|de|= -5.6e-09
+converged 23 24  |r|= 9.89e-05  e= [-29.72799408]  max|de|= -5.6e-09
+    CPU time for FCI solver     21.81 sec, wall time     21.93 sec
+CAS space CI energy = -29.7279940770632
+macro iter 2 (17 JK  4 micro), CASSCF E = -2086.62541039013  dE = -0.017343598  S^2 = 0.0000000
+               |grad[o]|=0.133  |grad[c]|= 0.02163363613890954  |ddm|= 0.11
+    CPU time for CASCI solver     22.63 sec, wall time     22.75 sec
+    CPU time for macro iter 2     36.11 sec, wall time     36.30 sec
+    |g|=0.0079
+    CPU time for gen h_op      0.03 sec, wall time      0.03 sec
+    imic 1(3)  |g[o]|=0.00453  |dxi|=0.0116  max(|x|)=0.0072  |dr|=0.0116  eig=-4.93e-05  seig=5.47e-06
+    imic 2(4)  |g[o]|=0.00265  |dxi|=0.00404  max(|x|)=0.00231  |dr|=0.0143  eig=-5.96e-06  seig=5.47e-06
+    imic 3(5)  |g[o]|=0.00195  |dxi|=0.00276  max(|x|)=0.00171  |dr|=0.0161  eig=-2.54e-06  seig=5.45e-06
+    CPU time for aug_hess in 3 inner iters      0.38 sec, wall time      0.38 sec
+    CPU time for orbital rotation      0.42 sec, wall time      0.42 sec
+    CPU time for update CAS DM      3.21 sec, wall time      3.21 sec
+micro 1  |u-1|=0.0228  |g[o]|=0.0079  |g[c]|=0.00213  |ddm|=0.00943
+    CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
+    |g|=0.00207 (keyframe), |g-correction|=0.00152
+    CPU time for gen h_op      0.85 sec, wall time      0.85 sec
+    imic 4(6)  |g[o]|=0.0012  |dxi|=0.00394  max(|x|)=0.0024  |dr|=0.00394  eig=-2.89e-06  seig=5.43e-06
+    imic 5(7)  |g[o]|=0.00074  |dxi|=0.00115  max(|x|)=0.00048  |dr|=0.00472  eig=-5.97e-07  seig=5.4e-06
+    imic 6(8)  |g[o]|=0.000414  |dxi|=0.000609  max(|x|)=0.000334  |dr|=0.00513  eig=-1.59e-07  seig=5.4e-06
+    CPU time for aug_hess in 6 inner iters      0.23 sec, wall time      0.23 sec
+    CPU time for orbital rotation      1.07 sec, wall time      1.08 sec
+    CPU time for update CAS DM      3.16 sec, wall time      3.16 sec
+micro 2  |u-1|=0.0294  |g[o]|=0.00207  |g[c]|=0.00242  |ddm|=0.0108
+    CPU time for micro iter 2      0.00 sec, wall time      0.00 sec
+    |g|=0.000475 (keyframe), |g-correction|=0.000214
+    CPU time for gen h_op      0.82 sec, wall time      0.83 sec
+    imic 7(9)  |g[o]|=0.000413  |dxi|=0.000908  max(|x|)=0.000554  |dr|=0.000908  eig=-1.26e-07  seig=5.38e-06
+    imic 8(10)  |g[o]|=0.000236  |dxi|=0.000338  max(|x|)=0.000219  |dr|=0.00114  eig=-5.13e-08  seig=5.37e-06
+    imic 9(11)  |g[o]|=0.000207  |dxi|=0.00025  max(|x|)=0.00015  |dr|=0.00132  eig=-2.4e-08  seig=5.33e-06
+    imic 10(12)  |g[o]|=9.72e-05  |dxi|=0.00012  max(|x|)=4.94e-05  |dr|=0.00139  eig=-8.03e-09  seig=5.25e-06
+    CPU time for aug_hess in 10 inner iters      0.31 sec, wall time      0.31 sec
+    CPU time for orbital rotation      1.13 sec, wall time      1.13 sec
+    CPU time for update CAS DM      3.12 sec, wall time      3.12 sec
+micro 3  |u-1|=0.0309  |g[o]|=0.000475  |g[c]|=0.00168  |ddm|=0.0119
+    CPU time for micro iter 3      0.00 sec, wall time      0.00 sec
+    |g|=0.00019 (keyframe), |g-correction|=0.000159
+    CPU time for gen h_op      0.83 sec, wall time      0.83 sec
+    imic 11(13)  |g[o]|=9.3e-05  |dxi|=0.00055  max(|x|)=0.000397  |dr|=0.00055  eig=-3.75e-08  seig=5.13e-06
+    imic 12(14)  |g[o]|=5.44e-05  |dxi|=5.13e-05  max(|x|)=2.28e-05  |dr|=0.000545  eig=-2.12e-09  seig=5.13e-06
+    CPU time for aug_hess in 12 inner iters      0.15 sec, wall time      0.15 sec
+    CPU time for orbital rotation      0.98 sec, wall time      0.98 sec
+micro 4  |u-1|=0.0317  |g[o]|=0.00019
+Active space overlap to initial guess, SVD = [0.99999395 0.99999388 0.99995748 0.99994867 0.99994843 0.99991066
+ 0.99965618 0.99962169 0.99962152 0.99917319 0.99917317 0.99378438]
+Active space overlap to last step, SVD = [0.99999978 0.99999977 0.99999939 0.99999854 0.99999778 0.99999564
+ 0.99999268 0.99999254 0.99999049 0.99999039 0.99999033 0.99980225]
+    CPU time for update eri      0.33 sec, wall time      0.33 sec
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = -2056.89952888316
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 0.00146  e= [-29.72595757]  max|de|= -29.7  lindep=    1
+davidson 1 2  |r|= 0.000988  e= [-29.7259579]  max|de|= -3.36e-07  lindep= 0.992
+davidson 2 3  |r|= 0.00109  e= [-29.72595827]  max|de|= -3.64e-07  lindep= 0.996
+davidson 3 4  |r|= 0.00121  e= [-29.7259587]  max|de|= -4.27e-07  lindep= 0.998
+davidson 4 5  |r|= 0.00123  e= [-29.72595941]  max|de|= -7.13e-07  lindep= 0.998
+davidson 5 6  |r|= 0.000962  e= [-29.72595979]  max|de|= -3.85e-07  lindep= 0.998
+davidson 6 7  |r|= 0.000535  e= [-29.72596003]  max|de|= -2.34e-07  lindep= 0.996
+davidson 7 8  |r|= 0.000328  e= [-29.7259601]  max|de|= -6.76e-08  lindep= 0.997
+davidson 8 9  |r|= 0.000267  e= [-29.72596013]  max|de|= -3.41e-08  lindep= 0.996
+davidson 9 10  |r|= 0.000279  e= [-29.72596016]  max|de|= -2.8e-08  lindep= 0.997
+davidson 10 11  |r|= 0.000252  e= [-29.72596018]  max|de|= -2.66e-08  lindep= 0.997
+davidson 11 12  |r|= 0.000181  e= [-29.7259602]  max|de|= -1.7e-08  lindep= 0.995
+davidson 12 13  |r|= 0.00014  e= [-29.72596021]  max|de|= -9.12e-09  lindep= 0.996
+davidson 13 14  |r|= 0.000116  e= [-29.72596022]  max|de|= -5.76e-09  lindep= 0.997
+root 0 converged  |r|= 7.34e-05  e= -29.725960219328506  max|de|= -3.22e-09
+converged 14 15  |r|= 7.34e-05  e= [-29.72596022]  max|de|= -3.22e-09
+    CPU time for FCI solver     12.71 sec, wall time     13.00 sec
+CAS space CI energy = -29.7259602193285
+macro iter 3 (17 JK  4 micro), CASSCF E = -2086.62548910249  dE = -7.8712356e-05  S^2 = 0.0000000
+               |grad[o]|=0.0079  |grad[c]|= 0.001683427771185007  |ddm|=0.0119
+    CPU time for CASCI solver     13.53 sec, wall time     13.82 sec
+    CPU time for macro iter 3     26.96 sec, wall time     27.26 sec
+    |g|=0.000647
+    CPU time for gen h_op      0.03 sec, wall time      0.03 sec
+    imic 1(3)  |g[o]|=0.000285  |dxi|=0.00153  max(|x|)=0.0011  |dr|=0.00153  eig=-5.15e-07  seig=2.56e-09
+    imic 2(4)  |g[o]|=0.000227  |dxi|=0.000455  max(|x|)=0.000256  |dr|=0.00184  eig=-4.78e-08  seig=2.51e-09
+    imic 3(5)  |g[o]|=0.000153  |dxi|=0.000212  max(|x|)=0.000104  |dr|=0.00199  eig=-1.58e-08  seig=2.37e-09
+    CPU time for aug_hess in 3 inner iters      0.38 sec, wall time      0.38 sec
+    CPU time for orbital rotation      0.42 sec, wall time      0.42 sec
+    CPU time for update CAS DM      3.14 sec, wall time      3.15 sec
+micro 1  |u-1|=0.00281  |g[o]|=0.000647  |g[c]|=0.000223  |ddm|=0.000848
+    CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
+    |g|=0.000192 (keyframe), |g-correction|=0.000131
+    CPU time for gen h_op      0.82 sec, wall time      0.82 sec
+    imic 4(6)  |g[o]|=0.000108  |dxi|=0.000537  max(|x|)=0.00034  |dr|=0.000537  eig=-3.54e-08  seig=2.37e-09
+    imic 5(7)  |g[o]|=6.23e-05  |dxi|=0.000144  max(|x|)=7.19e-05  |dr|=0.000628  eig=-6.33e-09  seig=2.24e-09
+    CPU time for aug_hess in 5 inner iters      0.15 sec, wall time      0.15 sec
+    CPU time for orbital rotation      0.97 sec, wall time      0.97 sec
+    CPU time for update CAS DM      3.18 sec, wall time      3.18 sec
+micro 2  |u-1|=0.00363  |g[o]|=0.000192  |g[c]|=0.000237  |ddm|=0.000982
+    CPU time for micro iter 2      0.00 sec, wall time      0.00 sec
+    |g|=6.82e-05 (keyframe), |g-correction|=3.36e-05
+    CPU time for gen h_op      0.82 sec, wall time      0.82 sec
+    imic 6(8)  |g[o]|=5.78e-05  |dxi|=0.000131  max(|x|)=7.58e-05  |dr|=0.000131  eig=-2.25e-09  seig=2.06e-09
+    imic 7(9)  |g[o]|=4.08e-05  |dxi|=5.01e-05  max(|x|)=2.47e-05  |dr|=0.000157  eig=-1.39e-09  seig=2.05e-09
+    imic 8(10)  |g[o]|=2.98e-05  |dxi|=4.29e-05  max(|x|)=1.66e-05  |dr|=0.00018  eig=-7.86e-10  seig=1.98e-09
+    imic 9(11)  |g[o]|=1.47e-05  |dxi|=1.82e-05  max(|x|)=5.5e-06  |dr|=0.000189  eig=-2.48e-10  seig=1.95e-09
+    CPU time for orbital rotation      1.13 sec, wall time      1.13 sec
+    CPU time for update CAS DM      3.19 sec, wall time      3.19 sec
+micro 3  |u-1|=0.00384  |g[o]|=6.82e-05  |g[c]|=0.00019  |ddm|=0.00119
+    CPU time for micro iter 3      0.00 sec, wall time      0.00 sec
+Active space overlap to initial guess, SVD = [0.99999385 0.99999376 0.99995886 0.99994727 0.99994705 0.99990984
+ 0.99964952 0.99961484 0.99961468 0.99916323 0.99916318 0.99349868]
+Active space overlap to last step, SVD = [1.         1.         0.99999999 0.99999999 0.99999999 0.99999997
+ 0.99999997 0.99999997 0.99999997 0.99999997 0.99999985 0.99999665]
+    CPU time for update eri      0.30 sec, wall time      0.30 sec
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = -2056.89940154881
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 0.000148  e= [-29.72608837]  max|de|= -29.7  lindep=    1
+davidson 1 2  |r|= 0.00013  e= [-29.72608838]  max|de|= -4.73e-09  lindep= 0.993
+davidson 2 3  |r|= 0.000129  e= [-29.72608838]  max|de|= -6.57e-09  lindep= 0.998
+davidson 3 4  |r|= 0.00014  e= [-29.72608839]  max|de|= -4.93e-09  lindep= 0.998
+davidson 4 5  |r|= 0.00017  e= [-29.7260884]  max|de|= -1.09e-08  lindep= 0.995
+davidson 5 6  |r|= 0.000119  e= [-29.72608841]  max|de|= -7.49e-09  lindep= 0.997
+root 0 converged  |r|= 6.16e-05  e= -29.726088410198763  max|de|= -3.6e-09
+converged 6 7  |r|= 6.16e-05  e= [-29.72608841]  max|de|= -3.6e-09
+    CPU time for FCI solver      5.83 sec, wall time      5.84 sec
+CAS space CI energy = -29.7260884101988
+macro iter 4 (13 JK  3 micro), CASSCF E = -2086.62548995901  dE = -8.5652164e-07  S^2 = 0.0000000
+               |grad[o]|=0.000647  |grad[c]|= 0.00018999990733152946  |ddm|=0.00119
+    CPU time for CASCI solver      6.64 sec, wall time      6.65 sec
+    CPU time for macro iter 4     18.96 sec, wall time     19.00 sec
+    |g|=9.4e-05
+    CPU time for gen h_op      0.03 sec, wall time      0.03 sec
+    imic 1(3)  |g[o]|=4.29e-05  |dxi|=0.00027  max(|x|)=0.000207  |dr|=0.00027  eig=-1.39e-08  seig=3.12e-10
+    imic 2(4)  |g[o]|=3.17e-05  |dxi|=6.55e-05  max(|x|)=3.7e-05  |dr|=0.000313  eig=-1.12e-09  seig=3.11e-10
+    imic 3(5)  |g[o]|=2.36e-05  |dxi|=3.62e-05  max(|x|)=1.71e-05  |dr|=0.000337  eig=-4.18e-10  seig=3.11e-10
+    CPU time for orbital rotation      0.42 sec, wall time      0.42 sec
+    CPU time for update CAS DM      3.11 sec, wall time      3.11 sec
+micro 1  |u-1|=0.000476  |g[o]|=9.4e-05  |g[c]|=6.93e-05  |ddm|=7.27e-05
+    CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
+Active space overlap to initial guess, SVD = [0.99999384 0.99999375 0.99995913 0.9999471  0.99994687 0.99990981
+ 0.99964875 0.99961419 0.99961404 0.9991624  0.99916236 0.99346343]
+Active space overlap to last step, SVD = [1.         1.         1.         1.         1.         1.
+ 1.         1.         1.         1.         1.         0.99999995]
+    CPU time for update eri      0.30 sec, wall time      0.30 sec
+Start CASCI
+    CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
+core energy = -2056.89937920853
+    CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
+davidson 0 1  |r|= 5.1e-05  e= [-29.72611077]  max|de|= -29.7  lindep=    1
+root 0 converged  |r|= 3.92e-05  e= -29.726110769693005  max|de|= -5.04e-10
+converged 1 2  |r|= 3.92e-05  e= [-29.72611077]  max|de|= -5.04e-10
+    CPU time for FCI solver      2.00 sec, wall time      2.00 sec
+CAS space CI energy = -29.7261107696932
+macro iter 5 (5 JK  1 micro), CASSCF E = -2086.62548997822  dE = -1.9208528e-08  S^2 = 0.0000000
+               |grad[o]|=9.4e-05  |grad[c]|= 6.932623581201777e-05  |ddm|=7.27e-05
+    CPU time for CASCI solver      2.81 sec, wall time      2.82 sec
+    CPU time for macro iter 5      6.64 sec, wall time      6.65 sec
+1-step CASSCF converged in 5 macro (71 JK 16 micro) steps
+CASSCF canonicalization
+where_natorb [0, 1, 2, 3, 5, 4, 7, 6, 8, 9, 10, 11]
+Natural occ [1.8248127  1.49396831 1.49396831 1.45794206 1.16828551 1.16828531
+ 0.83165465 0.83165445 0.54141634 0.50614545 0.50614544 0.17572147]
+Natural orbital (expansion on meta-Lowdin AOs) in CAS space
+               #1        #2        #3        #4        #5       
+0 Cr1 1s       0.00029  -0.00000  -0.00000  -0.00007   0.00000
+0 Cr1 2s      -0.00070  -0.00000   0.00000   0.00019  -0.00000
+0 Cr1 3s       0.00614  -0.00000  -0.00000  -0.00584  -0.00000
+0 Cr1 4s       0.70110  -0.00000   0.00000   0.08100   0.00000
+0 Cr1 5s       0.03811  -0.00000   0.00000   0.00470  -0.00000
+0 Cr1 6s      -0.01399   0.00000  -0.00000  -0.00252   0.00000
+0 Cr1 2px     -0.00000  -0.00002  -0.00000   0.00000   0.00000
+0 Cr1 2py      0.00000   0.00000  -0.00002   0.00000  -0.00000
+0 Cr1 2pz     -0.00039   0.00000  -0.00000  -0.00000  -0.00000
+0 Cr1 3px      0.00000   0.00922   0.00016   0.00000  -0.00000
+0 Cr1 3py     -0.00000  -0.00016   0.00922   0.00000  -0.00000
+0 Cr1 3pz      0.00244  -0.00000  -0.00000  -0.01211   0.00000
+0 Cr1 4px     -0.00000   0.05301   0.00091  -0.00000   0.00000
+0 Cr1 4py      0.00000  -0.00091   0.05301   0.00000   0.00000
+0 Cr1 4pz     -0.01408   0.00000   0.00000   0.01338   0.00000
+0 Cr1 5px     -0.00000  -0.00060  -0.00001  -0.00000   0.00000
+0 Cr1 5py      0.00000   0.00001  -0.00060   0.00000   0.00000
+0 Cr1 5pz      0.00037  -0.00000   0.00000  -0.00453  -0.00000
+0 Cr1 3dxy     0.00000   0.00000  -0.00000   0.00000  -0.00091
+0 Cr1 3dyz     0.00000   0.01215  -0.70437   0.00000  -0.00000
+0 Cr1 3dz^2   -0.08085   0.00000   0.00000   0.70205   0.00000
+0 Cr1 3dxz    -0.00000  -0.70437  -0.01215   0.00000   0.00000
+0 Cr1 3dx2-y2  -0.00000   0.00000  -0.00000  -0.00000   0.70708
+0 Cr1 4dxy     0.00000   0.00000   0.00000  -0.00000  -0.00001
+0 Cr1 4dyz     0.00000   0.00047  -0.02717   0.00000  -0.00000
+0 Cr1 4dz^2    0.00386  -0.00000   0.00000   0.00442   0.00000
+0 Cr1 4dxz    -0.00000  -0.02717  -0.00047  -0.00000   0.00000
+0 Cr1 4dx2-y2  -0.00000   0.00000  -0.00000   0.00000   0.00530
+0 Cr1 5dxy    -0.00000  -0.00000   0.00000   0.00000   0.00000
+0 Cr1 5dyz     0.00000   0.00004  -0.00255   0.00000   0.00000
+0 Cr1 5dz^2    0.00216  -0.00000  -0.00000  -0.00732  -0.00000
+0 Cr1 5dxz    -0.00000  -0.00255  -0.00004  -0.00000   0.00000
+0 Cr1 5dx2-y2  -0.00000   0.00000   0.00000   0.00000  -0.00047
+0 Cr1 6dxy    -0.00000   0.00000  -0.00000  -0.00000   0.00000
+0 Cr1 6dyz     0.00000   0.00001  -0.00080   0.00000   0.00000
+0 Cr1 6dz^2   -0.00037   0.00000  -0.00000   0.00258   0.00000
+0 Cr1 6dxz    -0.00000  -0.00080  -0.00001  -0.00000   0.00000
+0 Cr1 6dx2-y2  -0.00000   0.00000  -0.00000   0.00000  -0.00280
+0 Cr1 4fy^3   -0.00000   0.00000  -0.00000   0.00000  -0.00000
+0 Cr1 4fxyz    0.00000  -0.00000   0.00000  -0.00000  -0.00000
+0 Cr1 4fyz^2   0.00000   0.00015  -0.00893  -0.00000  -0.00000
+0 Cr1 4fz^3    0.00185   0.00000  -0.00000   0.00853   0.00000
+0 Cr1 4fxz^2  -0.00000  -0.00893  -0.00015  -0.00000   0.00000
+0 Cr1 4fzx^2  -0.00000  -0.00000  -0.00000  -0.00000   0.00277
+0 Cr1 4fx^3   -0.00000   0.00000   0.00000   0.00000   0.00000
+1 Cr2 1s       0.00029  -0.00000   0.00000  -0.00007  -0.00000
+1 Cr2 2s      -0.00070   0.00000  -0.00000   0.00019   0.00000
+1 Cr2 3s       0.00614  -0.00000   0.00000  -0.00584  -0.00000
+1 Cr2 4s       0.70111  -0.00000  -0.00000   0.08100   0.00000
+1 Cr2 5s       0.03811   0.00000  -0.00000   0.00470   0.00000
+1 Cr2 6s      -0.01399  -0.00000   0.00000  -0.00252  -0.00000
+1 Cr2 2px      0.00000  -0.00002  -0.00000  -0.00000   0.00000
+1 Cr2 2py     -0.00000   0.00000  -0.00002  -0.00000   0.00000
+1 Cr2 2pz      0.00039   0.00000  -0.00000   0.00000  -0.00000
+1 Cr2 3px      0.00000   0.00922   0.00016   0.00000   0.00000
+1 Cr2 3py      0.00000  -0.00016   0.00922  -0.00000   0.00000
+1 Cr2 3pz     -0.00244  -0.00000  -0.00000   0.01211  -0.00000
+1 Cr2 4px      0.00000   0.05301   0.00091   0.00000  -0.00000
+1 Cr2 4py     -0.00000  -0.00091   0.05301  -0.00000  -0.00000
+1 Cr2 4pz      0.01408  -0.00000   0.00000  -0.01338  -0.00000
+1 Cr2 5px      0.00000  -0.00060  -0.00001   0.00000   0.00000
+1 Cr2 5py     -0.00000   0.00001  -0.00060  -0.00000   0.00000
+1 Cr2 5pz     -0.00037   0.00000   0.00000   0.00453  -0.00000
+1 Cr2 3dxy    -0.00000  -0.00000  -0.00000  -0.00000  -0.00091
+1 Cr2 3dyz     0.00000  -0.01215   0.70437   0.00000   0.00000
+1 Cr2 3dz^2   -0.08085   0.00000  -0.00000   0.70205  -0.00000
+1 Cr2 3dxz    -0.00000   0.70437   0.01215  -0.00000   0.00000
+1 Cr2 3dx2-y2  -0.00000  -0.00000   0.00000   0.00000   0.70708
+1 Cr2 4dxy    -0.00000  -0.00000   0.00000   0.00000  -0.00001
+1 Cr2 4dyz     0.00000  -0.00047   0.02717   0.00000  -0.00000
+1 Cr2 4dz^2    0.00386   0.00000  -0.00000   0.00442  -0.00000
+1 Cr2 4dxz    -0.00000   0.02717   0.00047  -0.00000   0.00000
+1 Cr2 4dx2-y2  -0.00000  -0.00000   0.00000  -0.00000   0.00530
+1 Cr2 5dxy     0.00000   0.00000  -0.00000  -0.00000   0.00000
+1 Cr2 5dyz     0.00000  -0.00004   0.00255   0.00000   0.00000
+1 Cr2 5dz^2    0.00216   0.00000  -0.00000  -0.00732   0.00000
+1 Cr2 5dxz    -0.00000   0.00255   0.00004   0.00000   0.00000
+1 Cr2 5dx2-y2  -0.00000  -0.00000  -0.00000   0.00000  -0.00047
+1 Cr2 6dxy     0.00000  -0.00000   0.00000   0.00000   0.00000
+1 Cr2 6dyz     0.00000  -0.00001   0.00080   0.00000   0.00000
+1 Cr2 6dz^2   -0.00037  -0.00000   0.00000   0.00258  -0.00000
+1 Cr2 6dxz    -0.00000   0.00080   0.00001  -0.00000   0.00000
+1 Cr2 6dx2-y2  -0.00000  -0.00000   0.00000  -0.00000  -0.00280
+1 Cr2 4fy^3    0.00000   0.00000  -0.00000  -0.00000   0.00000
+1 Cr2 4fxyz    0.00000  -0.00000  -0.00000  -0.00000   0.00000
+1 Cr2 4fyz^2  -0.00000   0.00015  -0.00893   0.00000   0.00000
+1 Cr2 4fz^3   -0.00185   0.00000  -0.00000  -0.00853   0.00000
+1 Cr2 4fxz^2   0.00000  -0.00893  -0.00015  -0.00000   0.00000
+1 Cr2 4fzx^2   0.00000  -0.00000  -0.00000  -0.00000  -0.00277
+1 Cr2 4fx^3    0.00000   0.00000   0.00000  -0.00000  -0.00000
+               #6        #7        #8        #9        #10      
+0 Cr1 1s      -0.00000  -0.00000   0.00000   0.00009  -0.00000
+0 Cr1 2s      -0.00000   0.00000   0.00000  -0.00037  -0.00000
+0 Cr1 3s       0.00000  -0.00000   0.00000   0.00057  -0.00000
+0 Cr1 4s       0.00000  -0.00000  -0.00000   0.05495   0.00000
+0 Cr1 5s       0.00000   0.00000  -0.00000   0.02082   0.00000
+0 Cr1 6s       0.00000  -0.00000   0.00000  -0.00042  -0.00000
+0 Cr1 2px      0.00000  -0.00000   0.00000  -0.00000   0.00000
+0 Cr1 2py     -0.00000   0.00000  -0.00000  -0.00000   0.00016
+0 Cr1 2pz      0.00000  -0.00000   0.00000  -0.00016  -0.00000
+0 Cr1 3px     -0.00000   0.00000  -0.00000   0.00000  -0.00001
+0 Cr1 3py     -0.00000  -0.00000  -0.00000  -0.00000  -0.00073
+0 Cr1 3pz      0.00000  -0.00000  -0.00000   0.00280  -0.00000
+0 Cr1 4px      0.00000   0.00000   0.00000  -0.00000   0.00066
+0 Cr1 4py      0.00000   0.00000   0.00000   0.00000   0.03856
+0 Cr1 4pz     -0.00000  -0.00000   0.00000  -0.01068   0.00000
+0 Cr1 5px      0.00000   0.00000  -0.00000   0.00000   0.00015
+0 Cr1 5py      0.00000  -0.00000  -0.00000  -0.00000   0.00843
+0 Cr1 5pz     -0.00000  -0.00000  -0.00000  -0.00467  -0.00000
+0 Cr1 3dxy     0.70708   0.70705  -0.00091   0.00000  -0.00000
+0 Cr1 3dyz    -0.00000  -0.00000  -0.00000   0.00000  -0.70527
+0 Cr1 3dz^2   -0.00000  -0.00000   0.00000   0.70385   0.00000
+0 Cr1 3dxz     0.00000   0.00000   0.00000   0.00000  -0.01216
+0 Cr1 3dx2-y2   0.00091   0.00091   0.70705  -0.00000  -0.00000
+0 Cr1 4dxy     0.00530  -0.00798   0.00001   0.00000   0.00000
+0 Cr1 4dyz    -0.00000  -0.00000  -0.00000  -0.00000   0.02128
+0 Cr1 4dz^2   -0.00000   0.00000  -0.00000  -0.02952   0.00000
+0 Cr1 4dxz     0.00000   0.00000  -0.00000   0.00000   0.00037
+0 Cr1 4dx2-y2   0.00001  -0.00001  -0.00798   0.00000   0.00000
+0 Cr1 5dxy    -0.00047  -0.00351   0.00000   0.00000   0.00000
+0 Cr1 5dyz     0.00000  -0.00000  -0.00000  -0.00000   0.01625
+0 Cr1 5dz^2   -0.00000  -0.00000   0.00000  -0.00986   0.00000
+0 Cr1 5dxz     0.00000   0.00000  -0.00000   0.00000   0.00028
+0 Cr1 5dx2-y2  -0.00000  -0.00000  -0.00351  -0.00000   0.00000
+0 Cr1 6dxy    -0.00280  -0.00151   0.00000  -0.00000  -0.00000
+0 Cr1 6dyz     0.00000  -0.00000  -0.00000  -0.00000   0.01278
+0 Cr1 6dz^2    0.00000  -0.00000  -0.00000   0.00463   0.00000
+0 Cr1 6dxz    -0.00000  -0.00000  -0.00000   0.00000   0.00022
+0 Cr1 6dx2-y2  -0.00000  -0.00000  -0.00151  -0.00000  -0.00000
+0 Cr1 4fy^3    0.00000   0.00000  -0.00000  -0.00000  -0.00000
+0 Cr1 4fxyz    0.00277  -0.00023   0.00000  -0.00000   0.00000
+0 Cr1 4fyz^2  -0.00000  -0.00000  -0.00000  -0.00000   0.00258
+0 Cr1 4fz^3   -0.00000  -0.00000   0.00000  -0.00250   0.00000
+0 Cr1 4fxz^2   0.00000  -0.00000  -0.00000  -0.00000   0.00004
+0 Cr1 4fzx^2   0.00000  -0.00000  -0.00023  -0.00000   0.00000
+0 Cr1 4fx^3    0.00000   0.00000   0.00000   0.00000   0.00000
+1 Cr2 1s       0.00000  -0.00000   0.00000  -0.00009  -0.00000
+1 Cr2 2s       0.00000  -0.00000  -0.00000   0.00037  -0.00000
+1 Cr2 3s       0.00000  -0.00000   0.00000  -0.00057  -0.00000
+1 Cr2 4s      -0.00000  -0.00000   0.00000  -0.05495   0.00000
+1 Cr2 5s      -0.00000   0.00000  -0.00000  -0.02082   0.00000
+1 Cr2 6s      -0.00000  -0.00000   0.00000   0.00042  -0.00000
+1 Cr2 2px     -0.00000   0.00000  -0.00000   0.00000  -0.00000
+1 Cr2 2py      0.00000  -0.00000  -0.00000  -0.00000  -0.00016
+1 Cr2 2pz      0.00000   0.00000  -0.00000  -0.00016   0.00000
+1 Cr2 3px      0.00000   0.00000  -0.00000   0.00000   0.00001
+1 Cr2 3py      0.00000  -0.00000  -0.00000   0.00000   0.00073
+1 Cr2 3pz      0.00000   0.00000   0.00000   0.00280   0.00000
+1 Cr2 4px     -0.00000   0.00000   0.00000  -0.00000  -0.00066
+1 Cr2 4py     -0.00000   0.00000   0.00000   0.00000  -0.03856
+1 Cr2 4pz     -0.00000   0.00000   0.00000  -0.01068  -0.00000
+1 Cr2 5px     -0.00000   0.00000  -0.00000   0.00000  -0.00015
+1 Cr2 5py      0.00000  -0.00000  -0.00000  -0.00000  -0.00843
+1 Cr2 5pz     -0.00000   0.00000   0.00000  -0.00467   0.00000
+1 Cr2 3dxy     0.70708  -0.70705   0.00091   0.00000   0.00000
+1 Cr2 3dyz    -0.00000  -0.00000   0.00000  -0.00000  -0.70527
+1 Cr2 3dz^2    0.00000  -0.00000   0.00000  -0.70385   0.00000
+1 Cr2 3dxz     0.00000  -0.00000  -0.00000   0.00000  -0.01216
+1 Cr2 3dx2-y2   0.00091  -0.00091  -0.70705  -0.00000   0.00000
+1 Cr2 4dxy     0.00530   0.00798  -0.00001   0.00000   0.00000
+1 Cr2 4dyz    -0.00000   0.00000   0.00000   0.00000   0.02128
+1 Cr2 4dz^2    0.00000   0.00000  -0.00000   0.02952   0.00000
+1 Cr2 4dxz     0.00000  -0.00000   0.00000  -0.00000   0.00037
+1 Cr2 4dx2-y2   0.00001   0.00001   0.00798  -0.00000   0.00000
+1 Cr2 5dxy    -0.00047   0.00351  -0.00000   0.00000   0.00000
+1 Cr2 5dyz     0.00000   0.00000   0.00000   0.00000   0.01625
+1 Cr2 5dz^2    0.00000  -0.00000   0.00000   0.00986   0.00000
+1 Cr2 5dxz     0.00000  -0.00000   0.00000  -0.00000   0.00028
+1 Cr2 5dx2-y2  -0.00000   0.00000   0.00351  -0.00000   0.00000
+1 Cr2 6dxy    -0.00280   0.00151  -0.00000  -0.00000  -0.00000
+1 Cr2 6dyz     0.00000   0.00000   0.00000   0.00000   0.01278
+1 Cr2 6dz^2   -0.00000  -0.00000  -0.00000  -0.00463   0.00000
+1 Cr2 6dxz    -0.00000  -0.00000   0.00000  -0.00000   0.00022
+1 Cr2 6dx2-y2  -0.00000   0.00000   0.00151  -0.00000  -0.00000
+1 Cr2 4fy^3   -0.00000   0.00000  -0.00000  -0.00000   0.00000
+1 Cr2 4fxyz   -0.00277  -0.00023   0.00000   0.00000  -0.00000
+1 Cr2 4fyz^2   0.00000  -0.00000  -0.00000  -0.00000  -0.00258
+1 Cr2 4fz^3   -0.00000   0.00000  -0.00000  -0.00250  -0.00000
+1 Cr2 4fxz^2  -0.00000  -0.00000  -0.00000   0.00000  -0.00004
+1 Cr2 4fzx^2  -0.00000  -0.00000  -0.00023   0.00000   0.00000
+1 Cr2 4fx^3   -0.00000   0.00000   0.00000   0.00000  -0.00000
+               #11       #12      
+0 Cr1 1s      -0.00000   0.00026
+0 Cr1 2s       0.00000  -0.00093
+0 Cr1 3s       0.00000   0.00266
+0 Cr1 4s      -0.00000   0.70277
+0 Cr1 5s      -0.00000  -0.04721
+0 Cr1 6s       0.00000   0.01207
+0 Cr1 2px      0.00016   0.00000
+0 Cr1 2py     -0.00000  -0.00000
+0 Cr1 2pz     -0.00000   0.00024
+0 Cr1 3px     -0.00073  -0.00000
+0 Cr1 3py      0.00001   0.00000
+0 Cr1 3pz      0.00000  -0.00273
+0 Cr1 4px      0.03856  -0.00000
+0 Cr1 4py     -0.00066   0.00000
+0 Cr1 4pz     -0.00000   0.00611
+0 Cr1 5px      0.00843   0.00000
+0 Cr1 5py     -0.00015  -0.00000
+0 Cr1 5pz     -0.00000   0.00722
+0 Cr1 3dxy     0.00000   0.00000
+0 Cr1 3dyz     0.01216   0.00000
+0 Cr1 3dz^2    0.00000  -0.05199
+0 Cr1 3dxz    -0.70527  -0.00000
+0 Cr1 3dx2-y2   0.00000   0.00000
+0 Cr1 4dxy    -0.00000  -0.00000
+0 Cr1 4dyz    -0.00037  -0.00000
+0 Cr1 4dz^2   -0.00000   0.02685
+0 Cr1 4dxz     0.02128   0.00000
+0 Cr1 4dx2-y2   0.00000   0.00000
+0 Cr1 5dxy    -0.00000  -0.00000
+0 Cr1 5dyz    -0.00028  -0.00000
+0 Cr1 5dz^2   -0.00000   0.00683
+0 Cr1 5dxz     0.01625   0.00000
+0 Cr1 5dx2-y2   0.00000   0.00000
+0 Cr1 6dxy     0.00000  -0.00000
+0 Cr1 6dyz    -0.00022  -0.00000
+0 Cr1 6dz^2   -0.00000  -0.01127
+0 Cr1 6dxz     0.01278   0.00000
+0 Cr1 6dx2-y2   0.00000  -0.00000
+0 Cr1 4fy^3    0.00000  -0.00000
+0 Cr1 4fxyz   -0.00000  -0.00000
+0 Cr1 4fyz^2  -0.00004   0.00000
+0 Cr1 4fz^3    0.00000   0.00649
+0 Cr1 4fxz^2   0.00258   0.00000
+0 Cr1 4fzx^2   0.00000   0.00000
+0 Cr1 4fx^3    0.00000  -0.00000
+1 Cr2 1s      -0.00000  -0.00026
+1 Cr2 2s       0.00000   0.00093
+1 Cr2 3s       0.00000  -0.00266
+1 Cr2 4s      -0.00000  -0.70277
+1 Cr2 5s      -0.00000   0.04721
+1 Cr2 6s      -0.00000  -0.01207
+1 Cr2 2px     -0.00016   0.00000
+1 Cr2 2py      0.00000  -0.00000
+1 Cr2 2pz     -0.00000   0.00024
+1 Cr2 3px      0.00073  -0.00000
+1 Cr2 3py     -0.00001   0.00000
+1 Cr2 3pz      0.00000  -0.00273
+1 Cr2 4px     -0.03856  -0.00000
+1 Cr2 4py      0.00066   0.00000
+1 Cr2 4pz      0.00000   0.00611
+1 Cr2 5px     -0.00843   0.00000
+1 Cr2 5py      0.00015  -0.00000
+1 Cr2 5pz      0.00000   0.00722
+1 Cr2 3dxy     0.00000  -0.00000
+1 Cr2 3dyz     0.01216  -0.00000
+1 Cr2 3dz^2   -0.00000   0.05199
+1 Cr2 3dxz    -0.70527   0.00000
+1 Cr2 3dx2-y2   0.00000  -0.00000
+1 Cr2 4dxy    -0.00000  -0.00000
+1 Cr2 4dyz    -0.00037   0.00000
+1 Cr2 4dz^2   -0.00000  -0.02685
+1 Cr2 4dxz     0.02128  -0.00000
+1 Cr2 4dx2-y2   0.00000  -0.00000
+1 Cr2 5dxy    -0.00000  -0.00000
+1 Cr2 5dyz    -0.00028   0.00000
+1 Cr2 5dz^2   -0.00000  -0.00683
+1 Cr2 5dxz     0.01625  -0.00000
+1 Cr2 5dx2-y2   0.00000   0.00000
+1 Cr2 6dxy     0.00000  -0.00000
+1 Cr2 6dyz    -0.00022   0.00000
+1 Cr2 6dz^2   -0.00000   0.01127
+1 Cr2 6dxz     0.01278  -0.00000
+1 Cr2 6dx2-y2   0.00000   0.00000
+1 Cr2 4fy^3   -0.00000  -0.00000
+1 Cr2 4fxyz    0.00000   0.00000
+1 Cr2 4fyz^2   0.00004   0.00000
+1 Cr2 4fz^3   -0.00000   0.00649
+1 Cr2 4fxz^2  -0.00258   0.00000
+1 Cr2 4fzx^2   0.00000  -0.00000
+1 Cr2 4fx^3   -0.00000  -0.00000
+<CAS-nat-orb|mo-hf>  19  19    0.99984881
+<CAS-nat-orb|mo-hf>  20  20    0.99944198
+<CAS-nat-orb|mo-hf>  21  21    0.99944183
+<CAS-nat-orb|mo-hf>  22  22    0.99982916
+<CAS-nat-orb|mo-hf>  23  24    0.99999306
+<CAS-nat-orb|mo-hf>  24  23    0.99999318
+<CAS-nat-orb|mo-hf>  25  26    0.99994622
+<CAS-nat-orb|mo-hf>  26  25    0.99994648
+<CAS-nat-orb|mo-hf>  27  27    0.99913938
+<CAS-nat-orb|mo-hf>  28  28    0.99899046
+<CAS-nat-orb|mo-hf>  29  29    0.99899041
+<CAS-nat-orb|mo-hf>  30  30    0.99350448
+i = 1  <i|F|i> = -220.42610118
+i = 2  <i|F|i> = -220.42610000
+i = 3  <i|F|i> = -26.25415412
+i = 4  <i|F|i> = -26.25413328
+i = 5  <i|F|i> = -22.18548300
+i = 6  <i|F|i> = -22.18540209
+i = 7  <i|F|i> = -22.18252376
+i = 8  <i|F|i> = -22.18252373
+i = 9  <i|F|i> = -22.18246842
+i = 10  <i|F|i> = -22.18246832
+i = 11  <i|F|i> =  -3.33526493
+i = 12  <i|F|i> =  -3.31604383
+i = 13  <i|F|i> =  -2.14058147
+i = 14  <i|F|i> =  -2.09329430
+i = 15  <i|F|i> =  -2.09329420
+i = 16  <i|F|i> =  -2.07866115
+i = 17  <i|F|i> =  -2.07866112
+i = 18  <i|F|i> =  -2.05391809
+i = 19  <i|F|i> =  -0.18932735
+i = 20  <i|F|i> =  -0.13286417
+i = 21  <i|F|i> =  -0.13286415
+i = 22  <i|F|i> =  -0.12644517
+i = 23  <i|F|i> =  -0.02504952
+i = 24  <i|F|i> =  -0.02504950
+i = 25  <i|F|i> =   0.06729489
+i = 26  <i|F|i> =   0.06729495
+i = 27  <i|F|i> =   0.15972219
+i = 28  <i|F|i> =   0.17329548
+i = 29  <i|F|i> =   0.17329550
+i = 30  <i|F|i> =   0.06561517
+i = 31  <i|F|i> =   0.10249737
+i = 32  <i|F|i> =   0.12420638
+i = 33  <i|F|i> =   0.12420639
+i = 34  <i|F|i> =   0.14393342
+i = 35  <i|F|i> =   0.14393343
+i = 36  <i|F|i> =   0.16321857
+i = 37  <i|F|i> =   0.16321858
+i = 38  <i|F|i> =   0.16429037
+i = 39  <i|F|i> =   0.16467644
+i = 40  <i|F|i> =   0.20633542
+i = 41  <i|F|i> =   0.20633546
+i = 42  <i|F|i> =   0.21976660
+i = 43  <i|F|i> =   0.22449922
+i = 44  <i|F|i> =   0.22449923
+i = 45  <i|F|i> =   0.33663550
+i = 46  <i|F|i> =   0.40438294
+i = 47  <i|F|i> =   0.40438298
+i = 48  <i|F|i> =   0.62525265
+i = 49  <i|F|i> =   0.66327397
+i = 50  <i|F|i> =   0.66327399
+i = 51  <i|F|i> =   0.73744202
+i = 52  <i|F|i> =   0.73744203
+i = 53  <i|F|i> =   0.74733496
+i = 54  <i|F|i> =   0.74733496
+i = 55  <i|F|i> =   0.77753268
+i = 56  <i|F|i> =   0.77753275
+i = 57  <i|F|i> =   0.77994724
+i = 58  <i|F|i> =   0.93759173
+i = 59  <i|F|i> =   1.62022807
+i = 60  <i|F|i> =   1.66430855
+i = 61  <i|F|i> =   1.66430856
+i = 62  <i|F|i> =   1.84981288
+i = 63  <i|F|i> =   1.84981293
+i = 64  <i|F|i> =   1.98120224
+i = 65  <i|F|i> =   2.35311167
+i = 66  <i|F|i> =   2.40915938
+i = 67  <i|F|i> =   2.41174066
+i = 68  <i|F|i> =   2.41174068
+i = 69  <i|F|i> =   2.50771300
+i = 70  <i|F|i> =   2.53160842
+i = 71  <i|F|i> =   2.53160842
+i = 72  <i|F|i> =   2.58050158
+i = 73  <i|F|i> =   2.58050158
+i = 74  <i|F|i> =   2.69267763
+i = 75  <i|F|i> =   2.69267764
+i = 76  <i|F|i> =   3.04196009
+i = 77  <i|F|i> =   3.32912134
+i = 78  <i|F|i> =   3.32912135
+i = 79  <i|F|i> =   3.38924854
+i = 80  <i|F|i> =   3.38924858
+i = 81  <i|F|i> =   3.42320279
+i = 82  <i|F|i> =   3.42320284
+i = 83  <i|F|i> =   3.42944203
+i = 84  <i|F|i> =   3.42944207
+i = 85  <i|F|i> =   3.46019035
+i = 86  <i|F|i> =   3.46019037
+i = 87  <i|F|i> =   3.46365464
+i = 88  <i|F|i> =   3.63641343
+i = 89  <i|F|i> =   3.63641346
+i = 90  <i|F|i> =   4.10693232
+    CPU time for 1-step CASSCF    212.00 sec, wall time    214.71 sec
+CASSCF energy = -2086.62548997822
+CASCI E = -2086.62548997822  E(CI) = -29.7261107696932  S^2 = 0.0000000

@@ -1,0 +1,17 @@
+%nproc=1
+%mem=1gb
+%chk=cr2.chk
+#p uhf/def2tzvp guess(fragment=2, only)
+
+title
+
+0 1 0 5 0 -5
+Cr(fragment=1) 0.0 0.0 0.0
+Cr(fragment=2) 0.0 0.0 2.0
+
+--Link1--
+%nproc=1
+%mem=1gb
+%chk=cr2.chk
+#p uhf chkbasis guess(read) geom=allcheck scf=(maxcyc=2)
+

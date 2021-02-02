@@ -1,0 +1,6 @@
+%nproc=1
+%mem=1gb
+#p casscf/def2tzvp 
+
+mokit{readuhf='cr2.fchk', crazywfn, ist=2}
+
