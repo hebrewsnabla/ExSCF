@@ -1,6 +1,10 @@
 import numpy as np
 from py2fch import py2fch
 import os
+from functools import partial
+
+print = partial(print, flush=True)
+einsum = partial(np.einsum, optimize=True)
 
 def stack22(aa, ab, ba, bb):
     tot = np.vstack((
@@ -28,3 +32,18 @@ def tofch(oldfch, natorb, natocc, S, flag):
     nbfb = natorb_b.shape[0]
     nifb = natorb_b.shape[1]
     py2fch(fch, nbfb, nifb, natorb_b, Sdiag, 'b', natocc_b)
+
+def dump_moe(moe, na, nb):
+    ea = moe[0]
+    eb = moe[1]
+    avir = len(ea) - na
+    bvir = len(eb) - nb
+    print('Alpha occ %d vir %d; Beta occ %d vir %d' % (na, avir, nb, bvir))
+    amin = max(0, na-6)
+    amax = min(na+6, len(ea))
+    print('Alpha energies: ', ea[amin:na], '<- HOMO')
+    print('         LUMO-> ', ea[na:amax])
+    bmin = max(0, nb-6)
+    bmax = min(nb+6, len(eb))
+    print('Beta energies:  ', eb[bmin:nb], '<- HOMO')
+    print('         LUMO-> ', eb[nb:bmax])

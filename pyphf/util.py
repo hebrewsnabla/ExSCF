@@ -516,6 +516,9 @@ class SUHF():
             #self.max_cycle = self.diis_start_cyc + 30
             print('DIIS: %s' % self.diis.__class__)
             print('diis_start_cyc = %d' % self.diis_start_cyc)
+        if self.level_shift is not None:
+            shift = self.level_shift
+            print('level shift: %.3f a.u.' % shift)
         #if self.output is not None:
         #    os.system("echo '' > %s" % self.output)
         #    sys.stdout = open(self.output, 'a')
@@ -629,9 +632,7 @@ class SUHF():
             F_ortho = Fa_ortho, Fb_ortho
             if self.debug:
                 print('Fock (ortho)\n', F_ortho)
-        
-            e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, hcore_ortho, veff_ortho)
-            if self.debug:
+                e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, hcore_ortho, veff_ortho)
                 print('E(UHF) = %12.6f' % e_uhf)
         
             dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, na, nb)
@@ -670,9 +671,15 @@ class SUHF():
                 print('F(mod,ortho) updated with CDIIS')
                 if self.debug:
                     print(F_mod_ortho)
+            if self.level_shift is not None:
+                shift = self.level_shift
+                s1e = np.eye(norb)
+                print('level shift: %.3f a.u.' % shift)
+                F_mod_ortho = lev_shift(s1e, self.dm_ortho, F_mod_ortho, shift)
             mo_e, mo_ortho, dm_ortho = Diag_Feff(F_mod_ortho, na, nb)
-            print('e_a, e_b\n', mo_e[0], '\n', mo_e[1])
+            util2.dump_moe(mo_e, na, nb)
             if self.debug:
+                print('e_a, e_b\n', mo_e[0], '\n', mo_e[1])
                 print('v_a, v_b\n', mo_ortho[0], '\n', mo_ortho[1])
                 print('P_a, P_b\n', dm_ortho[0],'\n', dm_ortho[1])
             self.dm_ortho = dm_ortho
@@ -693,7 +700,9 @@ class SUHF():
                     print('Final E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
                 else:
                     print(' E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
-            
+            else:
+                print(' E(SUHF) = %15.8f' % E_suhf)
+            self.conv = conv
             cyc += 1
             if cyc >= max_cycle:
                 print('SUHF not converged')
@@ -701,15 +710,76 @@ class SUHF():
 
         t_aftercyc = time.time()
         print('time for cyc: %.3f' % (t_aftercyc-t_pre))
+        # extra cycle to remove level shift
+        old_suhf = self.E_suhf
+        old_dm = self.dm_ortho
         dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
         mo_ortho = np.array(self.mo_ortho)
         mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
         if self.debug:
             print('dm_reg\n', dm_reg)
             print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
-        #no = find_NO()
+        if self.level_shift is not None:
+            print('**** Extra Cycle %d ****' % (cyc+1))
+            veff = mf.get_veff(dm = dm_reg)
+            veff_ortho = einsum('ji,tjk,kl->til', X, veff, X)
+            if self.debug:
+                print('dm (ortho)')
+                print(self.dm_ortho)
+            Fa_ortho, Fb_ortho = hcore_ortho + veff_ortho
+            F_ortho = Fa_ortho, Fb_ortho
+            if self.debug:
+                print('Fock (ortho)\n', F_ortho)
+                e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, hcore_ortho, veff_ortho)
+                print('E(UHF) = %12.6f' % e_uhf)
+            dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, na, nb)
+            self.dm_no = dm_no
+            self.no = no
+            Dg, Ng, Pg = get_Ng(self.grids, self.no, self.dm_no, na+nb)
+            if self.debug:
+                print('D(g) (NO)\n', Dg[0])
+                print('N(g) (NO)\n', Ng[0])
+                print('P(g) (NO)\n', Pg[0])
+            Gg, Pg_ortho = get_Gg(self.mol, Pg, self.no, X)
+            if self.debug:
+                print('Pg_ortho\n', Pg_ortho[0])
+                print('G(g) (NO)\n' , Gg[0])
+            xg, yg, ciS, C_no = get_xg(self, self.no, na, nb, Ng)
+            self.xg, self.ciS = xg, ciS
+            #yg, ciS = util.get_yg(self, xg)
+            trHg, ciH = get_H(self, hcore_ortho, self.no, Pg, Gg, xg)
+            S2 = get_S2(self, Pg_ortho)
+            Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
+            Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
+            E_suhf = mf.energy_nuc() + H_suhf
+            self.E_suhf = E_suhf
+            #print('E(SUHF) = %15.8f' % E_suhf)
+            Faa = F_mod_ortho[:norb, :norb]
+            Fbb = F_mod_ortho[norb:, norb:]
+            F_mod_ortho = np.array([Faa,Fbb])
+            mo_e, mo_ortho, dm_ortho = Diag_Feff(F_mod_ortho, na, nb)
+            util2.dump_moe(mo_e, na, nb)
+            if self.debug:
+                print('e_a, e_b\n', mo_e[0], '\n', mo_e[1])
+                print('v_a, v_b\n', mo_ortho[0], '\n', mo_ortho[1])
+                print('P_a, P_b\n', dm_ortho[0],'\n', dm_ortho[1])
+            self.dm_ortho = dm_ortho
+            self.mo_ortho = mo_ortho
+            self.mo_e = mo_e
+            if old_suhf is not None:
+                dE = E_suhf - old_suhf
+                ddm = dm_ortho - old_dm
+                max_ddm = abs(ddm).max()
+                norm_ddm = np.linalg.norm(ddm)
+                #if abs(dE)<1e-8 and max_ddm<1e-5 and norm_ddm<1e-7:
+                #    conv = True
+                #    print('\n***************')
+                #    print('SUHF converged at cycle %d' %cyc)
+                #    print('Final E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
+                #else:
+                print('Extra E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
 
-        if self.makedm:
+        if self.makedm and self.conv:
             suhf_dm = sudm.make_1pdm(self, Dg, self.dm_no, C_no)
             self.suhf_dm = suhf_dm
             self.natorb, self.natocc = sudm.natorb(self, suhf_dm)
@@ -722,7 +792,11 @@ class SUHF():
 
         t_end = time.time()
         print('time tot: %.3f' % (t_end-t_start))
-        return E_suhf, conv, self.natorb, self.natocc
+        return E_suhf, self.conv
 
 
-        
+def lev_shift(s, dm, f, shift):
+    new_f = (scf.hf.level_shift(s, dm[0], f[0], shift),
+             scf.hf.level_shift(s, dm[1], f[1], shift)
+             )
+    return np.array(new_f)

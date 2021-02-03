@@ -3,7 +3,10 @@ from pyphf import util2
 import sympy
 from sympy.physics.quantum.cg import CG
 import os
+from functools import partial
 
+print = partial(print, flush=True)
+einsum = partial(np.einsum, optimize=True)
 
 def make_1pdm(suhf, Dg, dm_no, C_no):
     print('******* suhf density *****')
@@ -64,8 +67,8 @@ def natorb(suhf, dm):
     XS = suhf.XS
     X = suhf.X
     # P = S^0.5 * dm * S^0.5
-    P0 = np.einsum('ij,jk,lk->il', XS, dm[0], XS)
-    P1 = np.einsum('ij,jk,lk->il', XS, dm[1], XS)
+    P0 = einsum('ij,jk,lk->il', XS, dm[0], XS)
+    P1 = einsum('ij,jk,lk->il', XS, dm[1], XS)
     natocc_a, natorb_a = np.linalg.eigh(-P0)
     natocc_b, natorb_b = np.linalg.eigh(-P1)
     natorb_a = np.dot(X, natorb_a)
@@ -88,7 +91,7 @@ def get_CG(j1, m1, j2, m2, j, m):
 def get_Ngg(Dg, dm_no, occ):
     Ngg = []
     for dg in Dg:
-        ngg_inv = np.einsum('ij,jl,lm->im', dm_no[:occ,:], dg, dm_no[:,:occ])
+        ngg_inv = einsum('ij,jl,lm->im', dm_no[:occ,:], dg, dm_no[:,:occ])
         ngg = np.linalg.inv(ngg_inv)
         Ngg.append(ngg)
         #print('Ngg')
@@ -99,11 +102,11 @@ def get_Pgg(Dg, dm_no, Ngg, occ, no):
     Pgg = []
     Pgg_ortho = []
     for i, dg in enumerate(Dg):
-        pgg = np.einsum('ij,jk,kl,ln->in', dg, dm_no[:,:occ], Ngg[i], dm_no[:occ,:])
+        pgg = einsum('ij,jk,kl,ln->in', dg, dm_no[:,:occ], Ngg[i], dm_no[:occ,:])
         Pgg.append(pgg)
         #print('pgg')
         #print(pgg)
-        pgg_ortho = np.einsum('ij,jk,lk->il', no, pgg, no)
+        pgg_ortho = einsum('ij,jk,lk->il', no, pgg, no)
         Pgg_ortho.append(pgg_ortho)
     return Pgg, Pgg_ortho
 

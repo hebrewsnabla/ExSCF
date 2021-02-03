@@ -6,16 +6,20 @@ def guess_frag(mol, frags, chgs, spins):
     frags: e.g. [[0], [1]] for N2
     '''
     #mol.build()
+    print('generating fragment guess')
     atom = mol.format_atom(mol.atom, unit=1)
-    print(atom)
+    #print(atom)
     fraga, fragb = frags
     chga, chgb = chgs
     spina, spinb = spins
     atoma = [atom[i] for i in fraga]
     atomb = [atom[i] for i in fragb]
-    print(atoma)
+    print('fragments:', atoma, atomb)
     ca_a, cb_a, na_a, nb_a = do_uhf(atoma, mol.basis, chga, spina)
     ca_b, cb_b, na_b, nb_b = do_uhf(atomb, mol.basis, chgb, spinb)
+    print('       na   nb')
+    print('atom1  %2d   %2d' % (na_a, nb_a))
+    print('atom2  %2d   %2d' % (na_b, nb_b))
     #print(mo_a)
     #print(mo_b)
     nbasa = ca_a.shape[0]
@@ -31,13 +35,13 @@ def guess_frag(mol, frags, chgs, spins):
     mo = np.array([ca, cb])
     na = na_a + na_b
     nb = nb_a + nb_b
-    print(ca.shape, cb.shape)
+    #print(ca.shape, cb.shape)
     occa = np.hstack((np.ones(na), np.zeros(ca.shape[1]-na))) 
     occb = np.hstack((np.ones(nb), np.zeros(cb.shape[1]-nb)))
     occ = np.array([occa, occb]) 
-    print(occ)
+    #print(occ)
     dm = scf.uhf.make_rdm1(mo, occ)
-    print(dm.shape)
+    #print(dm.shape)
     return dm, mo, occ
     
 def do_uhf(atoma, basisa, chga, spina):
@@ -49,7 +53,7 @@ def do_uhf(atoma, basisa, chga, spina):
     mola.build()
     mfa = scf.UHF(mola)
     mfa.kernel()
-    print(mfa.nelec)
+    #print(mfa.nelec)
     ca, cb = mfa.mo_coeff
     na, nb = mfa.nelec
     return ca, cb, na, nb
