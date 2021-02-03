@@ -1,0 +1,15 @@
+ExSCF 0.2 (Feb 03, 2021)
+------------------------
+* density, natural orbitals for SUHF
+* add tofch
+* packed dm to accelerate J,K integrals
+* fragment guess
+* level shift
+
+ExSCF 0.1 (Nov 21, 2020)
+------------------------
+* SUHF
+* SUHF+DFT
+* DIIS
+
+
