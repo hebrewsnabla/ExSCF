@@ -2,7 +2,6 @@ import numpy as np
 import sympy as sym
 import scipy
 from pyscf import gto, scf
-from fch2py import fch2py
 from pyphf import sudm, util2
 import os, sys
 from functools import partial
@@ -11,59 +10,6 @@ import time
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
-def guess_from_fchk(xyz, bas, fch):
-    mol = gto.Mole()
-    mol.atom = xyz
-    #with open(xyz, 'r') as f:
-    #    mol.atom = f.read()
-    #print(mol.atom)
-    mol.basis = bas
-    #mol.output = 'test.pylog'
-    mol.verbose = 4
-    mol.build()
-    
-    mf = scf.UHF(mol)
-    #mf.init_guess = '1e'
-    mf.init_guess_breaksym = True
-    mf.max_cycle = 1
-    mf.kernel()
-    
-    # read MOs from .fch(k) file
-    nbf = mf.mo_coeff[0].shape[0]
-    nif = mf.mo_coeff[0].shape[1]
-    S = mol.intor_symmetric('int1e_ovlp')
-    Sdiag = S.diagonal()
-    alpha_coeff = fch2py(fch, nbf, nif, Sdiag, 'a')
-    beta_coeff  = fch2py(fch, nbf, nif, Sdiag, 'b')
-    mf.mo_coeff = (alpha_coeff, beta_coeff)
-    # read done
-    
-    dm = mf.make_rdm1()
-    mf.max_cycle = 1
-    mf.kernel(dm)
-    return mf
-
-def guess(xyz, bas):
-    mol = gto.Mole()
-    mol.atom = xyz
-    #with open(xyz, 'r') as f:
-    #    mol.atom = f.read()
-    #print(mol.atom)
-    mol.basis = bas
-    #mol.output = 'test.pylog'
-    mol.verbose = 4
-    mol.build()
-    
-    mf = scf.UHF(mol)
-    #mf.init_guess = '1e'
-    mf.init_guess_breaksym = True
-    #mf.max_cycle = 1
-    mf.kernel()
-    
-    #dm = mf.make_rdm1()
-    #mf.max_cycle = 0
-    #mf.kernel(dm)
-    return mf
 
 def get_beta(n):
     # Gauss-Legendre quadrature
@@ -716,6 +662,8 @@ class SUHF():
         dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
         mo_ortho = np.array(self.mo_ortho)
         mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
+        self.dm_reg = dm_reg
+        self.mo_reg = mo_reg
         if self.debug:
             print('dm_reg\n', dm_reg)
             print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
@@ -766,6 +714,11 @@ class SUHF():
             self.dm_ortho = dm_ortho
             self.mo_ortho = mo_ortho
             self.mo_e = mo_e
+            dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
+            mo_ortho = np.array(self.mo_ortho)
+            mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
+            self.dm_reg = dm_reg
+            self.mo_reg = mo_reg
             if old_suhf is not None:
                 dE = E_suhf - old_suhf
                 ddm = dm_ortho - old_dm

@@ -1,5 +1,75 @@
 from pyscf import gto, scf
 import numpy as np
+from fch2py import fch2py
+
+def from_fchk(xyz, bas, fch):
+    mol = gto.Mole()
+    mol.atom = xyz
+    #with open(xyz, 'r') as f:
+    #    mol.atom = f.read()
+    #print(mol.atom)
+    mol.basis = bas
+    #mol.output = 'test.pylog'
+    mol.verbose = 4
+    mol.build()
+    
+    mf = scf.UHF(mol)
+    #mf.init_guess = '1e'
+    mf.init_guess_breaksym = True
+    mf.max_cycle = 1
+    mf.kernel()
+    
+    # read MOs from .fch(k) file
+    nbf = mf.mo_coeff[0].shape[0]
+    nif = mf.mo_coeff[0].shape[1]
+    S = mol.intor_symmetric('int1e_ovlp')
+    Sdiag = S.diagonal()
+    alpha_coeff = fch2py(fch, nbf, nif, Sdiag, 'a')
+    beta_coeff  = fch2py(fch, nbf, nif, Sdiag, 'b')
+    mf.mo_coeff = (alpha_coeff, beta_coeff)
+    # read done
+    
+    dm = mf.make_rdm1()
+    mf.max_cycle = 1
+    mf.kernel(dm)
+    return mf
+
+def mix(xyz, bas):
+    mol = gto.Mole()
+    mol.atom = xyz
+    #with open(xyz, 'r') as f:
+    #    mol.atom = f.read()
+    #print(mol.atom)
+    mol.basis = bas
+    #mol.output = 'test.pylog'
+    mol.verbose = 4
+    mol.build()
+    
+    mf = scf.UHF(mol)
+    #mf.init_guess = '1e'
+    mf.init_guess_breaksym = True
+    #mf.max_cycle = 1
+    mf.kernel()
+    
+    #dm = mf.make_rdm1()
+    #mf.max_cycle = 0
+    #mf.kernel(dm)
+    return mf
+
+def from_frag(xyz, bas, frags, chgs, spins):
+    mol = gto.Mole()
+    mol.atom = xyz
+    mol.basis = bas
+    mol.build()
+    
+    dm, mo, occ = guess_frag(mol, frags, chgs, spins)
+    mf = scf.UHF(mol)
+    mf.verbose = 6
+    #mf.conv_tol = 1e-2
+    mf.max_cycle = 2
+    mf.kernel(dm0 = dm)
+    return mf
+
 
 def guess_frag(mol, frags, chgs, spins):
     '''
