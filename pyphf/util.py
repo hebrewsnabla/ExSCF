@@ -423,8 +423,9 @@ class SUHF():
         #self.debug = False
         self.output = None
         self.max_cycle = 70
-        self.diis_on = False 
+        self.diis_on = True
         self.diis_start_cyc = None
+        self.level_shift = None
         self.makedm = True
         self.tofch = False
         self.oldfch = None
@@ -455,7 +456,7 @@ class SUHF():
             #DIIS = lib.diis.SCF_DIIS
             self.diis_space = 8
             if self.diis_start_cyc is None:
-                self.diis_start_cyc = 40
+                self.diis_start_cyc = 10
             self.diis_file = None
             #mf_diis.rollback = mf.diis_space_rollback
             self.diis = scf.diis.CDIIS()
