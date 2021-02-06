@@ -432,6 +432,8 @@ class SUHF():
 
         self.built = False
 
+        self.E_suhf = None
+
     def build(self):
         print('\n******** %s ********' % self.__class__)
         print('max_cycle = %d' % self.max_cycle)

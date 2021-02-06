@@ -3,6 +3,10 @@ from pyscf import dft
 import pyscf.dft.numint as numint
 
 import numpy as np
+from functools import partial
+
+print = partial(print, flush=True)
+einsum = partial(np.einsum, optimize=True)
 
 
 class SUDFT():
@@ -12,9 +16,11 @@ class SUDFT():
         self.suxc = 'tpss'
         self.output = None
         self.dens = 'deformed' # or relaxed
+        self.trunc = None
 
     def kernel(self):
-        self.suhf.kernel()
+        if self.suhf.E_suhf is None:
+            self.suhf.kernel()
         #if self.output is not None:
         #    sys.stdout = open(self.output, 'a')
         print('***** Start DFT Correlation for SUHF+DFT **********')
@@ -29,18 +35,39 @@ class SUDFT():
 
         ks = dft.UKS(self.suhf.mol)
         ni = ks._numint
-        if self.suxc == 'CS':
-            suxc = 'MGGA_C_CS'
-            n, exc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm)
-        else:
-            n, exc, vxc = ni.nr_uks(self.suhf.mol, ks.grids, 'HF,%s'%self.suxc, dm)
+        if self.trunc is None:
+            if self.suxc == 'CS':
+                suxc = 'MGGA_C_CS'
+                n, exc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm)
+            else:
+                n, exc, vxc = ni.nr_uks(self.suhf.mol, ks.grids, 'HF,%s'%self.suxc, dm)
+        elif self.trunc == 'f':
+            natorb = self.suhf.natorb
+            natocc = self.suhf.natocc
+            natocc = natocc[0] + natocc[1]
+            print('natocc', natocc)
+            ref = [2.0 if occ > 1e-4 else 0.0 for occ in natocc]
+            print('ref', ref)
+            ref = np.array(ref)
+            dm_ref = einsum('ij,j,kj -> ik', natorb[0], ref, natorb[0])
+            if self.suxc == 'CS':
+                suxc = 'MGGA_C_CS'
+            else:
+                suxc = self.suxc
+            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, trunc='f', dmref=dm_ref)
+
         E_sudft = E_suhf + exc
+        E_sufdft = E_suhf + excf
         print("E(SUHF) = %15.8f" % E_suhf)
         print("E_c(%s) = %15.8f" % (self.suxc.upper(), exc))
         print("E(SUHF+DFT) = %15.8f" % E_sudft)
+        if self.trunc == 'f':
+            print("f E_c(%s) = %15.8f" % (self.suxc.upper(), excf))
+            print("E(SUHF+fDFT) = %15.8f" % E_sufdft)
         return exc, E_sudft
 
-def get_exc(ni, mol, grids, xc_code, dms, relativity=0, hermi=0, max_memory=2000, verbose=None):
+def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, 
+            relativity=0, hermi=0, max_memory=2000, verbose=None):
     '''
     modified from pyscf.dft.numint.nr_uks
     '''
@@ -58,9 +85,11 @@ def get_exc(ni, mol, grids, xc_code, dms, relativity=0, hermi=0, max_memory=2000
     nao = dma.shape[-1]
     make_rhoa, nset = ni._gen_rho_evaluator(mol, dma, hermi)[:2]
     make_rhob       = ni._gen_rho_evaluator(mol, dmb, hermi)[0]
+    make_rho_ref    = ni._gen_rho_evaluator(mol, dmref, hermi)[0]
 
     nelec = np.zeros((2,nset))
     excsum = np.zeros(nset)
+    excfsum = np.zeros(nset)
 #    vmat = np.zeros((2,nset,nao,nao), dtype=np.result_type(dma, dmb))
 #    aow = None
     if xctype == 'LDA':
@@ -126,16 +155,27 @@ def get_exc(ni, mol, grids, xc_code, dms, relativity=0, hermi=0, max_memory=2000
             for idm in range(nset):
                 rho_a = make_rhoa(idm, ao, mask, xctype)
                 rho_b = make_rhob(idm, ao, mask, xctype)
+                rho_ref = make_rho_ref(idm, ao, mask, xctype)
                 exc, vxc = ni.eval_xc(xc_code, (rho_a, rho_b), spin=1,
                                       relativity=relativity, deriv=1,
                                       verbose=verbose)[:2]
                 vrho, vsigma, vlapl, vtau = vxc[:4]
-                den = rho_a[0]*weight
-                nelec[0,idm] += den.sum()
-                excsum[idm] += np.dot(den, exc)
-                den = rho_b[0]*weight
-                nelec[1,idm] += den.sum()
-                excsum[idm] += np.dot(den, exc)
+                den_a = rho_a[0]*weight
+                nelec[0,idm] += den_a.sum()
+                excsum[idm] += np.dot(den_a, exc)
+
+                den_b = rho_b[0]*weight
+                nelec[1,idm] += den_b.sum()
+                excsum[idm] += np.dot(den_b, exc)
+                rhoall = rho_a[0] + rho_b[0]
+                eta = (rho_ref[0] / rhoall)**(1.0/3)
+                for i in range(len(rhoall)):
+                    if rhoall[i] < 1e-45:
+                        rhoall[i] = 1e-45
+                        eta[i] = 1.0
+                #print('f', f.shape)
+                f = get_f(rhoall, eta)
+                excfsum[idm] += einsum('i,i,i->', den_a+den_b, exc, f)
 
 #                wva, wvb = _uks_gga_wv0((rho_a,rho_b), vxc, weight)
 #                #:aow = np.einsum('npi,np->pi', ao[:4], wva, out=aow)
@@ -164,4 +204,22 @@ def get_exc(ni, mol, grids, xc_code, dms, relativity=0, hermi=0, max_memory=2000
 #        vmat = vmat[:,0]
         nelec = nelec.reshape(2)
         excsum = excsum[0]
-    return nelec, excsum #, vmat
+    if trunc is not None:
+        return nelec, excsum , excfsum
+    else:
+        return nelec, excsum 
+
+def get_f(rho, eta):
+    b = [[-2.207193,     6.807648,     -6.386316,     2.860522,     -0.07466076],
+         [ 1.128469,    -2.535669,      2.432821,    -1.064058,      0.03843687],
+         [-0.2475593,    0.4243142,    -0.2565175,    0.08294749,   -0.003184296],
+         [ 0.08616560,  -0.1715714,     0.1067547,   -0.02392882,    0.002579856],
+         [-0.6500077e-2, 0.1714085e-1, -0.1462187e-1, 0.4423830e-2, -0.4427570e-3],
+         [-0.2491486e-2, 0.5321373e-2, -0.3704699e-2, 0.9700054e-3, -0.9518308e-4]]
+    x = np.log((3.0 / (4 * np.pi * rho))**(1.0/3))
+    finv = np.zeros(rho.shape[0])
+    for m in range(6):
+        for n in range(5):
+            finv += b[m][n] * x**m * eta**n
+    f = finv**(-1)
+    return f
