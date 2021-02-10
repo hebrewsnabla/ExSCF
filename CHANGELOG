@@ -1,14 +1,14 @@
-version 0.3 (Feb 06, 2021)
+version 0.3 (Feb 10, 2021)
 --------------------------
 * Colle-Salveltti functional
 * SUHF+fDFT (MSS type)
-* generate NO from total 1pdm
+* generate total NO, instead of alpha/beta NO
 
 version 0.2 (Feb 03, 2021)
 --------------------------
 * density, natural orbitals for SUHF
 * add tofch
-* packed dm to accelerate J,K integrals
+* packed dm to accelerate J,K potential
 * fragment guess
 * level shift
 
