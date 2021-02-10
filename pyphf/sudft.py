@@ -46,14 +46,14 @@ class SUDFT():
             else:
                 n, exc, vxc = ni.nr_uks(self.suhf.mol, ks.grids, 'HF,%s'%self.suxc, dm)
         elif self.trunc == 'f':
-            natorb = self.suhf.natorb
-            natocc = self.suhf.natocc
-            natocc = natocc[0] + natocc[1]
+            natorb = self.suhf.natorb[2]
+            natocc = self.suhf.natocc[2]
+            #natocc = natocc[0] + natocc[1]
             print('natocc', natocc)
             ref = [2.0 if occ > 1e-2 else 0.0 for occ in natocc]
             print('ref', ref)
             ref = np.array(ref)
-            dm_ref = einsum('ij,j,kj -> ik', natorb[0], ref, natorb[0])
+            dm_ref = einsum('ij,j,kj -> ik', natorb, ref, natorb)
             if self.suxc == 'CS':
                 suxc = 'MGGA_C_CS'
             else:

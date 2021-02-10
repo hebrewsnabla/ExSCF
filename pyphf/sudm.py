@@ -59,25 +59,36 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
     int1pdm_a = suhf.integr_beta(np.array(Onepdm_a), fac='ci') / xggint
     #print(type(int1pdm_a), int1pdm_a.dtype)
     int1pdm_b = suhf.integr_beta(np.array(Onepdm_b), fac='ci') / xggint
-    print('SUHF DM alpha\n', int1pdm_a, '\nSUHF DM beta\n', int1pdm_b)
+    if suhf.debug:
+        print('SUHF DM alpha\n', int1pdm_a, '\nSUHF DM beta\n', int1pdm_b)
     return [int1pdm_a, int1pdm_b]
 
 def natorb(suhf, dm):
     #print(type(dm[0]), dm[0].dtype)
     XS = suhf.XS
     X = suhf.X
+    dmab = dm[0] + dm[1]
     # P = S^0.5 * dm * S^0.5
     P0 = einsum('ij,jk,lk->il', XS, dm[0], XS)
     P1 = einsum('ij,jk,lk->il', XS, dm[1], XS)
+    Pab = P0 + P1
     natocc_a, natorb_a = np.linalg.eigh(-P0)
     natocc_b, natorb_b = np.linalg.eigh(-P1)
+    natocc_ab, natorb_ab = np.linalg.eigh(-Pab)
     natorb_a = np.dot(X, natorb_a)
     natorb_b = np.dot(X, natorb_b)
+    natorb_ab = np.dot(X, natorb_ab)
     natocc_a = -1 * natocc_a
     natocc_b = -1 * natocc_b
-    print('SUHF natural orbitals alpha\n', natorb_a, '\nSUHF NO occ alpha\n', natocc_a)
-    print('SUHF natural orbitals beta\n', natorb_b, '\nSUHF NO occ beta\n', natocc_b)
-    return [natorb_a, natorb_b], [natocc_a, natocc_b]
+    natocc_ab = -1 * natocc_ab
+    if suhf.debug:
+        print('SUHF natural orbitals alpha\n', natorb_a)
+        print('SUHF natural orbitals beta\n', natorb_b)
+        print('SUHF natural orbitals, total\n', natorb_ab)
+    print('SUHF NO occ alpha\n', natocc_a)
+    print('SUHF NO occ beta\n', natocc_b)
+    print('SUHF NO occ, total', natocc_ab)
+    return [natorb_a, natorb_b, natorb_ab], [natocc_a, natocc_b, natocc_ab]
 
 
 def get_CG(j1, m1, j2, m2, j, m):
