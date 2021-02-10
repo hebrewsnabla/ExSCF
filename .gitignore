@@ -1,8 +1,7 @@
 core.*
 tmp*
-/test/*/*.log
-/test/*/*.chk
-/test/test_dm/Cr/
+/test/scan*/*.log
+*.chk
 /test/test_dm/B3/
 /phf/
 .vscode/
@@ -17,10 +16,6 @@ __pycache__/
 *.lo
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
 
 # Compiled Dynamic libraries
 *.so

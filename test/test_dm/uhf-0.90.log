@@ -1,0 +1,342 @@
+ Entering Gaussian System, Link 0=g09
+ Input=uhf-0.90.gjf
+ Output=uhf-0.90.log
+ Initial command:
+ /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l1.exe /scratch/scr/srwang/gau/Gau-26397.inp -scrdir=/scratch/scr/srwang/gau/
+ Entering Link 1 = /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l1.exe PID=     26403.
+  
+ Copyright (c) 1988,1990,1992,1993,1995,1998,2003,2009,2011,
+            Gaussian, Inc.  All Rights Reserved.
+  
+ This is part of the Gaussian(R) 09 program.  It is based on
+ the Gaussian(R) 03 system (copyright 2003, Gaussian, Inc.),
+ the Gaussian(R) 98 system (copyright 1998, Gaussian, Inc.),
+ the Gaussian(R) 94 system (copyright 1995, Gaussian, Inc.),
+ the Gaussian 92(TM) system (copyright 1992, Gaussian, Inc.),
+ the Gaussian 90(TM) system (copyright 1990, Gaussian, Inc.),
+ the Gaussian 88(TM) system (copyright 1988, Gaussian, Inc.),
+ the Gaussian 86(TM) system (copyright 1986, Carnegie Mellon
+ University), and the Gaussian 82(TM) system (copyright 1983,
+ Carnegie Mellon University). Gaussian is a federally registered
+ trademark of Gaussian, Inc.
+  
+ This software contains proprietary and confidential information,
+ including trade secrets, belonging to Gaussian, Inc.
+  
+ This software is provided under written license and may be
+ used, copied, transmitted, or stored only in accord with that
+ written license.
+  
+ The following legend is applicable only to US Government
+ contracts under FAR:
+  
+                    RESTRICTED RIGHTS LEGEND
+  
+ Use, reproduction and disclosure by the US Government is
+ subject to restrictions as set forth in subparagraphs (a)
+ and (c) of the Commercial Computer Software - Restricted
+ Rights clause in FAR 52.227-19.
+  
+ Gaussian, Inc.
+ 340 Quinnipiac St., Bldg. 40, Wallingford CT 06492
+  
+  
+ ---------------------------------------------------------------
+ Warning -- This program may not be used in any manner that
+ competes with the business of Gaussian, Inc. or will provide
+ assistance to any competitor of Gaussian, Inc.  The licensee
+ of this program is prohibited from giving any competitor of
+ Gaussian, Inc. access to this program.  By using this program,
+ the user acknowledges that Gaussian, Inc. is engaged in the
+ business of creating and licensing software in the field of
+ computational chemistry and represents and warrants to the
+ licensee that it is not a competitor of Gaussian, Inc. and that
+ it will not use this program in any manner prohibited above.
+ ---------------------------------------------------------------
+  
+
+ Cite this work as:
+ Gaussian 09, Revision C.01,
+ M. J. Frisch, G. W. Trucks, H. B. Schlegel, G. E. Scuseria, 
+ M. A. Robb, J. R. Cheeseman, G. Scalmani, V. Barone, B. Mennucci, 
+ G. A. Petersson, H. Nakatsuji, M. Caricato, X. Li, H. P. Hratchian, 
+ A. F. Izmaylov, J. Bloino, G. Zheng, J. L. Sonnenberg, M. Hada, 
+ M. Ehara, K. Toyota, R. Fukuda, J. Hasegawa, M. Ishida, T. Nakajima, 
+ Y. Honda, O. Kitao, H. Nakai, T. Vreven, J. A. Montgomery, Jr., 
+ J. E. Peralta, F. Ogliaro, M. Bearpark, J. J. Heyd, E. Brothers, 
+ K. N. Kudin, V. N. Staroverov, T. Keith, R. Kobayashi, J. Normand, 
+ K. Raghavachari, A. Rendell, J. C. Burant, S. S. Iyengar, J. Tomasi, 
+ M. Cossi, N. Rega, J. M. Millam, M. Klene, J. E. Knox, J. B. Cross, 
+ V. Bakken, C. Adamo, J. Jaramillo, R. Gomperts, R. E. Stratmann, 
+ O. Yazyev, A. J. Austin, R. Cammi, C. Pomelli, J. W. Ochterski, 
+ R. L. Martin, K. Morokuma, V. G. Zakrzewski, G. A. Voth, 
+ P. Salvador, J. J. Dannenberg, S. Dapprich, A. D. Daniels, 
+ O. Farkas, J. B. Foresman, J. V. Ortiz, J. Cioslowski, 
+ and D. J. Fox, Gaussian, Inc., Wallingford CT, 2010.
+ 
+ ******************************************
+ Gaussian 09:  EM64L-G09RevC.01 23-Sep-2011
+                25-Jan-2021 
+ ******************************************
+ %nproc=1
+ Will use up to    1 processors via shared memory.
+ %mem=1gb
+ %oldchk=uhf-1.30.chk
+ %chk=uhf-0.90.chk
+ Copying data from "uhf-1.30.chk" to current chk file "uhf-0.90.chk".
+ ---------------------------------------------------------------------
+ #p uhf chkbasis guess=(read) scf=conver=2 nosymm int=nobasistransform
+ ---------------------------------------------------------------------
+ 1/38=1/1;
+ 2/12=2,15=1,17=6,18=5,40=1/2;
+ 3/5=7,6=2,11=2,16=1,25=1,30=1,60=-1,67=1,116=2/1,2,3;
+ 4/5=1/1;
+ 5/5=2,6=2,38=6/2;
+ 6/7=2,8=2,9=2,10=2,28=1/1;
+ 99/5=1,9=1/99;
+ Leave Link    1 at Mon Jan 25 22:43:54 2021, MaxMem=  134217728 cpu:       0.0
+ (Enter /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l101.exe)
+ -----
+ tilte
+ -----
+ Charge =  0 Multiplicity = 1
+ Symbolic Z-Matrix:
+ N                     0.        0.        0. 
+ N                     0.        0.        0.9 
+ 
+ NAtoms=      2 NQM=        0 NQMF=       0 NMMI=      2 NMMIF=      0
+                NMic=       0 NMicF=      0.
+                    Isotopes and Nuclear Properties:
+ (Nuclear quadrupole moments (NQMom) in fm**2, nuclear magnetic moments (NMagM)
+  in nuclear magnetons)
+
+  Atom         1           2
+ IAtWgt=          14          14
+ AtmWgt=  14.0030740  14.0030740
+ NucSpn=           2           2
+ AtZEff=   0.0000000   0.0000000
+ NQMom=    2.0440000   2.0440000
+ NMagM=    0.4037610   0.4037610
+ Leave Link  101 at Mon Jan 25 22:43:54 2021, MaxMem=  134217728 cpu:       0.1
+ (Enter /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l202.exe)
+                          Input orientation:                          
+ ---------------------------------------------------------------------
+ Center     Atomic      Atomic             Coordinates (Angstroms)
+ Number     Number       Type             X           Y           Z
+ ---------------------------------------------------------------------
+      1          7           0        0.000000    0.000000    0.000000
+      2          7           0        0.000000    0.000000    0.900000
+ ---------------------------------------------------------------------
+ Symmetry turned off by external request.
+ Stoichiometry    N2
+ Framework group  D*H[C*(N.N)]
+ Deg. of freedom     1
+ Full point group                 D*H     NOp   8
+ Rotational constants (GHZ):      0.0000000     89.1125330     89.1125330
+ Leave Link  202 at Mon Jan 25 22:43:54 2021, MaxMem=  134217728 cpu:       0.0
+ (Enter /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l301.exe)
+ Basis read from chk: uhf-0.90.chk (5D, 7F)
+ No pseudopotential information found on chk file.
+ Integral buffers will be    131072 words long.
+ Raffenetti 2 integral format.
+ Two-electron integral symmetry is turned off.
+    28 basis functions,    66 primitive gaussians,    30 cartesian basis functions
+     7 alpha electrons        7 beta electrons
+       nuclear repulsion energy        28.8107591343 Hartrees.
+ IExCor=    0 DFT=F Ex=HF Corr=None ExCW=0 ScaHFX=  1.000000
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000 ScalE2=  1.000000  1.000000
+ IRadAn=      0 IRanWt=     -1 IRanGd=            0 ICorTp=0
+ NAtoms=    2 NActive=    2 NUniq=    2 SFac= 1.00D+00 NAtFMM=   60 NAOKFM=F Big=F
+ No density basis found on file 20724.
+ Leave Link  301 at Mon Jan 25 22:43:54 2021, MaxMem=  134217728 cpu:       0.0
+ (Enter /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l302.exe)
+ NPDir=0 NMtPBC=     1 NCelOv=     1 NCel=       1 NClECP=     1 NCelD=      1
+         NCelK=      1 NCelE2=     1 NClLst=     1 CellRange=     0.0.
+ One-electron integrals computed using PRISM.
+ Bad symmetry data in SVDSVc:  NBasis=   28 NT=   28 NBlks=1 MaxCmp=1 NBF=   28
+ NBasis=    28 RedAO= T  NBF=    28
+ NBsUse=    28 1.00D-06 NBFU=    28
+ Leave Link  302 at Mon Jan 25 22:43:54 2021, MaxMem=  134217728 cpu:       0.1
+ (Enter /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l303.exe)
+ DipDrv:  MaxL=1.
+ Leave Link  303 at Mon Jan 25 22:43:54 2021, MaxMem=  134217728 cpu:       0.0
+ (Enter /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l401.exe)
+ Initial guess read from the checkpoint file:  uhf-0.90.chk
+ B after Tr=     0.000000    0.000000    0.850377
+         Rot=    0.000000   -0.000000    1.000000   -0.000000 Ang= 180.00 deg.
+ Guess basis will be translated and rotated to current coordinates.
+ Initial guess <Sx>= 0.0000 <Sy>= 0.0000 <Sz>= 0.0000 <S**2>= 0.7052 S= 0.4773
+ Leave Link  401 at Mon Jan 25 22:43:54 2021, MaxMem=  134217728 cpu:       0.1
+ (Enter /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l502.exe)
+ UHF open shell SCF:
+ Requested convergence on RMS density matrix=1.00D-02 within 128 cycles.
+ Requested convergence on MAX density matrix=1.00D+00.
+ Requested convergence on             energy=1.00D+00.
+ No special actions if energy rises.
+ Using DIIS extrapolation, IDIIS=  1040.
+ Two-electron integral symmetry not used.
+ Keep R1 and R2 ints in memory in canonical form, NReq=1057921.
+ IEnd=       21210 IEndB=       21210 NGot=   134217728 MDV=   133997371
+ LenX=   133997371 LenY=   133996030
+ Symmetry not used in FoFDir.
+ MinBra= 0 MaxBra= 2 Meth= 1.
+ IRaf=       0 NMat=   1 IRICut=       1 DoRegI=T DoRafI=F ISym2E= 0 JSym2E=0.
+
+ Cycle   1  Pass 1  IDiag  1:
+ E= -108.549614352602    
+ DIIS: error= 5.27D-02 at cycle   1 NSaved=   1.
+ NSaved= 1 IEnMin= 1 EnMin= -108.549614352602     IErMin= 1 ErrMin= 5.27D-02
+ ErrMax= 5.27D-02 EMaxC= 1.00D-01 BMatC= 5.48D-01 BMatP= 5.48D-01
+ IDIUse=3 WtCom= 4.73D-01 WtEn= 5.27D-01
+ Coeff-Com:  0.100D+01
+ Coeff-En:   0.100D+01
+ Coeff:      0.100D+01
+ Gap=     1.110 Goal=   None    Shift=    0.000
+ Gap=     1.110 Goal=   None    Shift=    0.000
+ GapD=    1.110 DampG=2.000 DampE=0.500 DampFc=1.0000 IDamp=-1.
+ RMSDP=1.24D-02 MaxDP=7.20D-02              OVMax= 1.33D-01
+
+ Cycle   2  Pass 1  IDiag  1:
+ E= -108.719953462611     Delta-E=       -0.170339110009 Rises=F Damp=F
+ DIIS: error= 2.83D-02 at cycle   2 NSaved=   2.
+ NSaved= 2 IEnMin= 2 EnMin= -108.719953462611     IErMin= 2 ErrMin= 2.83D-02
+ ErrMax= 2.83D-02 EMaxC= 1.00D-01 BMatC= 6.53D-02 BMatP= 5.48D-01
+ IDIUse=3 WtCom= 7.17D-01 WtEn= 2.83D-01
+ Coeff-Com:  0.177D-01 0.982D+00
+ Coeff-En:   0.000D+00 0.100D+01
+ Coeff:      0.127D-01 0.987D+00
+ Gap=     0.920 Goal=   None    Shift=    0.000
+ Gap=     0.920 Goal=   None    Shift=    0.000
+ DSYEVD returned Info=          57 IAlg= 4 N=    28 NDim=    28 NE2=     4785571 trying DSYEV.
+ RMSDP=4.70D-03 MaxDP=4.37D-02 DE=-1.70D-01 OVMax= 5.79D-02
+
+ SCF Done:  E(UHF) =  -108.719953463     A.U. after    2 cycles
+             Convg  =    0.4697D-02             -V/T =  1.9813
+ <Sx>= 0.0000 <Sy>= 0.0000 <Sz>= 0.0000 <S**2>= 0.2123 S= 0.1799
+ <L.S>= 0.000000000000E+00
+ KE= 1.107973057763D+02 PE=-3.150894471462D+02 EE= 6.676142877286D+01
+ Annihilation of the first spin contaminant:
+ S**2 before annihilation     0.2123,   after     0.0526
+ Leave Link  502 at Mon Jan 25 22:43:54 2021, MaxMem=  134217728 cpu:       0.1
+ (Enter /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l601.exe)
+ Copying SCF densities to generalized density rwf, IOpCl= 1 IROHF=0.
+
+ **********************************************************************
+
+            Population analysis using the SCF density.
+
+ **********************************************************************
+
+ Alpha  occ. eigenvalues --  -15.58421 -15.54515  -1.58551  -0.69959  -0.69478
+ Alpha  occ. eigenvalues --   -0.69478  -0.60395
+ Alpha virt. eigenvalues --    0.31341   0.31341   0.62997   0.76588   0.81396
+ Alpha virt. eigenvalues --    0.81396   1.03869   1.13868   1.13868   1.45769
+ Alpha virt. eigenvalues --    1.72379   1.72379   1.96659   2.15191   2.15191
+ Alpha virt. eigenvalues --    2.47391   2.47391   2.99346   3.26180   3.26180
+ Alpha virt. eigenvalues --    4.23728
+  Beta  occ. eigenvalues --  -15.58421 -15.54515  -1.58551  -0.69959  -0.69478
+  Beta  occ. eigenvalues --   -0.69478  -0.60395
+  Beta virt. eigenvalues --    0.31341   0.31341   0.62997   0.76588   0.81396
+  Beta virt. eigenvalues --    0.81396   1.03869   1.13868   1.13868   1.45769
+  Beta virt. eigenvalues --    1.72379   1.72379   1.96659   2.15191   2.15191
+  Beta virt. eigenvalues --    2.47391   2.47391   2.99346   3.26180   3.26180
+  Beta virt. eigenvalues --    4.23728
+          Condensed to atoms (all electrons):
+              1          2
+     1  N    6.213878   0.786122
+     2  N    0.786122   6.213878
+ Mulliken atomic charges:
+              1
+     1  N   -0.000000
+     2  N    0.000000
+ Sum of Mulliken atomic charges =  -0.00000
+ Mulliken charges with hydrogens summed into heavy atoms:
+              1
+     1  N   -0.000000
+     2  N    0.000000
+ Sum of Mulliken charges with hydrogens summed into heavy atoms =  -0.00000
+          Atomic-Atomic Spin Densities.
+              1          2
+     1  N    0.876904  -0.000000
+     2  N   -0.000000  -0.876904
+ Mulliken atomic spin densities:
+              1
+     1  N    0.876904
+     2  N   -0.876904
+ Sum of Mulliken atomic spin densities =   0.00000
+ Electronic spatial extent (au):  <R**2>=             42.6794
+ Charge=             -0.0000 electrons
+ Dipole moment (field-independent basis, Debye):
+    X=              0.0000    Y=             -0.0000    Z=              0.0000  Tot=              0.0000
+ Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=             -9.3655   YY=             -9.3655   ZZ=            -11.4401
+   XY=              0.0000   XZ=             -0.0000   YZ=             -0.0000
+ Traceless Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=              0.6915   YY=              0.6915   ZZ=             -1.3831
+   XY=              0.0000   XZ=             -0.0000   YZ=             -0.0000
+ Octapole moment (field-independent basis, Debye-Ang**2):
+  XXX=              0.0000  YYY=             -0.0000  ZZZ=            -15.4442  XYY=              0.0000
+  XXY=              0.0000  XXZ=             -4.2145  XZZ=              0.0000  YZZ=             -0.0000
+  YYZ=             -4.2145  XYZ=              0.0000
+ Hexadecapole moment (field-independent basis, Debye-Ang**3):
+ XXXX=             -6.8830 YYYY=             -6.8830 ZZZZ=            -37.3558 XXXY=              0.0000
+ XXXZ=             -0.0000 YYYX=              0.0000 YYYZ=              0.0000 ZZZX=              0.0000
+ ZZZY=             -0.0000 XXYY=             -2.2943 XXZZ=             -6.6152 YYZZ=             -6.6152
+ XXYZ=              0.0000 YYXZ=             -0.0000 ZZXY=              0.0000
+ N-N= 2.881075913434D+01 E-N=-4.719323512817D+02  KE= 1.661959586645D+02
+                          Isotropic Fermi Contact Couplings
+        Atom                 a.u.       MegaHertz       Gauss      10(-4) cm-1
+     1  N(14)              0.18464      29.82851      10.64355       9.94972
+     2  N(14)             -0.18464     -29.82851     -10.64355      -9.94972
+ --------------------------------------------------------
+       Center         ----  Spin Dipole Couplings  ----
+                      3XX-RR        3YY-RR        3ZZ-RR
+ --------------------------------------------------------
+     1   Atom        0.479760      0.479760     -0.959519
+     2   Atom       -0.479760     -0.479760      0.959519
+ --------------------------------------------------------
+                        XY            XZ            YZ
+ --------------------------------------------------------
+     1   Atom        0.000000      0.000000     -0.000000
+     2   Atom        0.000000      0.000000     -0.000000
+ --------------------------------------------------------
+
+
+ ---------------------------------------------------------------------------------
+              Anisotropic Spin Dipole Couplings in Principal Axis System
+ ---------------------------------------------------------------------------------
+
+       Atom             a.u.   MegaHertz   Gauss  10(-4) cm-1        Axes
+
+              Baa    -0.9595   -37.007   -13.205   -12.344  0.0000  0.0000  1.0000
+     1 N(14)  Bbb     0.4798    18.503     6.602     6.172  1.0000  0.0000  0.0000
+              Bcc     0.4798    18.503     6.602     6.172 -0.0000  1.0000  0.0000
+ 
+              Baa    -0.4798   -18.503    -6.602    -6.172 -0.0000  1.0000  0.0000
+     2 N(14)  Bbb    -0.4798   -18.503    -6.602    -6.172  1.0000  0.0000  0.0000
+              Bcc     0.9595    37.007    13.205    12.344  0.0000 -0.0000  1.0000
+ 
+
+ ---------------------------------------------------------------------------------
+
+ No NMR shielding tensors so no spin-rotation constants.
+ Leave Link  601 at Mon Jan 25 22:43:54 2021, MaxMem=  134217728 cpu:       0.1
+ (Enter /share/apps/gaussian/G09C01Z/srwang-mod-2020/g09/l9999.exe)
+ 1\1\GINC-XN01\SP\UHF\Gen\N2\SRWANG\25-Jan-2021\0\\#p uhf chkbasis gues
+ s=(read) scf=conver=2 nosymm int=nobasistransform\\tilte\\0,1\N,0,0.,0
+ .,0.\N,0,0.,0.,0.9\\Version=EM64L-G09RevC.01\HF=-108.7199535\S2=0.2122
+ 93\S2-1=0.\S2A=0.052643\RMSD=4.697e-03\Dipole=0.,0.,0.\Quadrupole=0.51
+ 41445,0.5141445,-1.028289,0.,0.,0.\PG=D*H [C*(N1.N1)]\\@
+
+
+ O WAD SOME POWER THE GIFTIE GIE US       
+ TO SEE OURSELS AS OTHERS SEE US.....     
+ IT WOULD FRAE MONIE A BLUNDER FREE US,   
+                     AND FOOLISH NOTION...
+ WHAT AIRS IN DRESS AND GAIT WAD LEA'E US,
+                     AND EV'N DEVOTION....
+                                          
+              (ROBERT BURNS 'TO A LOUSE') 
+ Job cpu time:  0 days  0 hours  0 minutes  0.7 seconds.
+ File lengths (MBytes):  RWF=      9 Int=      0 D2E=      0 Chk=      8 Scr=      1
+ Normal termination of Gaussian 09 at Mon Jan 25 22:43:54 2021.
