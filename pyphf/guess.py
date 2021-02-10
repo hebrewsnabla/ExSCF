@@ -1,8 +1,8 @@
-from pyscf import gto, scf
+from pyscf import gto, scf, dft
 import numpy as np
 from fch2py import fch2py
 
-def from_fchk(xyz, bas, fch):
+def from_fchk(xyz, bas, fch, cycle=1):
     mol = gto.Mole()
     mol.atom = xyz
     #with open(xyz, 'r') as f:
@@ -30,7 +30,7 @@ def from_fchk(xyz, bas, fch):
     # read done
     
     dm = mf.make_rdm1()
-    mf.max_cycle = 1
+    mf.max_cycle = cycle
     mf.kernel(dm)
     return mf
 
@@ -56,17 +56,21 @@ def mix(xyz, bas):
     #mf.kernel(dm)
     return mf
 
-def from_frag(xyz, bas, frags, chgs, spins):
+def from_frag(xyz, bas, frags, chgs, spins, cycle=2, xc=None):
     mol = gto.Mole()
     mol.atom = xyz
     mol.basis = bas
     mol.build()
     
     dm, mo, occ = guess_frag(mol, frags, chgs, spins)
-    mf = scf.UHF(mol)
+    if xc is None:
+        mf = scf.UHF(mol)
+    else:
+        mf = dft.UKS(mol)
+        mf.xc = xc
     mf.verbose = 6
     #mf.conv_tol = 1e-2
-    mf.max_cycle = 2
+    mf.max_cycle = cycle
     mf.kernel(dm0 = dm)
     return mf
 

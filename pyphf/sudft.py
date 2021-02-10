@@ -4,6 +4,7 @@ import pyscf.dft.numint as numint
 
 import numpy as np
 from functools import partial
+import time
 
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
@@ -24,6 +25,9 @@ class SUDFT():
         #if self.output is not None:
         #    sys.stdout = open(self.output, 'a')
         print('***** Start DFT Correlation for SUHF+DFT **********')
+        print('density: %s' % self.dens)
+        print('truncation: %s' % self.trunc)
+        t1 = time.time()
         E_suhf = self.suhf.E_suhf
         #dm_ortho = self.suhf.dm_ortho
         #X = self.suhf.X
@@ -46,7 +50,7 @@ class SUDFT():
             natocc = self.suhf.natocc
             natocc = natocc[0] + natocc[1]
             print('natocc', natocc)
-            ref = [2.0 if occ > 1e-4 else 0.0 for occ in natocc]
+            ref = [2.0 if occ > 1e-2 else 0.0 for occ in natocc]
             print('ref', ref)
             ref = np.array(ref)
             dm_ref = einsum('ij,j,kj -> ik', natorb[0], ref, natorb[0])
@@ -57,13 +61,15 @@ class SUDFT():
             n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, trunc='f', dmref=dm_ref)
 
         E_sudft = E_suhf + exc
-        E_sufdft = E_suhf + excf
         print("E(SUHF) = %15.8f" % E_suhf)
         print("E_c(%s) = %15.8f" % (self.suxc.upper(), exc))
         print("E(SUHF+DFT) = %15.8f" % E_sudft)
         if self.trunc == 'f':
+            E_sufdft = E_suhf + excf
             print("f E_c(%s) = %15.8f" % (self.suxc.upper(), excf))
             print("E(SUHF+fDFT) = %15.8f" % E_sufdft)
+        t2 = time.time()
+        print('time for DFT: %.3f' % (t2-t1))
         return exc, E_sudft
 
 def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, 
@@ -216,7 +222,7 @@ def get_f(rho, eta):
          [ 0.08616560,  -0.1715714,     0.1067547,   -0.02392882,    0.002579856],
          [-0.6500077e-2, 0.1714085e-1, -0.1462187e-1, 0.4423830e-2, -0.4427570e-3],
          [-0.2491486e-2, 0.5321373e-2, -0.3704699e-2, 0.9700054e-3, -0.9518308e-4]]
-    x = np.log((3.0 / (4 * np.pi * rho))**(1.0/3))
+    x = (1.0/3) * np.log(3.0 / (4 * np.pi * rho))
     finv = np.zeros(rho.shape[0])
     for m in range(6):
         for n in range(5):
