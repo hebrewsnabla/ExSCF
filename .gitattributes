@@ -1,1 +1,1 @@
-*.gms linguist-vendored=false
+*.gms -linguist-vendored

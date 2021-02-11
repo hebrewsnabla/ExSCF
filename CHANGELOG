@@ -8,7 +8,7 @@ version 0.2 (Feb 03, 2021)
 --------------------------
 * density, natural orbitals for SUHF
 * add tofch
-* packed dm to accelerate J,K potential
+* packed dm to accelerate J,K matrices
 * fragment guess
 * level shift
 
