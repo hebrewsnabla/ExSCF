@@ -10,6 +10,62 @@ print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
 
+class CASDFT():
+    def __init__(self, suhf):
+        #suhf = util.SUHF(guesshf)
+        self.mc = mc
+        self.mcxc = 'tpss'
+        self.output = None
+        #self.dens = 'deformed' # or relaxed
+        self.trunc = None
+
+    def kernel(self):
+        #if self.suhf.E_suhf is None:
+        #    self.suhf.kernel()
+        #if self.output is not None:
+        #    sys.stdout = open(self.output, 'a')
+        print('***** Start DFT Correlation for CAS+DFT **********')
+        #print('density: %s' % self.dens)
+        print('truncation: %s' % self.trunc)
+        t1 = time.time()
+        E_mc = self.mc.e_tot
+        dm = self.mc.make_rdm1()
+
+        ks = dft.UKS(self.suhf.mol)
+        ni = ks._numint
+        if self.trunc is None:
+            if self.mcxc == 'CS':
+                mcxc = 'MGGA_C_CS'
+                n, exc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%mcxc, dm)
+            else:
+                n, exc, vxc = ni.nr_uks(self.suhf.mol, ks.grids, 'HF,%s'%self.mcxc, dm)
+        elif self.trunc == 'f':
+            natorb = self.mc.natorb
+            natocc = self.mc.mo_occ
+            #natocc = natocc[0] + natocc[1]
+            print('natocc', natocc)
+            ref = [2.0 if occ > 1e-2 else 0.0 for occ in natocc]
+            print('ref', ref)
+            ref = np.array(ref)
+            dm_ref = einsum('ij,j,kj -> ik', natorb, ref, natorb)
+            if self.mcxc == 'CS':
+                mcxc = 'MGGA_C_CS'
+            else:
+                mcxc = self.mcxc
+            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%mcxc, dm, trunc='f', dmref=dm_ref)
+
+        E_mcdft = E_mc + exc
+        print("E(CAS) = %15.8f" % E_mc)
+        print("E_c(%s) = %15.8f" % (self.mcxc.upper(), exc))
+        print("E(CAS+DFT) = %15.8f" % E_mcdft)
+        if self.trunc == 'f':
+            E_mcfdft = E_mc + excf
+            print("f E_c(%s) = %15.8f" % (self.mcxc.upper(), excf))
+            print("E(CAS+fDFT) = %15.8f" % E_mcfdft)
+        t2 = time.time()
+        print('time for DFT: %.3f' % (t2-t1))
+        return exc, E_mcdft
+
 class SUDFT():
     def __init__(self, suhf):
         #suhf = util.SUHF(guesshf)
