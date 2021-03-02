@@ -20,4 +20,6 @@ def kernel(pdft, suhf, ot):
     dm1 = suhf.suhf_dm
     dm2 = get_2CDM_from_2RDM(suhf.suhf_dm2, )
 
-    omega, alpha, hyb = ot.ot._numint.rsh_and_hybrid_coeff(ot.otxc, spin=spin)
+    omega, alpha, hyb = ot._numint.rsh_and_hybrid_coeff(ot.otxc, spin=spin)
+
+    hfx = suhf.get_EX()

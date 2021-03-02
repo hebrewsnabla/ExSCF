@@ -136,6 +136,63 @@ def get_Ng(grids, no, dm, occ):
         Pg.append(pg)
     return Dg, Ng, Pg
 
+def get_JKg(mol, Pg, no, X):
+    Jg = []
+    Kg = []
+    Pg_ortho = []
+    for pg in Pg:
+        pg_ortho = einsum('ij,jk,lk->il', no, pg, no)
+        #print(pg_ortho)
+        Pg_ortho.append(pg_ortho)
+    norb = int(Pg_ortho[0].shape[0]/2)
+    Pgaa_ao = []
+    Pgab_ao = []
+    Pgba_ao = []
+    Pgbb_ao = []
+    for pg in Pg_ortho:
+        pgaa = pg[:norb, :norb] # ortho ao
+        #print(pgaa)
+        pgab = pg[:norb, norb:]
+        pgba = pg[norb:, :norb]
+        pgbb = pg[norb:, norb:]
+        # X . P(g) . X^H
+        pgaa_ao = einsum('ij,jk,lk->il', X, pgaa, X) # regular ao
+        #print(pgaa_ao)
+        pgab_ao = einsum('ij,jk,lk->il', X, pgab, X)
+        pgba_ao = einsum('ij,jk,lk->il', X, pgba, X)
+        pgbb_ao = einsum('ij,jk,lk->il', X, pgbb, X)
+        Pgaa_ao.append(pgaa_ao)
+        Pgbb_ao.append(pgbb_ao)
+        Pgab_ao.append(pgab_ao)
+        Pgba_ao.append(pgba_ao)
+    Pgaabb_ao = Pgaa_ao + Pgbb_ao
+    #print(Pgaabb_ao.shape)
+    ndm = len(Pgab_ao)
+    vj,vk = scf.hf.get_jk(mol, Pgaabb_ao, hermi=0)
+    #print(vj.shape)
+    Jgaa_ao = vj[:ndm] + vj[ndm:] 
+    Kgaa_ao = - vk[:ndm]
+    Jgbb_ao = Jgaa_ao
+    Kgbb_ao = - vk[ndm:]
+    Kgab_ao = scf.hf.get_jk(mol, Pgab_ao, hermi=0)[1] *(-1)
+    Kgba_ao = scf.hf.get_jk(mol, Pgba_ao, hermi=0)[1] *(-1)
+    for i in range(len(Jgaa_ao)):
+        jgaa = einsum('ji,jk,kl->il', X, Jgaa_ao[i], X)  # ortho ao
+        kgaa = einsum('ji,jk,kl->il', X, Kgaa_ao[i], X)  # ortho ao
+        #print(ggaa)
+        kgab = einsum('ji,jk,kl->il', X, Kgab_ao[i], X) 
+        kgba = einsum('ji,jk,kl->il', X, Kgba_ao[i], X) 
+        jgbb = einsum('ji,jk,kl->il', X, Jgbb_ao[i], X) 
+        kgbb = einsum('ji,jk,kl->il', X, Kgbb_ao[i], X) 
+        jg = util2.stack22(jgaa, np.zeros(kgab.shape), 
+                           np.zeros(kgba.shape), jgbb)
+        kg = util2.stack22(kgaa, kgab, kgba, kgbb)
+        jg_no = einsum('ji,jk,kl->il', no, jg, no)
+        kg_no = einsum('ji,jk,kl->il', no, kg, no)
+        Jg.append(jg_no)
+        Kg.append(kg_no)
+    return Jg, Kg, Pg_ortho
+
 def get_Gg(mol, Pg, no, X):
     Gg = []
     Pg_ortho = []
@@ -275,6 +332,16 @@ def get_H(suhf, hcore_ortho, no, Pg, Gg, xg):
     ciH = suhf.integr_beta(trHg*xg)
     print('ciH', ciH)
     return trHg, ciH
+
+def get_EX(suhf, no, Pg, Kg, xg):
+    trXg = np.zeros(len(Pg))
+    for i, pg in enumerate(Pg):
+        trXg[i] = 0.5 * np.trace(np.dot(Kg[i], pg))
+        #H = H * xg[i]
+    #ciH = suhf.integr_beta(trHg*xg)
+    #print('ciH', ciH)
+    X = suhf.integr_beta(trXg, fac='xg')
+    return trXg, X
 
 def get_S2(suhf, Pg_ortho):
     norb = int(Pg_ortho[0].shape[0]/2)
@@ -527,6 +594,7 @@ class SUHF():
         print('value :', d)
         self.d_expr, self.d_func, self.d = Wignerd_expr, Wignerd, d
         self.E_suhf = None
+        self.energy_nuc = self.mol.energy_nuc()
 
         self.built = True
 
@@ -588,6 +656,7 @@ class SUHF():
             self.dm_no = dm_no
             self.no = no
             Dg, Ng, Pg = get_Ng(self.grids, self.no, self.dm_no, na+nb)
+            self.Pg = Pg
             if self.debug:
                 print('D(g) (NO)\n', Dg[0])
                 print('N(g) (NO)\n', Ng[0])
@@ -607,7 +676,7 @@ class SUHF():
             S2 = get_S2(self, Pg_ortho)
             Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
             Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
-            E_suhf = mf.energy_nuc() + H_suhf
+            E_suhf = self.energy_nuc + H_suhf
             self.E_suhf = E_suhf
             #print('E(SUHF) = %15.8f' % E_suhf)
 
@@ -687,6 +756,7 @@ class SUHF():
             self.dm_no = dm_no
             self.no = no
             Dg, Ng, Pg = get_Ng(self.grids, self.no, self.dm_no, na+nb)
+            self.Pg = Pg
             if self.debug:
                 print('D(g) (NO)\n', Dg[0])
                 print('N(g) (NO)\n', Ng[0])
@@ -749,6 +819,14 @@ class SUHF():
         t_end = time.time()
         print('time tot: %.3f' % (t_end-t_start))
         return E_suhf, self.conv
+
+    def get_JKg(self):
+        return get_JKg(self.mol, self.Pg, self.no, self.X)[:2]
+
+    def get_EX(self):
+        Jg, Kg = self.get_JKg()
+        return get_EX(self, self.no, self.Pg, Kg, self.xg)[1]
+        
 
 
 def lev_shift(s, dm, f, shift):
