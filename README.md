@@ -2,11 +2,11 @@
 ## Pre-requisites
 * sympy
 * PySCF
-* [MOKIT](https://gitlab.com/jxzou/mokit)
+* [MOKIT](https://gitlab.com/jxzou/mokit) (optional)
 
 ## Features
 * SUHF
-* SUHF+DFT
+* SUHF+DFT, SUHF+$f$DFT
 * guess: 
   + mix (read from Gaussian)
   + fragment (`frag.guess_frag`)

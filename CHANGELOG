@@ -1,8 +1,11 @@
-version 0.3 (Feb 10, 2021)
+version 0.3 (Mar 02, 2021)
 --------------------------
-* Colle-Salveltti functional
+* libxc's Colle-Salveltti functional (1988mod, not the 1975 one)
 * SUHF+fDFT (MSS type)
 * generate total NO, instead of alpha/beta NO
+* SU-PDFT
+  + decompose X energy from SUHF
+  + class PDFT
 
 version 0.2 (Feb 03, 2021)
 --------------------------
