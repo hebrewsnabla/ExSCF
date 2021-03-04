@@ -828,7 +828,6 @@ class SUHF():
         return get_EX(self, self.no, self.Pg, Kg, self.xg)[1]
         
 
-
 def lev_shift(s, dm, f, shift):
     new_f = (scf.hf.level_shift(s, dm[0], f[0], shift),
              scf.hf.level_shift(s, dm[1], f[1], shift)

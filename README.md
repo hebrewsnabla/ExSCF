@@ -6,7 +6,7 @@
 
 ## Features
 * SUHF
-* SUHF+DFT, SUHF+$f$DFT
+* SUHF+DFT, SUHF+*f*DFT
 * guess: 
   + mix (read from Gaussian)
   + fragment (`frag.guess_frag`)

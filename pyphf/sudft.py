@@ -101,7 +101,7 @@ class SUDFT():
                 n, exc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm)
             else:
                 n, exc, vxc = ni.nr_uks(self.suhf.mol, ks.grids, 'HF,%s'%self.suxc, dm)
-        elif self.trunc == 'f':
+        elif self.trunc == 'f' or self.trunc == 'fc':
             natorb = self.suhf.natorb[2]
             natocc = self.suhf.natocc[2]
             #natocc = natocc[0] + natocc[1]
@@ -115,15 +115,29 @@ class SUDFT():
             else:
                 suxc = self.suxc
             n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, trunc='f', dmref=dm_ref)
+        if self.trunc == 'fc':
+            core = [2.0 if occ > 1.98 else 0.0 for occ in natocc]
+            print('core', core)
+            core = np.array(core)
+            dm_core = einsum('ij,j,kj -> ik', natorb, core, natorb)
+            n1, exc1, core1 = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm_core, trunc='f', dmref=dm)
+            n2, exc2, core2 = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm_core, trunc='f', dmref=dm_ref)
+            dE_fc = core1 - core2
+            excfc = excf + dE_fc
 
         E_sudft = E_suhf + exc
         print("E(SUHF) = %15.8f" % E_suhf)
         print("E_c(%s) = %15.8f" % (self.suxc.upper(), exc))
         print("E(SUHF+DFT) = %15.8f" % E_sudft)
-        if self.trunc == 'f':
+        if self.trunc == 'f' or self.trunc == 'fc':
             E_sufdft = E_suhf + excf
             print("f E_c(%s) = %15.8f" % (self.suxc.upper(), excf))
             print("E(SUHF+fDFT) = %15.8f" % E_sufdft)
+        if self.trunc == 'fc':
+            E_sufcdft = E_suhf + excfc
+            print("fc E_c(%s) = %15.8f" % (self.suxc.upper(), excfc))
+            print("E(SUHF+fcDFT) = %15.8f" % E_sufcdft)
+        
         t2 = time.time()
         print('time for DFT: %.3f' % (t2-t1))
         return exc, E_sudft
