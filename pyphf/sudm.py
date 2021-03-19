@@ -89,7 +89,7 @@ def natorb(suhf, dm):
     print('SUHF NO occ beta\n', dump_occ(natocc_b, 1.0)[0])
     occ_ab, [core, act, ext] = dump_occ(natocc_ab, 2.0)
     print('SUHF NO occ, total', occ_ab)
-    print('core %d, active %d, external %d' % [core, act, ext])
+    print('core %d, active %d, external %d' % (core, act, ext))
     return [natorb_a, natorb_b, natorb_ab], [natocc_a, natocc_b, natocc_ab]
 
 def dump_occ(occ, full=1.0):
@@ -99,14 +99,16 @@ def dump_occ(occ, full=1.0):
     ext = 0
     for i in occ:
         if i>1e-6:
-            s += '%.6f'%i
-            if i>(full-1e-6):
+            s += '%.6f  '%i
+            if i>(full*0.99):
                 core += 1
-            else:
+            elif i>(full*0.01):
                 act +=1
+            else:
+                ext +=1
         else:
             ext += 1
-    return s, [core, act, ext]
+    return s + '...', [core, act, ext]
 
 def get_CG(j1, m1, j2, m2, j, m):
     j1, m1, j2, m2, j, m = list(map(sympy.Rational, [j1, m1, j2, m2, j, m]))
