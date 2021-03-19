@@ -88,9 +88,9 @@ class SUDFT():
         #dm_ortho = self.suhf.dm_ortho
         #X = self.suhf.X
         #dm_reg = np.einsum('ij,tjk,lk->til', X, dm_ortho, X)
-        if self.dens == 'deformed':
+        if self.dens[:3] == 'def':
             dm = self.suhf.dm_reg
-        elif self.dens == 'relaxed':
+        elif self.dens[:3] == 'rel':
             dm = self.suhf.suhf_dm
 
         ks = dft.UKS(self.suhf.mol)

@@ -620,7 +620,7 @@ class SUHF():
         mf = self.guesshf
         
         max_cycle = self.max_cycle
-        cyc = 0
+        cyc = 1
         conv = False
         
         hcore = mf.get_hcore()
@@ -628,7 +628,7 @@ class SUHF():
         t_pre = time.time() 
         print('time for Preparation before cyc: %.3f' % (t_pre-t_start))
         while(not conv):
-            print('**** Start Cycle %d ****' % (cyc+1))
+            print('**** Start Cycle %d ****' % cyc)
             old_suhf = self.E_suhf
             old_dm = self.dm_ortho
             #if cyc==0:

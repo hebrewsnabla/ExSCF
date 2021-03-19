@@ -1,11 +1,13 @@
-version 0.3 (Mar 02, 2021)
+version 0.3 (Mar 19, 2021)
 --------------------------
 * libxc's Colle-Salveltti functional (1988mod, not the 1975 one)
 * SUHF+fDFT (MSS type)
-* generate total NO, instead of alpha/beta NO
+* generate not only alpha/beta NO but also total NO
 * SU-PDFT
   + decompose X energy from SUHF
   + class PDFT
+* SUHF+fcDFT
+* guess.mix
 
 version 0.2 (Feb 03, 2021)
 --------------------------

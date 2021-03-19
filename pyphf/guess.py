@@ -34,27 +34,30 @@ def from_fchk(xyz, bas, fch, cycle=1):
     mf.kernel(dm)
     return mf
 
-def mix(xyz, bas):
+def mix(xyz, bas, charge=0, cycle=2):
     mol = gto.Mole()
     mol.atom = xyz
     #with open(xyz, 'r') as f:
     #    mol.atom = f.read()
     #print(mol.atom)
     mol.basis = bas
+    mol.charge = charge
     #mol.output = 'test.pylog'
     mol.verbose = 4
     mol.build()
     
-    mf = scf.UHF(mol)
-    #mf.init_guess = '1e'
-    mf.init_guess_breaksym = True
-    #mf.max_cycle = 1
-    mf.kernel()
+    mf = scf.RHF(mol)
+    dm, mo_coeff, mo_energy, mo_occ = init_guess_by_1e(mf)
+    #mf.init_guess_breaksym = True
+    dm_mix = init_guess_mixed(mo_coeff, mo_occ)
+    mf_mix = scf.UHF(mol)
+    mf_mix.max_cycle = cycle
+    mf_mix.kernel(dm0=dm_mix)
     
     #dm = mf.make_rdm1()
     #mf.max_cycle = 0
-    #mf.kernel(dm)
-    return mf
+    #mf_mix.kernel(dm)
+    return mf_mix
 
 def from_frag(xyz, bas, frags, chgs, spins, cycle=2, xc=None):
     mol = gto.Mole()
@@ -131,3 +134,65 @@ def do_uhf(atoma, basisa, chga, spina):
     ca, cb = mfa.mo_coeff
     na, nb = mfa.nelec
     return ca, cb, na, nb
+
+'''
+Scan H2 molecule dissociation curve comparing UHF and RHF solutions per the 
+example of Szabo and Ostlund section 3.8.7
+The initial guess is obtained by mixing the HOMO and LUMO and is implemented
+as a function that can be used in other applications.
+See also 16-h2_scan.py, 30-scan_pes.py, 32-break_spin_symm.py
+'''
+
+def init_guess_by_1e(rhf, mol=None):
+    h1e = rhf.get_hcore(mol)
+    s1e = rhf.get_ovlp(mol)
+    mo_energy, mo_coeff = scf.hf.eig(h1e, s1e)
+    mo_occ = rhf.get_occ(mo_energy, mo_coeff)
+    return rhf.make_rdm1(mo_coeff, mo_occ), mo_coeff, mo_energy, mo_occ
+
+def init_guess_mixed(mo_coeff, mo_occ,mixing_parameter=np.pi/4):
+    ''' Generate density matrix with broken spatial and spin symmetry by mixing
+    HOMO and LUMO orbitals following ansatz in Szabo and Ostlund, Sec 3.8.7.
+    
+    psi_1a = numpy.cos(q)*psi_homo + numpy.sin(q)*psi_lumo
+    psi_1b = numpy.cos(q)*psi_homo - numpy.sin(q)*psi_lumo
+        
+    psi_2a = -numpy.sin(q)*psi_homo + numpy.cos(q)*psi_lumo
+    psi_2b =  numpy.sin(q)*psi_homo + numpy.cos(q)*psi_lumo
+    Returns: 
+        Density matrices, a list of 2D ndarrays for alpha and beta spins
+    '''
+    # opt: q, mixing parameter 0 < q < 2 pi
+
+    homo_idx=0
+    lumo_idx=1
+
+    for i in range(len(mo_occ)-1):
+        if mo_occ[i]>0 and mo_occ[i+1]<0.1:
+            homo_idx=i
+            lumo_idx=i+1
+
+    psi_homo=mo_coeff[:, homo_idx]
+    psi_lumo=mo_coeff[:, lumo_idx]
+    
+    Ca=np.zeros_like(mo_coeff)
+    Cb=np.zeros_like(mo_coeff)
+
+
+    #mix homo and lumo of alpha and beta coefficients
+    q=mixing_parameter
+
+    for k in range(mo_coeff.shape[0]):
+        if k == homo_idx:
+            Ca[:,k] = np.cos(q)*psi_homo + np.sin(q)*psi_lumo
+            Cb[:,k] = np.cos(q)*psi_homo - np.sin(q)*psi_lumo
+            continue
+        if k == lumo_idx:
+            Ca[:,k] = -np.sin(q)*psi_homo + np.cos(q)*psi_lumo
+            Cb[:,k] =  np.sin(q)*psi_homo + np.cos(q)*psi_lumo
+            continue
+        Ca[:,k]=mo_coeff[:,k]
+        Cb[:,k]=mo_coeff[:,k]
+
+    dm =scf.uhf.make_rdm1( (Ca,Cb), (mo_occ,mo_occ) )
+    return dm 
