@@ -65,10 +65,12 @@ def mix(xyz, bas, charge=0, cycle=5):
     
     mf = scf.RHF(mol)
     mf.max_cycle=8
-    mf.kernel()
-    dm, mo_coeff, mo_energy, mo_occ = init_guess_by_1e(mf)
+    mf.kernel() # Guess by 1e is poor,
+    #dm, mo_coeff, mo_energy, mo_occ = init_guess_by_1e(mf)
     #mf.init_guess_breaksym = True
-    dm_mix = init_guess_mixed(mo_coeff, mo_occ)
+    #mo = (mf.mo_coeff, mf.mo_coeff)
+    #occ = (mf.mo_occ, mf.mo_occ)
+    dm_mix = init_guess_mixed(mf.mo_coeff, mf.mo_occ)
     mf_mix = scf.UHF(mol)
     mf_mix.max_cycle = cycle
     mf_mix.kernel(dm0=dm_mix)
