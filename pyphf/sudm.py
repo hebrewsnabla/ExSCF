@@ -85,10 +85,10 @@ def natorb(suhf, dm):
         print('SUHF natural orbitals alpha\n', natorb_a)
         print('SUHF natural orbitals beta\n', natorb_b)
         print('SUHF natural orbitals, total\n', natorb_ab)
-    print('SUHF NO occ alpha\n', dump_occ(natocc_a, 1.0)[0])
-    print('SUHF NO occ beta\n', dump_occ(natocc_b, 1.0)[0])
+    print('SUHF NO occ alpha: ', dump_occ(natocc_a, 1.0)[0])
+    print('SUHF NO occ beta:  ', dump_occ(natocc_b, 1.0)[0])
     occ_ab, [core, act, ext] = dump_occ(natocc_ab, 2.0)
-    print('SUHF NO occ, total', occ_ab)
+    print('SUHF NO occ total: ', occ_ab)
     print('core %d, active %d, external %d' % (core, act, ext))
     return [natorb_a, natorb_b, natorb_ab], [natocc_a, natocc_b, natocc_ab]
 

@@ -2,6 +2,23 @@ from pyscf import gto, scf, dft
 import numpy as np
 from fch2py import fch2py
 
+def gen(xyz, bas, charge=0, spin=0, cycle=2):
+    '''for states other than singlets'''
+    mol = gto.Mole()
+    mol.atom = xyz
+    mol.basis = bas
+    mol.charge = charge
+    mol.spin = spin
+    #mol.output = 'test.pylog'
+    mol.verbose = 4
+    mol.build()
+    
+    mf = scf.UHF(mol)
+    mf.max_cycle = cycle
+    mf.kernel()
+
+    return mf
+
 def from_fchk(xyz, bas, fch, cycle=1):
     mol = gto.Mole()
     mol.atom = xyz
@@ -34,7 +51,7 @@ def from_fchk(xyz, bas, fch, cycle=1):
     mf.kernel(dm)
     return mf
 
-def mix(xyz, bas, charge=0, cycle=2):
+def mix(xyz, bas, charge=0, cycle=5):
     mol = gto.Mole()
     mol.atom = xyz
     #with open(xyz, 'r') as f:
@@ -47,6 +64,8 @@ def mix(xyz, bas, charge=0, cycle=2):
     mol.build()
     
     mf = scf.RHF(mol)
+    mf.max_cycle=8
+    mf.kernel()
     dm, mo_coeff, mo_energy, mo_occ = init_guess_by_1e(mf)
     #mf.init_guess_breaksym = True
     dm_mix = init_guess_mixed(mo_coeff, mo_occ)
