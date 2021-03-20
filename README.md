@@ -8,8 +8,8 @@
 * SUHF
 * SUHF+DFT, SUHF+*f*DFT
 * guess: 
-  + mix (read from Gaussian)
-  + fragment (`frag.guess_frag`)
+  + mix (`guess.mix`)
+  + fragment (`guess.from_frag`)
 * converging strategy
   + DIIS (`diis_on = True`)
   + `level_shift = ` (in a.u.)
@@ -18,3 +18,6 @@
   + read guess MO from fch
   + dump MO, NO to fch (`tofch = True`)
 
+## TODO
+* SU-PDFT
+* SUPT2
