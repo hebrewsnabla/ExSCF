@@ -7,8 +7,10 @@ tmp*
 .vscode/
 __pycache__/
 *.pyc
-**/CMakeFiles/
-
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
 
 # Prerequisites
 *.d
