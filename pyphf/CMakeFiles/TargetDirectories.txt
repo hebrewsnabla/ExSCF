@@ -1,6 +1,0 @@
-/share/home/srwang/ExSCF/pyphf/CMakeFiles/rebuild_cache.dir
-/share/home/srwang/ExSCF/pyphf/CMakeFiles/edit_cache.dir
-/share/home/srwang/ExSCF/pyphf/dft/CMakeFiles/rebuild_cache.dir
-/share/home/srwang/ExSCF/pyphf/dft/CMakeFiles/edit_cache.dir
-/share/home/srwang/ExSCF/pyphf/dft/CMakeFiles/dft.dir
-/share/home/srwang/ExSCF/pyphf/dft/CMakeFiles/xc_itrf.dir
