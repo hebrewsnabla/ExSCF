@@ -26,12 +26,12 @@ target_link_libraries(dft cvhf cgto cint ${BLAS_LIBRARIES})
 
 
 if(ENABLE_LIBXC)
-add_library(xc_itrf SHARED libxc_itrf.c)
-set_target_properties(xc_itrf PROPERTIES
+add_library(xc_itrf_mod SHARED libxc_itrf_mod.c)
+set_target_properties(xc_itrf_mod PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}
   COMPILE_FLAGS ${OpenMP_C_FLAGS}
   LINK_FLAGS ${OpenMP_C_FLAGS})
-target_link_libraries(xc_itrf xc)
+target_link_libraries(xc_itrf_mod xc)
 # add_dependencies(xc_itrf libxc)
 endif()
 

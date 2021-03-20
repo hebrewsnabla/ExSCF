@@ -1,6 +1,7 @@
 from pyphf import util
 from pyscf import dft
-import pyscf.dft.numint as numint
+#import pyscf.dft.numint as numint
+from pyphf import numint
 
 import numpy as np
 from functools import partial
@@ -69,11 +70,14 @@ class CASDFT():
 class SUDFT():
     def __init__(self, suhf):
         #suhf = util.SUHF(guesshf)
+        print('\n******** %s ********' % self.__class__)
         self.suhf = suhf
         self.suxc = 'tpss'
         self.output = None
         self.dens = 'deformed' # or relaxed
         self.trunc = None
+        print('density: %s' % self.dens)
+        print('truncation: %s' % self.trunc)
 
     def kernel(self):
         if self.suhf.E_suhf is None:
@@ -81,8 +85,6 @@ class SUDFT():
         #if self.output is not None:
         #    sys.stdout = open(self.output, 'a')
         print('***** Start DFT Correlation for SUHF+DFT **********')
-        print('density: %s' % self.dens)
-        print('truncation: %s' % self.trunc)
         t1 = time.time()
         E_suhf = self.suhf.E_suhf
         #dm_ortho = self.suhf.dm_ortho
@@ -143,7 +145,7 @@ class SUDFT():
         return exc, E_sudft
 
 def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, 
-            relativity=0, hermi=0, max_memory=2000, verbose=None):
+            relativity=0, hermi=0, max_memory=2000, verbose=9):
     '''
     modified from pyscf.dft.numint.nr_uks
     '''

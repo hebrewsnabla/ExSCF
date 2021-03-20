@@ -22,7 +22,7 @@ XC functional, the interface to libxc
 (http://www.tddft.org/programs/octopus/wiki/index.php/Libxc)
 '''
 
-import sys
+import sys, os
 import warnings
 import copy
 import ctypes
@@ -31,8 +31,9 @@ import numpy
 from pyscf import lib
 from pyscf.dft.xc.utils import remove_dup, format_xc_code
 from pyscf import __config__
+import pyphf
 
-_itrf = lib.load_library('libxc_itrf')
+_itrf = numpy.ctypeslib.load_library('libxc_itrf_mod', os.path.dirname(__file__))
 _itrf.LIBXC_is_lda.restype = ctypes.c_int
 _itrf.LIBXC_is_gga.restype = ctypes.c_int
 _itrf.LIBXC_is_meta_gga.restype = ctypes.c_int
