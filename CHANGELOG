@@ -1,3 +1,8 @@
+version 0.3.1 (Mar 20, 2021)
+--------------------------
+* subdirectory dft
+  + modified TPSS
+
 version 0.3 (Mar 19, 2021)
 --------------------------
 * DFT
@@ -5,9 +10,7 @@ version 0.3 (Mar 19, 2021)
  + SUHF+fDFT (MSS type)
  + SUHF+fcDFT
 * generate not only alpha/beta NO but also total NO
-* SU-PDFT
-  + decompose X energy from SUHF
-  + class PDFT
+* decompose X energy from SUHF, draft class PDFT
 * guess.mix
 
 version 0.2 (Feb 03, 2021)

@@ -2,7 +2,15 @@
 ## Pre-requisites
 * sympy
 * PySCF
+* libxc
 * [MOKIT](https://gitlab.com/jxzou/mokit) (optional)
+
+## Build
+```
+cd ExSCF/pyphf
+cmake . -DCMAKE_INSTALL_PREFIX:PATH=$HOME/pyscf_deps # the directory above libxc's lib
+make xc_itrf
+```
 
 ## Features
 * SUHF
