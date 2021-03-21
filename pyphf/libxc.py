@@ -500,6 +500,7 @@ else:
         'MGGA_X_MK00'                  : 230, # F. R. Manby and P. J. Knowles, J. Chem. Phys. 112, 7002 (2000)
         'MGGA_C_TPSS'                  : 231, # J. Tao, J. P. Perdew, V. N. Staroverov, and G. E. Scuseria, Phys. Rev. Lett. 91, 146401 (2003)
                                               # J. P. Perdew, J. Tao, V. N. Staroverov, and G. E. Scuseria, J. Chem. Phys. 120, 6898 (2004)
+        #'MGGA_C_TPSS_MOD'              : 300, # J. Tao, J. P. Perdew, V. N. Staroverov, and G. E. Scuseria, Phys. Rev. Lett. 91, 146401 (2003)
         'MGGA_C_VSXC'                  : 232, # T. V. Voorhis and G. E. Scuseria, J. Chem. Phys. 109, 400 (1998)
         'MGGA_C_M06_L'                 : 233, # Y. Zhao and D. G. Truhlar, J. Chem. Phys. 125, 194101 (2006)
                                               # Y. Zhao and D. G. Truhlar, Theor. Chem. Acc. 120, 215 (2008)
@@ -1163,7 +1164,7 @@ _NAME_WITH_DASH = {'SR-HF'    : 'SR_HF',
                    'CAM-B3LYP': 'CAM_B3LYP'}
 
 
-def eval_xc(xc_code, rho, spin=0, relativity=0, deriv=1, omega=None, verbose=None):
+def eval_xc(xc_code, rho, spin=0, relativity=0, deriv=1, omega=None, verbose=None, special=0):
     r'''Interface to call libxc library to evaluate XC functional, potential
     and functional derivatives.
 
@@ -1283,13 +1284,14 @@ def eval_xc(xc_code, rho, spin=0, relativity=0, deriv=1, omega=None, verbose=Non
     hyb, fn_facs = parse_xc(xc_code)
     if omega is not None:
         hyb[2] = float(omega)
-    return _eval_xc(hyb, fn_facs, rho, spin, relativity, deriv, verbose)
+    print('eval_xc: special = %s' % special)
+    return _eval_xc(hyb, fn_facs, rho, spin, relativity, deriv, verbose, special)
 
 
 SINGULAR_IDS = set((131,  # LYP functions
                     402, 404, 411, 416, 419,   # hybrid LYP functions
                     74 , 75 , 226, 227))       # M11L and MN12L functional
-def _eval_xc(hyb, fn_facs, rho, spin=0, relativity=0, deriv=1, verbose=None):
+def _eval_xc(hyb, fn_facs, rho, spin=0, relativity=0, deriv=1, verbose=None, special=0):
     assert(deriv <= 3)
     if spin == 0:
         nspin = 1
@@ -1356,7 +1358,8 @@ def _eval_xc(hyb, fn_facs, rho, spin=0, relativity=0, deriv=1, verbose=None):
                         ctypes.c_int(deriv), ctypes.c_int(rho_u.shape[1]),
                         rho_u.ctypes.data_as(ctypes.c_void_p),
                         rho_d.ctypes.data_as(ctypes.c_void_p),
-                        outbuf.ctypes.data_as(ctypes.c_void_p))
+                        outbuf.ctypes.data_as(ctypes.c_void_p),
+                        ctypes.c_int(special))
     if outbuf.shape[1] != ngrids:
         out = numpy.zeros((outlen,ngrids))
         out[:,non0idx] = outbuf

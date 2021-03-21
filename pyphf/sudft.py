@@ -1,4 +1,4 @@
-from pyphf import util
+from pyphf import util, util2
 from pyscf import dft
 #import pyscf.dft.numint as numint
 from pyphf import numint
@@ -76,12 +76,12 @@ class SUDFT():
         self.output = None
         self.dens = 'deformed' # or relaxed
         self.trunc = None
-        print('density: %s' % self.dens)
-        print('truncation: %s' % self.trunc)
 
     def kernel(self):
         if self.suhf.E_suhf is None:
             self.suhf.kernel()
+        print('density: %s' % self.dens)
+        print('truncation: %s' % self.trunc)
         #if self.output is not None:
         #    sys.stdout = open(self.output, 'a')
         print('***** Start DFT Correlation for SUHF+DFT **********')
@@ -96,27 +96,35 @@ class SUDFT():
             dm = self.suhf.suhf_dm
 
         ks = dft.UKS(self.suhf.mol)
-        ni = ks._numint
+        ni = numint.NumInt()
         if self.trunc is None:
             if self.suxc == 'CS':
                 suxc = 'MGGA_C_CS'
                 n, exc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm)
+            elif self.suxc.upper() == 'TPSS_MOD':
+                suxc = 'TPSS'
+                n, exc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, special=1)
             else:
                 n, exc, vxc = ni.nr_uks(self.suhf.mol, ks.grids, 'HF,%s'%self.suxc, dm)
         elif self.trunc == 'f' or self.trunc == 'fc':
             natorb = self.suhf.natorb[2]
             natocc = self.suhf.natocc[2]
             #natocc = natocc[0] + natocc[1]
-            print('natocc', natocc)
+            #print('natocc', natocc)
             ref = [2.0 if occ > 1e-2 else 0.0 for occ in natocc]
-            print('ref', ref)
+            refdump, [refc, refa, refe] = util2.dump_occ(ref, 2.0)
+            print('ref: ', refdump)
             ref = np.array(ref)
             dm_ref = einsum('ij,j,kj -> ik', natorb, ref, natorb)
+            special=0
             if self.suxc == 'CS':
                 suxc = 'MGGA_C_CS'
+            elif self.suxc.upper() == 'TPSS_MOD':
+                suxc = 'TPSS'
+                special=1
             else:
                 suxc = self.suxc
-            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, trunc='f', dmref=dm_ref)
+            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, trunc='f', dmref=dm_ref, special=special)
         if self.trunc == 'fc':
             core = [2.0 if occ > 1.98 else 0.0 for occ in natocc]
             print('core', core)
@@ -145,9 +153,10 @@ class SUDFT():
         return exc, E_sudft
 
 def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, 
-            relativity=0, hermi=0, max_memory=2000, verbose=9):
+            relativity=0, hermi=0, max_memory=2000, verbose=9, special=0):
     '''
     modified from pyscf.dft.numint.nr_uks
+    special = 1 for TPSS modified
     '''
     xctype = ni._xc_type(xc_code)
     #if xctype == 'NLC':
@@ -236,7 +245,7 @@ def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None,
                 rho_ref = make_rho_ref(idm, ao, mask, xctype)
                 exc, vxc = ni.eval_xc(xc_code, (rho_a, rho_b), spin=1,
                                       relativity=relativity, deriv=1,
-                                      verbose=verbose)[:2]
+                                      verbose=verbose, special=special)[:2]
                 vrho, vsigma, vlapl, vtau = vxc[:4]
                 den_a = rho_a[0]*weight
                 nelec[0,idm] += den_a.sum()

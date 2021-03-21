@@ -1923,6 +1923,7 @@ class NumInt(object):
 
     def __init__(self):
         self.omega = None  # RSH paramter
+        print('ni: %s' % self.__class__)
 
     @lib.with_doc(nr_vxc.__doc__)
     def nr_vxc(self, mol, grids, xc_code, dms, spin=0, relativity=0, hermi=0,
@@ -2042,10 +2043,10 @@ class NumInt(object):
         return self.libxc.rsh_coeff(xc_code)
 
     def eval_xc(self, xc_code, rho, spin=0, relativity=0, deriv=1, omega=None,
-                verbose=None):
+                verbose=None, special=0):
         if omega is None: omega = self.omega
         return self.libxc.eval_xc(xc_code, rho, spin, relativity, deriv,
-                                  omega, verbose)
+                                  omega, verbose, special)
     eval_xc.__doc__ = libxc.eval_xc.__doc__
 
     def _xc_type(self, xc_code):

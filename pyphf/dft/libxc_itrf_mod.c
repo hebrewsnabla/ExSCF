@@ -373,6 +373,8 @@ int LIBXC_is_gga(int xc_id)
 
 int LIBXC_is_meta_gga(int xc_id)
 {
+        if (xc_id == 300)
+                return 1;
         xc_func_type func;
         int mgga;
         if(xc_func_init(&func, xc_id, XC_UNPOLARIZED) != 0){
@@ -696,7 +698,8 @@ static void merge_xc(double *dst, double *ebuf, double *vbuf,
 // omega is the range separation parameter mu in xcfun
 void LIBXC_eval_xc(int nfn, int *fn_id, double *fac, double *omega,
                    int spin, int deriv, int np,
-                   double *rho_u, double *rho_d, double *output)
+                   double *rho_u, double *rho_d, double *output, 
+                   int special)
 {
         assert(deriv <= 3);
         int nvar = LIBXC_input_length(nfn, fn_id, fac, spin);
@@ -767,6 +770,11 @@ void LIBXC_eval_xc(int nfn, int *fn_id, double *fac, double *omega,
 #if defined XC_SET_RELATIVITY
                 xc_lda_x_set_params(&func, relativity);
 #endif
+                if (fn_id[i] == 231 && special == 1) {
+                    //xc_func_init(&func, 231, spin);
+                    xc_mgga_c_tpss_set_params(&func,  0.06672455060314922, 31.68, -0.22, 0.87, 0.50, 2.26);
+                    //printf("TPSS parameter modified");
+                }
                 _eval_xc(&func, spin, np, rho_u, rho_d, ebuf, vbuf, fbuf, kbuf);
                 merge_xc(output, ebuf, vbuf, fbuf, kbuf, fac[i],
                          np, outlen, nvar, spin, func.info->family);
