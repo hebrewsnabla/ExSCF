@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-add_library(dft SHARED 
-  CxLebedevGrid.c grid_basis.c nr_numint.c r_numint.c
-  numint_uniform_grid.c
-  )
+#add_library(dft SHARED 
+#  CxLebedevGrid.c grid_basis.c nr_numint.c r_numint.c
+#  numint_uniform_grid.c
+#  )
+#
+#set_target_properties(dft PROPERTIES
+#  LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}
+#  COMPILE_FLAGS ${OpenMP_C_FLAGS}
+#  LINK_FLAGS ${OpenMP_C_FLAGS})
+#
+#target_link_libraries(dft cvhf cgto cint ${BLAS_LIBRARIES})
 
-set_target_properties(dft PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}
-  COMPILE_FLAGS ${OpenMP_C_FLAGS}
-  LINK_FLAGS ${OpenMP_C_FLAGS})
 
-target_link_libraries(dft cvhf cgto cint ${BLAS_LIBRARIES})
-
-
-if(ENABLE_LIBXC)
+#if(ENABLE_LIBXC)
 add_library(xc_itrf_mod SHARED libxc_itrf_mod.c)
 set_target_properties(xc_itrf_mod PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -33,15 +33,15 @@ set_target_properties(xc_itrf_mod PROPERTIES
   LINK_FLAGS ${OpenMP_C_FLAGS})
 target_link_libraries(xc_itrf_mod xc)
 # add_dependencies(xc_itrf libxc)
-endif()
+#endif()
 
-if(ENABLE_XCFUN)
-add_library(xcfun_itrf SHARED xcfun_itrf.c)
-set_target_properties(xcfun_itrf PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}
-  COMPILE_FLAGS ${OpenMP_C_FLAGS}
-  LINK_FLAGS ${OpenMP_C_FLAGS})
-target_link_libraries(xcfun_itrf xcfun)
-# add_dependencies(xcfun_itrf libxcfun)
-endif()
+#if(ENABLE_XCFUN)
+#add_library(xcfun_itrf SHARED xcfun_itrf.c)
+#set_target_properties(xcfun_itrf PROPERTIES
+#  LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}
+#  COMPILE_FLAGS ${OpenMP_C_FLAGS}
+#  LINK_FLAGS ${OpenMP_C_FLAGS})
+#target_link_libraries(xcfun_itrf xcfun)
+## add_dependencies(xcfun_itrf libxcfun)
+#endif()
 

@@ -9,7 +9,7 @@
 ```
 cd ExSCF/pyphf
 cmake . -DCMAKE_INSTALL_PREFIX:PATH=$HOME/pyscf_deps # the directory above libxc's lib
-make xc_itrf
+make xc_itrf_mod
 ```
 
 ## Features
