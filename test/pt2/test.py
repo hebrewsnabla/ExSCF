@@ -4,7 +4,7 @@ from pyscf import gto, scf, lib
 #import numpy as np
 import sys
 
-from pyphf import util, guess
+from pyphf import util, guess, pt2
 
 lib.num_threads(4)
 
@@ -22,3 +22,6 @@ mf2.verbose = 6
 mf2.diis_on = True
 mf2.max_cycle = 15
 mf2.kernel()
+
+mf4 = pt2.EMP2(mf2)
+mf4.kernel()

@@ -3,12 +3,24 @@ EMP2 and SUPT2
 Tsuchimochi, T.; Van Voorhis, T. J Chem Phys 2014, 141, 164117
 Tsuchimochi, T.; Ten-no, S. L. J Chem Theory Comput 2019, 15, 6688–6702
 '''
+import numpy as np
+#import sympy as sym
+#import scipy
+from pyscf import gto, scf
+from pyphf import  util2
+#import os, sys
+from functools import partial
+import time
 
-def defm_Fock(hcore_no, g_no):
+print = partial(print, flush=True)
+einsum = partial(np.einsum, optimize=True)
+
+def defm_Fock(mol, hcore_no, dm_no, no, X):
+    g_no = defm_G(mol, dm_no, no, X)
     F0 = hcore_no + g_no
     return F0
 
-def defm_G(dm_no, no, X):
+def defm_G(mol, dm_no, no, X):
     #G = 
     p = dm_no
 
@@ -31,7 +43,7 @@ def defm_G(dm_no, no, X):
     #print(Pgaabb_ao.shape)
     #nao = Pgaabb_ao.shape[-1]
     #ndm = len(Pgab_ao)
-    vj,vk = scf.hf.get_jk(mol, [paa_ap, pbb_ao], hermi=0)
+    vj,vk = scf.hf.get_jk(mol, [paa_ao, pbb_ao], hermi=0)
     #print(vj.shape)
     Gaa_ao = vj[0] + vj[1] - vk[0]
     Gbb_ao = vj[0] + vj[1] - vk[1]
@@ -48,6 +60,34 @@ def defm_G(dm_no, no, X):
     gba = einsum('ji,jk,kl->il', X, Gba_ao, X) 
     gbb = einsum('ji,jk,kl->il', X, Gbb_ao, X) 
     g = util2.stack22(gaa, gab, gba, gbb)
-    g_no = einsum('ji,jk,kl->il', no, gg, no)
+    g_no = einsum('ji,jk,kl->il', no, g, no)
 
     return g_no
+
+def t1(F0, epsl):
+    ''' F_ia / (e_i - e_a) '''
+    l = len(epsl)
+    e = epsl - epsl.reshape((l,1))
+    t1 = F0 / e
+    return t1
+
+def t2():
+    return 0
+
+class EMP2():
+    def __init__(self, suhf):
+        self.suhf = suhf
+        self.mol = suhf.mol
+
+        #self.cut_no = False
+        self.verbose = 4
+        #self.debug = False
+        self.output = None
+    
+    def kernel(self):
+        np.set_printoptions(precision=6, linewidth=160, suppress=True)
+        suhf = self.suhf
+        F0 = defm_Fock(self.mol, suhf.hcore_no, suhf.dm_no, suhf.no, suhf.X )
+        epsl = F0.diagonal()
+        print(suhf.hcore_no)
+        print(F0, '\n', epsl)
