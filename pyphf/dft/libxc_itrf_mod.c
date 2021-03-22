@@ -373,8 +373,8 @@ int LIBXC_is_gga(int xc_id)
 
 int LIBXC_is_meta_gga(int xc_id)
 {
-        if (xc_id == 300)
-                return 1;
+        //if (xc_id == 300)
+        //        return 1;
         xc_func_type func;
         int mgga;
         if(xc_func_init(&func, xc_id, XC_UNPOLARIZED) != 0){
