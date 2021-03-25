@@ -73,6 +73,7 @@ class SUDFT():
         print('\n******** %s ********' % self.__class__)
         self.suhf = suhf
         self.suxc = 'tpss'
+        self.grids = 'fine'
         self.output = None
         self.dens = 'deformed' # or relaxed
         self.trunc = None
@@ -96,6 +97,8 @@ class SUDFT():
             dm = self.suhf.suhf_dm
 
         ks = dft.UKS(self.suhf.mol)
+        if self.grids[:5] == 'ultra':
+            ks.grids.atom_grid = (99, 590)
         ni = numint.NumInt()
         if self.trunc is None:
             if self.suxc == 'CS':
