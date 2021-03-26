@@ -14,6 +14,7 @@ def gen(xyz, bas, charge=0, spin=0, cycle=2):
     mol.build()
     
     mf = scf.UHF(mol)
+    mf.conv_tol = 1e-7
     mf.max_cycle = cycle
     mf.kernel()
 
@@ -64,7 +65,7 @@ def mix(xyz, bas, charge=0, cycle=5):
     mol.build()
     
     mf = scf.RHF(mol)
-    mf.max_cycle=8
+    mf.conv_tol = 1e-5
     mf.kernel() # Guess by 1e is poor,
     #dm, mo_coeff, mo_energy, mo_occ = init_guess_by_1e(mf)
     #mf.init_guess_breaksym = True
@@ -72,8 +73,12 @@ def mix(xyz, bas, charge=0, cycle=5):
     #occ = (mf.mo_occ, mf.mo_occ)
     dm_mix = init_guess_mixed(mf.mo_coeff, mf.mo_occ)
     mf_mix = scf.UHF(mol)
+    mf_mix.conv_tol = 1e-3
     mf_mix.max_cycle = cycle
     mf_mix.kernel(dm0=dm_mix)
+    ss, s = mf_mix.spin_square()
+    if s < 0.1:
+        print('Warning: S too small, symmetry breaking may be failed')
     
     #dm = mf.make_rdm1()
     #mf.max_cycle = 0
@@ -96,6 +101,9 @@ def from_frag(xyz, bas, frags, chgs, spins, cycle=2, xc=None):
     #mf.conv_tol = 1e-2
     mf.max_cycle = cycle
     mf.kernel(dm0 = dm)
+    ss, s = mf.spin_square()
+    if s < 0.1:
+        print('Warning: S too small, symmetry breaking may be failed')
     return mf
 
 
