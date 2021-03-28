@@ -5,7 +5,10 @@
 * libxc
 * [MOKIT](https://gitlab.com/jxzou/mokit) (optional)
 
-## Build
+## Installation
+* git clone
+* add `/path/to/ExSCF` to your `PYTHONPATH`
+* build(optional, only if you need modified DFT functional)
 ```
 cd ExSCF/pyphf
 cmake . -DCMAKE_INSTALL_PREFIX:PATH=$HOME/pyscf_deps # the directory above libxc's lib
