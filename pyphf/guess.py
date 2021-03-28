@@ -2,20 +2,21 @@ from pyscf import gto, scf, dft
 import numpy as np
 from fch2py import fch2py
 
-def gen(xyz, bas, charge=0, spin=0, cycle=2):
+def gen(xyz, bas, charge, spin, conv='tight', level_shift=0):
     '''for states other than singlets'''
     mol = gto.Mole()
     mol.atom = xyz
     mol.basis = bas
     mol.charge = charge
     mol.spin = spin
-    #mol.output = 'test.pylog'
     mol.verbose = 4
     mol.build()
     
     mf = scf.UHF(mol)
-    mf.conv_tol = 1e-7
-    mf.max_cycle = cycle
+    if conv == 'loose':
+        mf.conv_tol = 1e-6
+        mf.max_cycle = 10
+    mf.level_shift = level_shift
     mf.kernel()
 
     return mf

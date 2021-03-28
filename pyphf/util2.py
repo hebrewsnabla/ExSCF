@@ -19,10 +19,11 @@ def reg2ortho(dm, X, forward=True):
     else:
         return np.einsum('ij,jk,lk', X, dm, X)
 
-def tofch(oldfch, natorb, natocc, S, flag):
+def tofch(oldfch, natorb, natocc, S, flag='SUHFNO'):
     fch = oldfch.split('.fch')[0] + '_' + flag + '.fch'
-    os.system('cp %s %s' % (oldfch, fch))
-    os.system('fch_u2r %s' % fch)
+    os.system('fch_u2r %s' % oldfch)
+    oldfch_r = oldfch.split('.fch')[0] + '_r.fch'
+    os.system('mv %s %s' % (oldfch_r, fch))
     #S = suhf.mol.intor_symmetric('int1e_ovlp')
     Sdiag = S.diagonal()
     #natorb_a, natorb_b = natorb
@@ -35,6 +36,20 @@ def tofch(oldfch, natorb, natocc, S, flag):
     #nbfb = natorb_b.shape[0]
     #nifb = natorb_b.shape[1]
     #py2fch(fch, nbfb, nifb, natorb_b, Sdiag, 'b', natocc_b)
+
+def tofchmo(oldfch, orb, occ, S, flag='SUHFMO'):
+    fch = oldfch.split('.fch')[0] + '_' + flag + '.fch'
+    os.system('cp %s %s' % (oldfch, fch))
+    Sdiag = S.diagonal()
+    orb_a, orb_b = orb
+    occ_a, occ_b = occ
+    nbfa = orb_a.shape[0]
+    nifa = orb_a.shape[1]
+    py2fch(fch, nbfa, nifa, orb_a, Sdiag, 'a', occ_a, True)
+    nbfb = orb_b.shape[0]
+    nifb = orb_b.shape[1]
+    py2fch(fch, nbfb, nifb, orb_b, Sdiag, 'b', occ_b, True)
+    
 
 def dump_moe(moe, na, nb):
     ea = moe[0]

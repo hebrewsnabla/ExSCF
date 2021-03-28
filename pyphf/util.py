@@ -811,7 +811,7 @@ class SUHF():
             self.natorb, self.natocc = sudm.natorb(self, suhf_dm)
             if self.tofch:
                 S = self.mol.intor_symmetric('int1e_ovlp')
-                util2.tofch(self.oldfch, self.natorb[2], self.natocc[2], S, 'SUHFNO')
+                util2.tofch(self.oldfch, self.natorb[2], self.natocc[2], S)
                 #util2.tofch(self.oldfch, mo_reg, self.mo_e, S, 'SUHFMO')
             t_dm = time.time()
             print('time for dm: %.3f' % (t_dm-t_aftercyc))
