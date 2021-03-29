@@ -1,17 +1,19 @@
 version 0.3.1 (Mar 28, 2021)
 --------------------------
-* subdirectory dft, copied from pyscf.dft and pyscf.lib.dft
+* DFT
+  + subdirectory dft, copied from pyscf.dft and pyscf.lib.dft
   + modified TPSS
+  + ultrafine grid
 * EMP2 draft
 * fix bug in tofch
-* modify guess
+* modify UHF strategy in guess
 
 version 0.3 (Mar 19, 2021)
 --------------------------
 * DFT
  + libxc's Colle-Salveltti functional (1988mod, not the 1975 one)
  + SUHF+fDFT (MSS type)
- + SUHF+fcDFT
+ + SUHF+fcDFT (not work ...)
 * generate not only alpha/beta NO but also total NO
 * decompose X energy from SUHF, draft class PDFT
 * guess.mix

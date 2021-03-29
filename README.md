@@ -17,7 +17,7 @@ make xc_itrf_mod
 
 ## Features
 * SUHF
-* SUHF+DFT, SUHF+*f*DFT
+* SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
 * guess: 
   + mix (`guess.mix`)
   + fragment (`guess.from_frag`)
