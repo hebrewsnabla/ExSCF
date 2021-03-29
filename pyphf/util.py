@@ -710,7 +710,7 @@ class SUHF():
             if old_suhf is not None:
                 dE = E_suhf - old_suhf
                 ddm = dm_ortho - old_dm
-                conv_check(dE, ddm, thresh, cyc)
+                conv = conv_check(E_suhf, dE, ddm, thresh, cyc)
             else:
                 print(' E(SUHF) = %15.8f' % E_suhf)
             self.conv = conv
@@ -814,7 +814,7 @@ class SUHF():
         return get_EX(self, self.no, self.Pg, Kg, self.xg)[1]
         
 
-def conv_check(dE, ddm, thresh, cyc, nocheck):
+def conv_check(E_suhf, dE, ddm, thresh, cyc):
     max_ddm = abs(ddm).max()
     norm_ddm = np.linalg.norm(ddm) / (ddm.shape[-1]*np.sqrt(2))
     if abs(dE)< (thresh*1e-2) and max_ddm < (thresh*1e2) and norm_ddm < thresh:
@@ -823,7 +823,9 @@ def conv_check(dE, ddm, thresh, cyc, nocheck):
         print('SUHF converged at cycle %d' %cyc)
         print('Final E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
     else:
+        conv = False
         print(' E = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
+    return conv
 
 def lev_shift(s, dm, f, shift):
     new_f = (scf.hf.level_shift(s, dm[0], f[0], shift),

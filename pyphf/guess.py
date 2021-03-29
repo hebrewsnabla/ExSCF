@@ -5,6 +5,7 @@ try:
 except:
     print('fch2py not found. Interface with fch is disabled. Install MOKIT if you need that.')
 from pyphf import stability
+import time
 
 def gen(xyz, bas, charge, spin, conv='tight', level_shift=0):
     '''for states other than singlets'''
@@ -68,7 +69,8 @@ def mix(xyz, bas, charge=0, conv='loose', cycle=5):
     #mol.output = 'test.pylog'
     mol.verbose = 4
     mol.build()
-    
+
+    t1 = time.time() 
     mf = scf.RHF(mol)
     mf.conv_tol = 1e-5
     mf.kernel() # Guess by 1e is poor,
@@ -95,7 +97,8 @@ def mix(xyz, bas, charge=0, conv='loose', cycle=5):
             mf_mix.kernel(dm0=dm_new)
             mo, stable = stability.uhf_internal(mf_mix)
 
-
+    t2 = time.time()
+    print('time for guess: %.3f' % (t2-t1))
     #dm = mf.make_rdm1()
     #mf.max_cycle = 0
     #mf_mix.kernel(dm)
