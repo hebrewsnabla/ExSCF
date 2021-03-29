@@ -1,5 +1,8 @@
 import numpy as np
-from py2fch import py2fch
+try:
+    from py2fch import py2fch
+except:
+    print('py2fch not found. Interface with fch is disabled. Install MOKIT if you need that.')
 import os
 from functools import partial
 

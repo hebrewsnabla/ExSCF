@@ -489,6 +489,7 @@ class SUHF():
         self.verbose = 4
         #self.debug = False
         self.output = None
+        self.conv_tol = 1e-7 # For RMSD
         self.max_cycle = 70
         self.diis_on = True
         self.diis_start_cyc = None
@@ -515,11 +516,10 @@ class SUHF():
             self.debug = True
             self.debug2 = True
             print('verbose: %d, debug2' % self.verbose)
+        print('conv_tol: %g' % self.conv_tol)
+        if self.conv_tol > 1e-5:
+            print('Warning: conv_tol too large')
 
-        #if self.debug:
-        #    print('verbose: debug')
-        #else:
-        #    print('verbose: normal')
         if self.diis_on:
             #assert issubclass(mf.DIIS, lib.diis.DIIS)
             #DIIS = lib.diis.SCF_DIIS
@@ -619,6 +619,7 @@ class SUHF():
         norb = self.norb
         mf = self.guesshf
         
+        thresh = self.conv_tol
         max_cycle = self.max_cycle
         cyc = 1
         conv = False
@@ -709,15 +710,7 @@ class SUHF():
             if old_suhf is not None:
                 dE = E_suhf - old_suhf
                 ddm = dm_ortho - old_dm
-                max_ddm = abs(ddm).max()
-                norm_ddm = np.linalg.norm(ddm)
-                if abs(dE)<1e-8 and max_ddm<1e-5 and norm_ddm<1e-7:
-                    conv = True
-                    print('\n***************')
-                    print('SUHF converged at cycle %d' %cyc)
-                    print('Final E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
-                else:
-                    print(' E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
+                conv_check(dE, ddm, thresh, cyc)
             else:
                 print(' E(SUHF) = %15.8f' % E_suhf)
             self.conv = conv
@@ -726,8 +719,6 @@ class SUHF():
                 print('SUHF not converged')
                 break
 
-        t_aftercyc = time.time()
-        print('time for cyc: %.3f' % (t_aftercyc-t_pre))
         # extra cycle to remove level shift
         old_suhf = self.E_suhf
         old_dm = self.dm_ortho
@@ -774,7 +765,6 @@ class SUHF():
             Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
             E_suhf = mf.energy_nuc() + H_suhf
             self.E_suhf = E_suhf
-            #print('E(SUHF) = %15.8f' % E_suhf)
             Faa = F_mod_ortho[:norb, :norb]
             Fbb = F_mod_ortho[norb:, norb:]
             F_mod_ortho = np.array([Faa,Fbb])
@@ -792,20 +782,16 @@ class SUHF():
             mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
             self.dm_reg = dm_reg
             self.mo_reg = mo_reg
-            if old_suhf is not None:
-                dE = E_suhf - old_suhf
-                ddm = dm_ortho - old_dm
-                max_ddm = abs(ddm).max()
-                norm_ddm = np.linalg.norm(ddm)
-                #if abs(dE)<1e-8 and max_ddm<1e-5 and norm_ddm<1e-7:
-                #    conv = True
-                #    print('\n***************')
-                #    print('SUHF converged at cycle %d' %cyc)
-                #    print('Final E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
-                #else:
-                print('Extra E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
+            #if old_suhf is not None:
+            dE = E_suhf - old_suhf
+            ddm = dm_ortho - old_dm
+            max_ddm = abs(ddm).max()
+            norm_ddm = np.linalg.norm(ddm) / (ddm.shape[-1]*np.sqrt(2))
+            print('Extra E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
+        t_aftercyc = time.time()
+        print('time for cyc: %.3f' % (t_aftercyc-t_pre))
 
-        if self.makedm and self.conv:
+        if self.makedm:
             suhf_dm = sudm.make_1pdm(self, Dg, self.dm_no, C_no)
             self.suhf_dm = suhf_dm
             self.natorb, self.natocc = sudm.natorb(self, suhf_dm)
@@ -827,6 +813,17 @@ class SUHF():
         Jg, Kg = self.get_JKg()
         return get_EX(self, self.no, self.Pg, Kg, self.xg)[1]
         
+
+def conv_check(dE, ddm, thresh, cyc, nocheck):
+    max_ddm = abs(ddm).max()
+    norm_ddm = np.linalg.norm(ddm) / (ddm.shape[-1]*np.sqrt(2))
+    if abs(dE)< (thresh*1e-2) and max_ddm < (thresh*1e2) and norm_ddm < thresh:
+        conv = True
+        print('\n***************')
+        print('SUHF converged at cycle %d' %cyc)
+        print('Final E(SUHF) = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
+    else:
+        print(' E = %15.8f, delta E = %10.6g, MaxD(dm) = %10.6g, RMSD(dm) = %10.6g' % (E_suhf, dE, max_ddm, norm_ddm))
 
 def lev_shift(s, dm, f, shift):
     new_f = (scf.hf.level_shift(s, dm[0], f[0], shift),

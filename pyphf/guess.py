@@ -1,6 +1,10 @@
 from pyscf import gto, scf, dft
 import numpy as np
-from fch2py import fch2py
+try:
+    from fch2py import fch2py
+except:
+    print('fch2py not found. Interface with fch is disabled. Install MOKIT if you need that.')
+from pyphf import stability
 
 def gen(xyz, bas, charge, spin, conv='tight', level_shift=0):
     '''for states other than singlets'''
@@ -53,7 +57,7 @@ def from_fchk(xyz, bas, fch, cycle=1):
     mf.kernel(dm)
     return mf
 
-def mix(xyz, bas, charge=0, cycle=5):
+def mix(xyz, bas, charge=0, conv='loose', cycle=5):
     mol = gto.Mole()
     mol.atom = xyz
     #with open(xyz, 'r') as f:
@@ -74,13 +78,24 @@ def mix(xyz, bas, charge=0, cycle=5):
     #occ = (mf.mo_occ, mf.mo_occ)
     dm_mix = init_guess_mixed(mf.mo_coeff, mf.mo_occ)
     mf_mix = scf.UHF(mol)
-    mf_mix.conv_tol = 1e-3
-    mf_mix.max_cycle = cycle
+    if conv == 'loose':
+        mf_mix.conv_tol = 1e-3
+        mf_mix.max_cycle = cycle
+    elif conv == 'tight':
+        pass
     mf_mix.kernel(dm0=dm_mix)
     ss, s = mf_mix.spin_square()
     if s < 0.1:
         print('Warning: S too small, symmetry breaking may be failed')
     
+    if conv == 'tight':
+        mo, stable = stability.uhf_internal(mf_mix)
+        while(not stable):
+            dm_new = scf.uhf.make_rdm1(mo, mf_mix.mo_occ)
+            mf_mix.kernel(dm0=dm_new)
+            mo, stable = stability.uhf_internal(mf_mix)
+
+
     #dm = mf.make_rdm1()
     #mf.max_cycle = 0
     #mf_mix.kernel(dm)
