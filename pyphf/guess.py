@@ -58,7 +58,7 @@ def from_fchk(xyz, bas, fch, cycle=1):
     mf.kernel(dm)
     return mf
 
-def mix(xyz, bas, charge=0, conv='loose', cycle=5):
+def mix(xyz, bas, charge=0, conv='loose', cycle=5, skipstb=False):
     mol = gto.Mole()
     mol.atom = xyz
     #with open(xyz, 'r') as f:
@@ -90,7 +90,7 @@ def mix(xyz, bas, charge=0, conv='loose', cycle=5):
     if s < 0.1:
         print('Warning: S too small, symmetry breaking may be failed')
     
-    if conv == 'tight':
+    if conv == 'tight' and not skipstb:
         mo, stable = stability.uhf_internal(mf_mix)
         while(not stable):
             dm_new = scf.uhf.make_rdm1(mo, mf_mix.mo_occ)

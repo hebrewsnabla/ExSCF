@@ -9,6 +9,13 @@ from functools import partial
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
+def dmlist(dmas, dmbs, fac=-1):
+    ddms = []
+    for i in range(len(dmas)):
+        ddm = dmas[i] + fac*dmbs[i]
+        ddms.append(ddm)
+    return ddms
+
 def stack22(aa, ab, ba, bb):
     tot = np.vstack((
         np.hstack((aa,ab)),

@@ -2,6 +2,7 @@ import numpy as np
 import sympy as sym
 import scipy
 from pyscf import gto, scf
+from pyscf.lib import temporary_env
 from pyphf import sudm, util2
 import os, sys
 from functools import partial
@@ -193,7 +194,15 @@ def get_JKg(mol, Pg, no, X):
         Kg.append(kg_no)
     return Jg, Kg, Pg_ortho
 
-def get_Gg(mol, Pg, no, X):
+def get_jk(mol, dm, hermi=1, opt=None):
+    return scf.hf.get_jk(mol, dm, hermi, opt)
+
+def get_k(mol, dm, hermi=1, opt=None):
+    with temporary_env(opt, prescreen='CVHFnrs8_vk_prescreen'):
+        vk = scf.hf.get_jk(mol, dm, hermi, opt, with_j=False)[1]
+    return vk
+
+def get_Gg(mol, Pg, no, X, dm_last=None, Ggao_last=None, opt=None):
     Gg = []
     Pg_ortho = []
     for pg in Pg:
@@ -222,19 +231,40 @@ def get_Gg(mol, Pg, no, X):
         Pgab_ao.append(pgab_ao)
         Pgba_ao.append(pgba_ao)
     Pgaabb_ao = Pgaa_ao + Pgbb_ao
+    Pgao = [Pgaabb_ao, Pgab_ao, Pgba_ao]
+    if dm_last is not None:
+        old_Pgaabb_ao, old_Pgab_ao, old_Pgba_ao = dm_last
+        old_vj, old_vk, old_Ggab_ao, old_Ggba_ao = Ggao_last
     #print(Pgaabb_ao.shape)
     #nao = Pgaabb_ao.shape[-1]
+    if dm_last is None:
+        vj,vk = get_jk(mol, Pgaabb_ao, hermi=0, opt=opt)
+        Ggab_ao = get_k(mol, Pgab_ao, hermi=0, opt=opt)
+        Ggba_ao = get_k(mol, Pgba_ao, hermi=0, opt=opt)
+    else:
+        d_aabb = util2.dmlist(Pgaabb_ao, old_Pgaabb_ao)
+        d_ab = util2.dmlist(Pgab_ao, old_Pgab_ao)
+        d_ba = util2.dmlist(Pgba_ao, old_Pgba_ao)
+        vj,vk = get_jk(mol, d_aabb, hermi=0, opt=opt) 
+        #vj = util2.dmlist(vj, old_vj, 1)
+        #vk = util2.dmlist(vk, old_vk, 1)
+        vj += old_vj
+        vk += old_vk
+        Ggab_ao = get_jk(mol, d_ab, hermi=0, opt=opt)[1] + old_Ggab_ao
+        #Ggab_ao = util2.dmlist(Ggab_ao, old_Ggab_ao, 1)
+        Ggba_ao = get_jk(mol, d_ba, hermi=0, opt=opt)[1] + old_Ggba_ao
+        #Ggba_ao = util2.dmlist(Ggba_ao, old_Ggba_ao, 1)
     ndm = len(Pgab_ao)
-    vj,vk = scf.hf.get_jk(mol, Pgaabb_ao, hermi=0)
     #print(vj.shape)
     Ggaa_ao = vj[:ndm] + vj[ndm:] - vk[:ndm]
     Ggbb_ao = vj[:ndm] + vj[ndm:] - vk[ndm:]
     #Ggbb_ao = scf.hf.get_jk(mol, Pgbb_ao, hermi=0)
     #print(ggaa_ao)
-    Ggab_ao = scf.hf.get_jk(mol, Pgab_ao, hermi=0)[1] *(-1)
-    Ggba_ao = scf.hf.get_jk(mol, Pgba_ao, hermi=0)[1] *(-1)
+    Ggao = [vj,vk,Ggab_ao, Ggba_ao]
     #ggbb_ao = scf.uhf.get_veff(mol, [pgaa_ao, pgbb_ao], hermi=0)[1]
         # X^H . G(g) . X
+    Ggab_ao *= -1
+    Ggba_ao *= -1
     for i,ggab_ao in enumerate(Ggab_ao):
         #ggab_ao = Ggab_ao[i]
         ggba_ao = Ggba_ao[i]
@@ -248,7 +278,7 @@ def get_Gg(mol, Pg, no, X):
         gg = util2.stack22(ggaa, ggab, ggba, ggbb)
         gg_no = einsum('ji,jk,kl->il', no, gg, no)
         Gg.append(gg_no)
-    return Gg, Pg_ortho
+    return Gg, Pg_ortho, Pgao, Ggao
 
 
 def get_xg(suhf, no, na, nb, Ng):
@@ -626,12 +656,20 @@ class SUHF():
         
         hcore = mf.get_hcore()
         hcore_ortho = einsum('ji,jk,kl->il', X, hcore, X)
+        Pgao = None
+        vhfopt = mf.init_direct_scf()
+        print(vhfopt)
         t_pre = time.time() 
         print('time for Preparation before cyc: %.3f' % (t_pre-t_start))
         while(not conv):
             print('**** Start Cycle %d ****' % cyc)
             old_suhf = self.E_suhf
             old_dm = self.dm_ortho
+            #if Pgao is not None:
+            #    old_Pgao = Pgao
+            #    old_Ggao = Ggao
+            #else:
+            old_Pgao = old_Ggao = None
             #if cyc==0:
             #    veff = mf.get_veff(dm = dm)
             #else:
@@ -642,7 +680,6 @@ class SUHF():
             if self.debug:
                 print('dm (ortho)')
                 print(self.dm_ortho)
-            #print(veff)
             #Fa, Fb = hcore + veff
             #Fa_ortho = einsum('ji,jk,kl->il', X, Fa, X)
             #Fb_ortho = einsum('ji,jk,kl->il', X, Fb, X)
@@ -664,7 +701,7 @@ class SUHF():
                 print('P(g) (NO)\n', Pg[0])
             t05 = time.time()
             print('time for NO, Ng: %.3f' % (t05-t01))
-            Gg, Pg_ortho = get_Gg(self.mol, Pg, self.no, X)
+            Gg, Pg_ortho, Pgao, Ggao = get_Gg(self.mol, Pg, self.no, X, dm_last=old_Pgao, Ggao_last=old_Ggao, opt=vhfopt)
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
@@ -722,6 +759,8 @@ class SUHF():
         # extra cycle to remove level shift
         old_suhf = self.E_suhf
         old_dm = self.dm_ortho
+        #old_Pgao = Pgao
+        #old_Ggao = Ggao
         dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
         mo_ortho = np.array(self.mo_ortho)
         mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
@@ -731,7 +770,7 @@ class SUHF():
             print('dm_reg\n', dm_reg)
             print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
         if self.level_shift is not None:
-            print('**** Extra Cycle %d ****' % (cyc+1))
+            print('**** Extra Cycle %d ****' % cyc)
             veff = mf.get_veff(dm = dm_reg)
             veff_ortho = einsum('ji,tjk,kl->til', X, veff, X)
             if self.debug:
@@ -752,7 +791,7 @@ class SUHF():
                 print('D(g) (NO)\n', Dg[0])
                 print('N(g) (NO)\n', Ng[0])
                 print('P(g) (NO)\n', Pg[0])
-            Gg, Pg_ortho = get_Gg(self.mol, Pg, self.no, X)
+            Gg, Pg_ortho, _, _ = get_Gg(self.mol, Pg, self.no, X, opt=vhfopt)
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
