@@ -512,14 +512,14 @@ class SUHF():
         natorb: SUHF natural orbital (regular basis) 
     '''
 
-    def __init__(self, guesshf):
+    def __init__(self, guesshf=None):
         self.guesshf = guesshf
-        self.mol = guesshf.mol
 
         self.cut_no = False
         self.verbose = 4
         #self.debug = False
         self.output = None # since 0.3.1, define output is important, it decides self.chkfile
+        self.restart = False
         self.conv_tol = 1e-7 # For RMSD
         self.max_cycle = 70
         self.diis_on = True
@@ -547,16 +547,30 @@ class SUHF():
             self.debug = True
             self.debug2 = True
             print('verbose: %d, debug2' % self.verbose)
-        hf = self.guesshf
         if self.output is None:
-            self.chkfile0 = hf.chkfile
-        else:
+            self.output = os.getpid()
+        if self.guesshf is not None:
+            hf = self.guesshf
+            self.mol = guesshf.mol
             self.chkfile0 = self.output + '_ges.pchk'
-        chkfile.dump_scf(hf.mol, self.chkfile, hf.e_tot, hf.mo_energy,
-                             hf.mo_coeff, hf.mo_occ)
-        self.chkfile = self.chkfile0 + '.pchk'
-        print('chkfile0: %s # the file store hf for guess' % self.chkfile0)
+            chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
+                                 hf.mo_coeff, hf.mo_occ)
+            print('chkfile0: %s # the file store hf for guess' % self.chkfile0)
+        elif self.chkfile0 is not None:
+            pass ## todo
+        elif self.chkfile is not None:
+            self.mol, suinfo = util2.load(self.chkfile)
+        else:
+            guess = ''' 
+            guesshf: a UHF object
+            chkfile0: a PySCF chkfile storing a UHF result
+            chkfile: SUHF chkfile
+            '''
+            raise AttributeError('You must provide one of below as a guess:' + guess)
+        self.chkfile = self.output + '_su.pchk'
         print('chkfile: %s # the file store suhf info' % self.chkfile)
+        #self.chkfile2 = self.output + '_no.pchk'
+        #print('chkfile2: %s # the file store suhf NO' % self.chkfile2)
         print('conv_tol: %g' % self.conv_tol)
         if self.conv_tol > 1e-5:
             print('Warning: conv_tol too large')
@@ -579,7 +593,7 @@ class SUHF():
         #if self.output is not None:
         #    os.system("echo '' > %s" % self.output)
         #    sys.stdout = open(self.output, 'a')
-        S = self.guesshf.get_ovlp()
+        S = scf.hf.get_ovlp(self.mol)
         Ca, Cb = self.guesshf.mo_coeff
         #S_sqrt = scipy.linalg.sqrtm(S)
         if self.debug:
@@ -669,7 +683,7 @@ class SUHF():
         conv = False
         
         Pgao = None
-        print(vhfopt)
+        #print(vhfopt)
         t_pre = time.time() 
         print('time for Preparation before cyc: %.3f' % (t_pre-t_start))
         while(not conv):
