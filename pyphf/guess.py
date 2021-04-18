@@ -2,6 +2,7 @@ from pyscf import gto, scf, dft
 import numpy as np
 try:
     from fch2py import fch2py
+    import gaussian
 except:
     print('fch2py not found. Interface with fch is disabled. Install MOKIT if you need that.')
 from pyphf import stability
@@ -26,7 +27,30 @@ def gen(xyz, bas, charge, spin, conv='tight', level_shift=0):
 
     return mf
 
-def from_fchk(xyz, bas, fch, cycle=1):
+def from_fch_simp(fch, cycle=2):
+    mol = gaussian.load_mol_from_fch('anthracene_uhf.fch')
+    
+    mf = scf.UHF(mol)
+    #mf.init_guess = '1e'
+    #mf.init_guess_breaksym = True
+    mf.max_cycle = 1
+    mf.kernel()
+    
+    # read MOs from .fch(k) file
+    nbf = mf.mo_coeff[0].shape[0]
+    nif = mf.mo_coeff[0].shape[1]
+    S = mol.intor_symmetric('int1e_ovlp')
+    Sdiag = S.diagonal()
+    alpha_coeff = fch2py(fch, nbf, nif, Sdiag, 'a')
+    beta_coeff  = fch2py(fch, nbf, nif, Sdiag, 'b')
+    mf.mo_coeff = (alpha_coeff, beta_coeff)
+    # read done
+    dm = mf.make_rdm1()
+    mf.max_cycle = cycle
+    mf.kernel(dm)
+    return mf
+
+def from_fchk(xyz, bas, fch, cycle=2):
     mol = gto.Mole()
     mol.atom = xyz
     #with open(xyz, 'r') as f:

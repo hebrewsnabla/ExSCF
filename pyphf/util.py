@@ -2,6 +2,7 @@ import numpy as np
 import sympy as sym
 import scipy
 from pyscf import gto, scf
+from pyscf.scf import chkfile
 from pyscf.lib import temporary_env
 from pyphf import sudm, util2
 import os, sys
@@ -518,7 +519,7 @@ class SUHF():
         self.cut_no = False
         self.verbose = 4
         #self.debug = False
-        self.output = None
+        self.output = None # since 0.3.1, define output is important, it decides self.chkfile
         self.conv_tol = 1e-7 # For RMSD
         self.max_cycle = 70
         self.diis_on = True
@@ -546,6 +547,16 @@ class SUHF():
             self.debug = True
             self.debug2 = True
             print('verbose: %d, debug2' % self.verbose)
+        hf = self.guesshf
+        if self.output is None:
+            self.chkfile0 = hf.chkfile
+        else:
+            self.chkfile0 = self.output + '_ges.pchk'
+        chkfile.dump_scf(hf.mol, self.chkfile, hf.e_tot, hf.mo_energy,
+                             hf.mo_coeff, hf.mo_occ)
+        self.chkfile = self.chkfile0 + '.pchk'
+        print('chkfile0: %s # the file store hf for guess' % self.chkfile0)
+        print('chkfile: %s # the file store suhf info' % self.chkfile)
         print('conv_tol: %g' % self.conv_tol)
         if self.conv_tol > 1e-5:
             print('Warning: conv_tol too large')
@@ -625,6 +636,9 @@ class SUHF():
         self.d_expr, self.d_func, self.d = Wignerd_expr, Wignerd, d
         self.E_suhf = None
         self.energy_nuc = self.mol.energy_nuc()
+        hcore = hf.get_hcore()
+        self.hcore_ortho = einsum('ji,jk,kl->il', X, hcore, X)
+        self.vhfopt = hf.init_direct_scf()
 
         self.built = True
 
@@ -647,17 +661,14 @@ class SUHF():
         X = self.X
         na, nb = self.nelec
         norb = self.norb
-        mf = self.guesshf
+        #mf = self.guesshf
         
         thresh = self.conv_tol
         max_cycle = self.max_cycle
         cyc = 1
         conv = False
         
-        hcore = mf.get_hcore()
-        hcore_ortho = einsum('ji,jk,kl->il', X, hcore, X)
         Pgao = None
-        vhfopt = mf.init_direct_scf()
         print(vhfopt)
         t_pre = time.time() 
         print('time for Preparation before cyc: %.3f' % (t_pre-t_start))
@@ -675,7 +686,7 @@ class SUHF():
             #else:
             t01 = time.time()
             dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X)
-            veff = mf.get_veff(dm = dm_reg)
+            veff = scf.hf.get_veff(self.mol, dm_reg, vhfopt=self.vhfopt)
             veff_ortho = einsum('ji,tjk,kl->til', X, veff, X)
             if self.debug:
                 print('dm (ortho)')
@@ -683,11 +694,11 @@ class SUHF():
             #Fa, Fb = hcore + veff
             #Fa_ortho = einsum('ji,jk,kl->il', X, Fa, X)
             #Fb_ortho = einsum('ji,jk,kl->il', X, Fb, X)
-            Fa_ortho, Fb_ortho = hcore_ortho + veff_ortho
+            Fa_ortho, Fb_ortho = self.hcore_ortho + veff_ortho
             F_ortho = Fa_ortho, Fb_ortho
             if self.debug:
                 print('Fock (ortho)\n', F_ortho)
-                e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, hcore_ortho, veff_ortho)
+                e_uhf, e_uhf_coul = scf.uhf.energy_elec(self.guesshf, self.dm_ortho, self.hcore_ortho, veff_ortho)
                 print('E(UHF) = %12.6f' % e_uhf)
         
             dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, na, nb)
@@ -701,7 +712,7 @@ class SUHF():
                 print('P(g) (NO)\n', Pg[0])
             t05 = time.time()
             print('time for NO, Ng: %.3f' % (t05-t01))
-            Gg, Pg_ortho, Pgao, Ggao = get_Gg(self.mol, Pg, self.no, X, dm_last=old_Pgao, Ggao_last=old_Ggao, opt=vhfopt)
+            Gg, Pg_ortho, Pgao, Ggao = get_Gg(self.mol, Pg, self.no, X, dm_last=old_Pgao, Ggao_last=old_Ggao, opt=self.vhfopt)
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
@@ -710,7 +721,7 @@ class SUHF():
             xg, yg, ciS, C_no = get_xg(self, self.no, na, nb, Ng)
             self.xg, self.ciS = xg, ciS
             #yg, ciS = util.get_yg(self, xg)
-            trHg, ciH = get_H(self, hcore_ortho, self.no, Pg, Gg, xg)
+            trHg, ciH = get_H(self, self.hcore_ortho, self.no, Pg, Gg, xg)
             S2 = get_S2(self, Pg_ortho)
             Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
             Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
@@ -751,6 +762,7 @@ class SUHF():
             else:
                 print(' E(SUHF) = %15.8f' % E_suhf)
             self.conv = conv
+            util2.dump_chk(self.mol, self.chkfile, self.mo_e, self.mo_ortho, self.dm_ortho)
             cyc += 1
             if cyc >= max_cycle:
                 print('SUHF not converged')
@@ -771,16 +783,16 @@ class SUHF():
             print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
         if self.level_shift is not None:
             print('**** Extra Cycle %d ****' % cyc)
-            veff = mf.get_veff(dm = dm_reg)
+            veff = scf.hf.get_veff(self.mol, dm_reg, vhfopt=self.vhfopt)
             veff_ortho = einsum('ji,tjk,kl->til', X, veff, X)
             if self.debug:
                 print('dm (ortho)')
                 print(self.dm_ortho)
-            Fa_ortho, Fb_ortho = hcore_ortho + veff_ortho
+            Fa_ortho, Fb_ortho = self.hcore_ortho + veff_ortho
             F_ortho = Fa_ortho, Fb_ortho
             if self.debug:
                 print('Fock (ortho)\n', F_ortho)
-                e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, hcore_ortho, veff_ortho)
+                e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, self.hcore_ortho, veff_ortho)
                 print('E(UHF) = %12.6f' % e_uhf)
             dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, na, nb)
             self.dm_no = dm_no
@@ -791,14 +803,14 @@ class SUHF():
                 print('D(g) (NO)\n', Dg[0])
                 print('N(g) (NO)\n', Ng[0])
                 print('P(g) (NO)\n', Pg[0])
-            Gg, Pg_ortho, _, _ = get_Gg(self.mol, Pg, self.no, X, opt=vhfopt)
+            Gg, Pg_ortho, _, _ = get_Gg(self.mol, Pg, self.no, X, opt=self.vhfopt)
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
             xg, yg, ciS, C_no = get_xg(self, self.no, na, nb, Ng)
             self.xg, self.ciS = xg, ciS
             #yg, ciS = util.get_yg(self, xg)
-            trHg, ciH = get_H(self, hcore_ortho, self.no, Pg, Gg, xg)
+            trHg, ciH = get_H(self, self.hcore_ortho, self.no, Pg, Gg, xg)
             S2 = get_S2(self, Pg_ortho)
             Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
             Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
@@ -832,14 +844,16 @@ class SUHF():
 
         if self.makedm:
             suhf_dm = sudm.make_1pdm(self, Dg, self.dm_no, C_no)
+            t_dm = time.time()
+            print('time for dm: %.3f' % (t_dm-t_aftercyc))
             self.suhf_dm = suhf_dm
             self.natorb, self.natocc = sudm.natorb(self, suhf_dm)
             if self.tofch:
                 S = self.mol.intor_symmetric('int1e_ovlp')
                 util2.tofch(self.oldfch, self.natorb[2], self.natocc[2], S)
                 #util2.tofch(self.oldfch, mo_reg, self.mo_e, S, 'SUHFMO')
-            t_dm = time.time()
-            print('time for dm: %.3f' % (t_dm-t_aftercyc))
+            t_nat = time.time()
+            print('time for natorb: %.3f' % (t_nat-t_dm))
 
         t_end = time.time()
         print('time tot: %.3f' % (t_end-t_start))

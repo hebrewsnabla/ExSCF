@@ -25,9 +25,9 @@ def stack22(aa, ab, ba, bb):
 
 def reg2ortho(dm, X, forward=True):
     if forward:
-        return np.einsum('ji,jk,kl', X, dm, X)
+        return einsum('ji,jk,kl', X, dm, X)
     else:
-        return np.einsum('ij,jk,lk', X, dm, X)
+        return einsum('ij,jk,lk', X, dm, X)
 
 def tofch(oldfch, natorb, natocc, S, flag='SUHFNO'):
     fch = oldfch.split('.fch')[0] + '_' + flag + '.fch'
