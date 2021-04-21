@@ -548,10 +548,10 @@ class SUHF():
             self.debug2 = True
             print('verbose: %d, debug2' % self.verbose)
         if self.output is None:
-            self.output = os.getpid()
+            self.output = str(os.getpid())
         if self.guesshf is not None:
             hf = self.guesshf
-            self.mol = guesshf.mol
+            self.mol = hf.mol
             self.chkfile0 = self.output + '_ges.pchk'
             chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
                                  hf.mo_coeff, hf.mo_occ)

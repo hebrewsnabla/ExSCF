@@ -93,3 +93,9 @@ def dump_occ(occ, full=1.0):
         else:
             ext += 1
     return s + '...', [core, act, ext]
+
+def load(pchk):
+    return 0
+
+def dump_chk(mol, chkfile, moe, mo, dm):
+    return 0

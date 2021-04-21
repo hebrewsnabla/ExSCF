@@ -7,6 +7,7 @@ except:
     print('fch2py not found. Interface with fch is disabled. Install MOKIT if you need that.')
 from pyphf import stability
 import time
+import copy
 
 def gen(xyz, bas, charge, spin, conv='tight', level_shift=0):
     '''for states other than singlets'''
@@ -108,8 +109,10 @@ def mix(xyz, bas, charge=0, conv='loose', cycle=5, skipstb=False):
         mf_mix.conv_tol = 1e-3
         mf_mix.max_cycle = cycle
     elif conv == 'tight':
-        pass
+        mf_mix.max_cycle = 100
     mf_mix.kernel(dm0=dm_mix)
+    if not mf_mix.converged:
+        raise ValueError('UHF not converged')
     ss, s = mf_mix.spin_square()
     if s < 0.1:
         print('Warning: S too small, symmetry breaking may be failed')
@@ -208,8 +211,7 @@ def do_uhf(atoma, basisa, chga, spina):
     return ca, cb, na, nb
 
 '''
-Scan H2 molecule dissociation curve comparing UHF and RHF solutions per the 
-example of Szabo and Ostlund section 3.8.7
+modified from pyscf/examples/scf/56-h2_symm_breaking.py, by James D Whitfield
 The initial guess is obtained by mixing the HOMO and LUMO and is implemented
 as a function that can be used in other applications.
 See also 16-h2_scan.py, 30-scan_pes.py, 32-break_spin_symm.py
@@ -221,6 +223,46 @@ def init_guess_by_1e(rhf, mol=None):
     mo_energy, mo_coeff = scf.hf.eig(h1e, s1e)
     mo_occ = rhf.get_occ(mo_energy, mo_coeff)
     return rhf.make_rdm1(mo_coeff, mo_occ), mo_coeff, mo_energy, mo_occ
+
+def init_guess_mixed2(mo_coeff, mo_occ, mixing_parameter=np.pi/4):
+    ''' Generate density matrix with broken spatial and spin symmetry by mixing
+    HOMO and LUMO orbitals following ansatz in Szabo and Ostlund, Sec 3.8.7.
+    
+    psi_1a = numpy.cos(q)*psi_homo + numpy.sin(q)*psi_lumo
+    psi_1b = numpy.cos(q)*psi_homo - numpy.sin(q)*psi_lumo
+        
+    psi_2a = -numpy.sin(q)*psi_homo + numpy.cos(q)*psi_lumo
+    psi_2b =  numpy.sin(q)*psi_homo + numpy.cos(q)*psi_lumo
+    Returns: 
+        Density matrices, a list of 2D ndarrays for alpha and beta spins
+    '''
+    # opt: q, mixing parameter 0 < q < 2 pi
+
+    homo_idx=0
+    lumo_idx=1
+
+    for i in range(len(mo_occ)-1):
+        if mo_occ[i]>0 and mo_occ[i+1]<0.1:
+            homo_idx=i
+            lumo_idx=i+1
+
+    psi_homo=mo_coeff[:, homo_idx]
+    psi_lumo=mo_coeff[:, lumo_idx]
+    
+    Ca=copy.deepcopy(mo_coeff)
+    Cb=copy.deepcopy(mo_coeff)
+
+    #mix homo and lumo of alpha and beta coefficients
+    q=mixing_parameter
+
+    Ca[:,homo_idx] = np.cos(q)*psi_homo + np.sin(q)*psi_lumo
+    Cb[:,homo_idx] = np.cos(q)*psi_homo - np.sin(q)*psi_lumo
+
+    Ca[:,lumo_idx] = -np.sin(q)*psi_homo + np.cos(q)*psi_lumo
+    Cb[:,lumo_idx] =  np.sin(q)*psi_homo + np.cos(q)*psi_lumo
+
+    dm = scf.uhf.make_rdm1( (Ca,Cb), (mo_occ,mo_occ) )
+    return dm
 
 def init_guess_mixed(mo_coeff, mo_occ,mixing_parameter=np.pi/4):
     ''' Generate density matrix with broken spatial and spin symmetry by mixing
