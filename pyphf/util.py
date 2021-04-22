@@ -553,8 +553,8 @@ class SUHF():
             hf = self.guesshf
             self.mol = hf.mol
             self.chkfile0 = self.output + '_ges.pchk'
-            chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
-                                 hf.mo_coeff, hf.mo_occ)
+            #chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
+            #                     hf.mo_coeff, hf.mo_occ)
             print('chkfile0: %s # the file store hf for guess' % self.chkfile0)
         elif self.chkfile0 is not None:
             pass ## todo
@@ -652,6 +652,8 @@ class SUHF():
         self.energy_nuc = self.mol.energy_nuc()
         hcore = hf.get_hcore()
         self.hcore_ortho = einsum('ji,jk,kl->il', X, hcore, X)
+        if self.debug:
+            print('hcore (ortho)\n', self.hcore_ortho)
         self.vhfopt = hf.init_direct_scf()
 
         self.built = True
@@ -700,7 +702,7 @@ class SUHF():
             #else:
             t01 = time.time()
             dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X)
-            veff = scf.hf.get_veff(self.mol, dm_reg, vhfopt=self.vhfopt)
+            veff = scf.uhf.get_veff(self.mol, dm_reg, vhfopt=self.vhfopt)
             veff_ortho = einsum('ji,tjk,kl->til', X, veff, X)
             if self.debug:
                 print('dm (ortho)')
@@ -797,7 +799,7 @@ class SUHF():
             print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
         if self.level_shift is not None:
             print('**** Extra Cycle %d ****' % cyc)
-            veff = scf.hf.get_veff(self.mol, dm_reg, vhfopt=self.vhfopt)
+            veff = scf.uhf.get_veff(self.mol, dm_reg, vhfopt=self.vhfopt)
             veff_ortho = einsum('ji,tjk,kl->til', X, veff, X)
             if self.debug:
                 print('dm (ortho)')
@@ -828,7 +830,7 @@ class SUHF():
             S2 = get_S2(self, Pg_ortho)
             Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
             Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
-            E_suhf = mf.energy_nuc() + H_suhf
+            E_suhf = self.energy_nuc + H_suhf
             self.E_suhf = E_suhf
             Faa = F_mod_ortho[:norb, :norb]
             Fbb = F_mod_ortho[norb:, norb:]

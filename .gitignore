@@ -2,6 +2,7 @@ core.*
 tmp*
 /test/scan*/*.log
 *.chk
+*.pchk
 /test/test_dm/B3/
 /phf/
 .vscode/

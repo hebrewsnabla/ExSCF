@@ -1,7 +1,7 @@
 from pyscf import lib
 from pyphf import util, guess
 
-lib.num_threads(4)
+lib.num_threads(8)
 
 # structure from dx.doi.org/10.1021/ct300689e | J. Chem. Theory Comput. 2012, 8, 4944−4949
 xyz = '''
