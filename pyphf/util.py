@@ -861,7 +861,7 @@ class SUHF():
         if self.makedm:
             suhf_dm = sudm.make_1pdm(self, Dg, self.dm_no, C_no)
             t_dm = time.time()
-            print('time for dm: %.3f' % (t_dm-t_aftercyc))
+            print('time for 1pdm: %.3f' % (t_dm-t_aftercyc))
             self.suhf_dm = suhf_dm
             self.natorb, self.natocc = sudm.natorb(self, suhf_dm)
             if self.tofch:

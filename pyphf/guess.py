@@ -118,7 +118,7 @@ def mix(xyz, bas, charge=0, conv='loose', cycle=5, skipstb=False):
         print('Warning: S too small, symmetry breaking may be failed')
     
     if conv == 'tight' and not skipstb:
-        mo, stable = check_stab(mf_mix)
+        check_stab(mf_mix)
 
     t2 = time.time()
     print('time for guess: %.3f' % (t2-t1))
@@ -140,7 +140,7 @@ def check_stab(mf_mix):
         cyc += 1
     if not stable:
         raise RuntimeError('Stablility Opt failed after %d attempts.' % cyc)
-    return mo, stable
+
 
 def from_frag(xyz, bas, frags, chgs, spins, cycle=2, xc=None):
     mol = gto.Mole()
@@ -148,6 +148,7 @@ def from_frag(xyz, bas, frags, chgs, spins, cycle=2, xc=None):
     mol.basis = bas
     mol.build()
     
+    t1 = time.time() 
     dm, mo, occ = guess_frag(mol, frags, chgs, spins)
     if xc is None:
         mf = scf.UHF(mol)
@@ -161,6 +162,8 @@ def from_frag(xyz, bas, frags, chgs, spins, cycle=2, xc=None):
     ss, s = mf.spin_square()
     if s < 0.1:
         print('Warning: S too small, symmetry breaking may be failed')
+    t2 = time.time()
+    print('time for guess: %.3f' % (t2-t1))
     return mf
 
 

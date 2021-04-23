@@ -18,13 +18,14 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
     C_oo = C_no[:occ,:occ]
     Ngg = get_Ngg(Dg, dm_no, occ)
     t1 = time.time()
-    print('time for Ngg: %.3f' % (t1-t0))
     Pgg, Pgg_ortho = get_Pgg(Dg, dm_no, Ngg, occ, no)
     t2 = time.time()
-    print('time for Pgg: %.3f' % (t2-t1))
     xgg = get_xgg(Ngg, C_oo)
     t3 = time.time()
-    print('time for xgg: %.3f' % (t3-t2))
+    if suhf.debug:
+        print('time for Ngg: %.3f' % (t1-t0))
+        print('time for Pgg: %.3f' % (t2-t1))
+        print('time for xgg: %.3f' % (t3-t2))
     #wgtf0 = suhf.d
     S, Sz = suhf.S, suhf.Sz
     cgcoeff0, cgfloat0 = get_CG(S, Sz, 0, 0, S, Sz)
