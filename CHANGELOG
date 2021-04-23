@@ -1,4 +1,4 @@
-version 0.3.1 (Apr 18, 2021)
+version 0.3.1 (Apr 23, 2021)
 --------------------------
 * DFT
   + subdirectory dft, copied from pyscf.dft and pyscf.lib.dft
@@ -8,9 +8,9 @@ version 0.3.1 (Apr 18, 2021)
 * fix bug in tofch
 * guess
   + modify UHF strategy
-  + add stability check
+  + add stability check for UHF
 * fix bug in conv check
-* using PySCF's vhfopt
+* using PySCF's vhfopt, 30% faster. 1pdm made faster.
 
 version 0.3 (Mar 19, 2021)
 --------------------------

@@ -21,14 +21,16 @@ make xc_itrf_mod
 * guess: 
   + mix (`guess.mix`)
   + fragment (`guess.from_frag`)
+  + stablize (`guess.check_stab`)
 * converging strategy
   + DIIS (`diis_on = True`)
   + `level_shift = ` (in a.u.)
 * SUHF relaxed density, natural orbitals
 * interface (require MOKIT)
-  + read guess MO from fch
+  + read guess MO from fch (`guess.from_fch_simp`)
   + dump MO, NO to fch (`tofch = True`)
 
 ## TODO
 * SU-PDFT
 * SUPT2
+* TD-SUHF

@@ -14,7 +14,7 @@ mf = guess.mix(xyz, 'def2-tzvp', charge=2, conv='tight')
 # stability check of UHF will be performed
 
 mf2 = util.SUHF(mf)
-mf2.level_shift = 0.3
+mf2.level_shift = 0.2
 mf2.max_cycle = 100
 #mf2.conv_tol = 1e-6
 mf2.kernel()
