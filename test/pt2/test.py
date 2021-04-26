@@ -1,15 +1,15 @@
 #import phf
-from pyscf import gto, scf, lib
+from pyscf import lib
 #import scipy
 #import numpy as np
-import sys
+#import sys
 
 from pyphf import util, guess, pt2
 
 lib.num_threads(4)
 
 xyz = '''H 0.0 0.0 0.0; H 0.0 0.0 2.0''' #sys.argv[1]
-fch = '../test_carlos/test_uhf.fchk' #sys.argv[2]
+#fch = '../test_carlos/test_uhf.fchk' #sys.argv[2]
 bas = '3-21g'
 
 

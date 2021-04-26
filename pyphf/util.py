@@ -127,6 +127,8 @@ def get_Ng(grids, no, dm, occ):
         #print(dg.shape)
         #print(dg)
         dg_no = einsum('ji,jk,kl->il', no, dg, no)
+        #det_dg = np.linalg.det(dg_no)
+        #print(det_dg)
         #print(dg_no)
         Dg.append(dg_no)
         tg = einsum('ij,jk,kl->il', dm[:occ,:], dg_no, dm[:,:occ])
@@ -257,6 +259,7 @@ def get_Gg(mol, Pg, no, X, dm_last=None, Ggao_last=None, opt=None):
         #Ggba_ao = util2.dmlist(Ggba_ao, old_Ggba_ao, 1)
     ndm = len(Pgab_ao)
     #print(vj.shape)
+    #print(vj)
     Ggaa_ao = vj[:ndm] + vj[ndm:] - vk[:ndm]
     Ggbb_ao = vj[:ndm] + vj[ndm:] - vk[ndm:]
     #Ggbb_ao = scf.hf.get_jk(mol, Pgbb_ao, hermi=0)
@@ -516,6 +519,7 @@ class SUHF():
         self.guesshf = guesshf
 
         self.cut_no = False
+        self.use_no = True
         self.verbose = 4
         #self.debug = False
         self.output = None # since 0.3.1, define output is important, it decides self.chkfile
@@ -716,8 +720,8 @@ class SUHF():
                 print('Fock (ortho)\n', F_ortho)
                 e_uhf, e_uhf_coul = scf.uhf.energy_elec(self.guesshf, self.dm_ortho, self.hcore_ortho, veff_ortho)
                 print('E(UHF) = %12.6f' % e_uhf)
-        
-            dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, na, nb)
+            if self.use_no:
+                dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, na, nb)
             self.dm_no = dm_no
             self.no = no
             Dg, Ng, Pg = get_Ng(self.grids, self.no, self.dm_no, na+nb)

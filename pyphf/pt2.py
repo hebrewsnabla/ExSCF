@@ -6,63 +6,76 @@ Tsuchimochi, T.; Ten-no, S. L. J Chem Theory Comput 2019, 15, 6688–6702
 import numpy as np
 #import sympy as sym
 #import scipy
-from pyscf import gto, scf
-from pyphf import  util2
+from pyscf import gto, scf, mp
+from pyphf import util, util2
+from pyphf.util import count0, eig
 #import os, sys
 from functools import partial
 import time
+import copy
 
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
-def defm_Fock(mol, hcore_no, dm_no, no, X):
-    g_no = defm_G(mol, dm_no, no, X)
-    F0 = hcore_no + g_no
+def defm_Fock(mol, hcore_ortho, dm, X):
+    gaa, gbb = defm_G(mol, dm, X)
+    #F0 = hcore_ortho 
+    #norb = gaa.shape[0]
+    #Faa = g[:norb, :norb]
+    #Fbb = g[norb:, norb:]
+    F0 = gaa + hcore_ortho, gbb + hcore_ortho
+    #F0_no = hcore_no + g_no
     return F0
 
-def defm_G(mol, dm_no, no, X):
+def defm_G(mol, dm, X):
     #G = 
-    p = dm_no
+    #p = dm_no
 
-    p_ortho = einsum('ij,jk,lk->il', no, p, no)
+    #p_ortho = einsum('ij,jk,lk->il', no, p, no)
+    #print(p_ortho)
+    p_ortho = dm
 
-    norb = int(p.shape[0]/2)
+    #norb = int(p_ortho.shape[0]/2)
 
-    paa = p[:norb, :norb] # ortho ao
+    paa = p_ortho[0] # ortho ao
     #print(pgaa)
-    pab = p[:norb, norb:]
-    pba = p[norb:, :norb]
-    pbb = p[norb:, norb:]
+    #pab = p_ortho[1]
+    #pba = p_ortho[norb:, :norb]
+    pbb = p_ortho[1]
     # X . P(g) . X^H
     paa_ao = einsum('ij,jk,lk->il', X, paa, X) # regular ao
     #print(pgaa_ao)
-    pab_ao = einsum('ij,jk,lk->il', X, pab, X)
-    pba_ao = einsum('ij,jk,lk->il', X, pba, X)
+    #pab_ao = einsum('ij,jk,lk->il', X, pab, X)
+    #pba_ao = einsum('ij,jk,lk->il', X, pba, X)
     pbb_ao = einsum('ij,jk,lk->il', X, pbb, X)
+    #print(pbb)
+    #print(pbb_ao)
     #Pgaabb_ao = Pgaa_ao + Pgbb_ao
     #print(Pgaabb_ao.shape)
     #nao = Pgaabb_ao.shape[-1]
     #ndm = len(Pgab_ao)
     vj,vk = scf.hf.get_jk(mol, [paa_ao, pbb_ao], hermi=0)
     #print(vj.shape)
+    #print(vj, vk)
     Gaa_ao = vj[0] + vj[1] - vk[0]
     Gbb_ao = vj[0] + vj[1] - vk[1]
     #Ggbb_ao = scf.hf.get_jk(mol, Pgbb_ao, hermi=0)
     #print(ggaa_ao)
-    Gab_ao = scf.hf.get_jk(mol, pab_ao, hermi=0)[1] *(-1)
-    Gba_ao = scf.hf.get_jk(mol, pba_ao, hermi=0)[1] *(-1)
+    #Gab_ao = scf.hf.get_jk(mol, pab_ao, hermi=0)[1] *(-1)
+    #Gba_ao = scf.hf.get_jk(mol, pba_ao, hermi=0)[1] *(-1)
     #ggbb_ao = scf.uhf.get_veff(mol, [pgaa_ao, pgbb_ao], hermi=0)[1]
     # X^H . G(g) . X
 
     gaa = einsum('ji,jk,kl->il', X, Gaa_ao, X)  # ortho ao
     #print(ggaa)
-    gab = einsum('ji,jk,kl->il', X, Gab_ao, X) 
-    gba = einsum('ji,jk,kl->il', X, Gba_ao, X) 
+    #gab = einsum('ji,jk,kl->il', X, Gab_ao, X) 
+    #gba = einsum('ji,jk,kl->il', X, Gba_ao, X) 
     gbb = einsum('ji,jk,kl->il', X, Gbb_ao, X) 
-    g = util2.stack22(gaa, gab, gba, gbb)
-    g_no = einsum('ji,jk,kl->il', no, g, no)
+    #g = util2.stack22(gaa, gab, gba, gbb)
+    #g_no = einsum('ji,jk,kl->il', no, g, no)
+    #print(gaa, gbb)
 
-    return g_no
+    return gaa, gbb
 
 def t1(F0, epsl):
     ''' F_ia / (e_i - e_a) '''
@@ -83,11 +96,141 @@ class EMP2():
         self.verbose = 4
         #self.debug = False
         self.output = None
+
+        self.norb = suhf.norb
+        self.nelec = suhf.nelec
+        na, nb = self.nelec
+        #self.occ = na + nb
+        #self.vir = self.norb - occ
     
     def kernel(self):
         np.set_printoptions(precision=6, linewidth=160, suppress=True)
         suhf = self.suhf
-        F0 = defm_Fock(self.mol, suhf.hcore_no, suhf.dm_no, suhf.no, suhf.X )
-        epsl = F0.diagonal()
-        print(suhf.hcore_no)
-        print(F0, '\n', epsl)
+        F0 = defm_Fock(self.mol, suhf.hcore_ortho, suhf.dm_ortho, suhf.X )
+        #epsl = F0.diagonal()
+        print('F0', F0)
+        na, nb = self.nelec
+        occ = na+nb
+        norb = self.norb
+        vir = norb*2 - occ
+        nmo = self.norb
+        nvira, nvirb = nmo-na, nmo-nb
+        '''
+        Foo = F0_no[:occ, :occ]
+        Fvv = F0_no[occ:norb*2, occ:norb*2]
+        eo, co = np.linalg.eigh(Foo)
+        ev, cv = np.linalg.eigh(Fvv)
+        #ea = F0[0].diagonal()
+        #eb = F0[1].diagonal()
+        #print(suhf.hcore_no)
+        print('F0_no', F0_no)
+        print(eo, ev)
+        '''
+        mo_ortho = suhf.mo_ortho
+        print(mo_ortho)
+        eao, eav, cao, cav = Diag_F(F0[0], na, norb)
+        ebo, ebv, cbo, cbv = Diag_F(F0[1], nb, norb)
+        ca = util2.stack22(cao, np.zeros((na, nvira)), np.zeros((nvira, na)), cav)
+        cb = util2.stack22(cbo, np.zeros((nb, nvirb)), np.zeros((nvirb, nb)), cbv)
+        ca = einsum('ij,jk->ik', mo_ortho[0], ca)
+        cb = einsum('ij,jk->ik', mo_ortho[1], cb)
+        pa = einsum('ij,kj->ik', ca[:,:na], ca[:,:na])
+        pb = einsum('ij,kj->ik', cb[:,:nb], cb[:,:nb])
+        print(ca, cb)
+        F0 = defm_Fock(self.mol, suhf.hcore_ortho, [pa, pb], suhf.X)
+        print(F0)
+        #print(e0)
+        #for i in range(self.occ):
+        #    for a in range(self.occ, self.norb):
+        dm_no, _, no = find_NO(suhf, suhf.dm_ortho, na, nb)
+        Dg, Ng, Pg = util.get_Ng(suhf.grids, no, dm_no, na+nb)
+        #print('D(g) (NO)\n', Dg[0])
+        #print('N(g) (NO)\n', Ng[0])
+        #print('P(g) (NO)\n', Pg[0])
+        C_no = util.get_xg(suhf, no, na, nb, Ng)[-1]
+
+        xg, yg, ciS = get_xg(suhf, C_no, Dg, na+nb)
+        #get_Mg2(suhf, Dg, na+nb)
+        mo = suhf.mo_ortho
+        '''
+        eris = mp.ao2mo(mo)
+        emp2 = 0.0
+        
+        for i in range(na):
+            eris_ovov = eris.ovov[i]
+    
+            eris_ovov = eris_ovov.reshape(nvira,na,nvira).transpose(1,0,2)
+            t2i = eris_ovov.conj()/lib.direct_sum('a+jb->jab', eia_a[i], eia_a)
+            emp2 += numpy.einsum('jab,jab', t2i, eris_ovov) * .5
+            emp2 -= numpy.einsum('jab,jba', t2i, eris_ovov) * .5
+        '''
+
+def Diag_F(F, occ, norb):
+    Foo = F[:occ, :occ]
+    Fvv = F[occ:norb, occ:norb]
+    eo, co = np.linalg.eigh(Foo)
+    ev, cv = np.linalg.eigh(Fvv)
+    return eo, ev, co, cv
+
+def find_NO(suhf, dm, na, nb, i=0, a=0):
+    cut_no = suhf.cut_no
+    #dm = dm*(-1)
+    #np.set_printoptions(precision=16, linewidth=200, suppress=False)
+    #print(dm)
+    ev_a, v_a = eig(dm[0]*(-1))
+    ev_b, v_b = eig(dm[1]*(-1))
+    pa = count0(ev_a)
+    pb = count0(ev_b)
+    if suhf.debug:
+        print('NO eigenvalue')
+        print(ev_a, '\n', ev_b)
+    v_a1 = v_a[:,:na]
+    v_a2 = v_a[:,na:]
+    v_b1 = v_b[:,:nb]
+    v_b2 = v_b[:,nb:]
+    #print(v_a1, v_a2, v_b1, v_b2)
+    v_a1 = np.vstack((v_a1, np.zeros(v_a1.shape)))
+    v_a2 = np.vstack((v_a2, np.zeros(v_a2.shape)))
+    v_b1 = np.vstack((np.zeros(v_b1.shape), v_b1))
+    v_b2 = np.vstack((np.zeros(v_b2.shape), v_b2))
+    #print(v_a1, v_a2, v_b1, v_b2)
+
+    v = np.hstack((v_a1, v_b1, v_a2, v_b2))
+    v_flip = copy.deepcopy(v)
+    v_flip[:,i] = v[:,a]
+    v_flip[:,a] = v[:,i]
+    if cut_no:
+        v = np.hstack((v_a1, v_b1, v_a2, v_b2))[:,:pa+pb]
+    #v = np.hstack((v, np.zeros((v.shape[0], v.shape[0]-pa-pb))))
+    if suhf.debug:
+        print('NO vec')
+        print(v_flip)
+    dm_expd = np.hstack(
+        (np.vstack((dm[0], np.zeros(dm[0].shape))), 
+        np.vstack((np.zeros(dm[1].shape), dm[1])))
+        )
+    #print(dm_expd)
+    dm_no = einsum('ji,jk,kl->il', v, dm_expd, v)
+    dm_no_flip = einsum('ji,jk,kl->il', v_flip, dm_expd, v_flip)
+    if suhf.debug:
+        print('dm(NO)')
+        print(dm_no_flip)
+    #np.set_printoptions(precision=6, linewidth=160, suppress=True)
+    return dm_no_flip, dm_expd, v_flip
+
+def get_xg(suhf, C_no, Dg, occ):
+    Cocc = C_no[:,:occ]
+    Mg = []
+    xg = []
+    for dg in Dg:
+        mg = einsum('ji,jk,kl->il', Cocc, dg, Cocc)
+        x = np.linalg.det(mg)
+        Mg.append(mg)
+        xg.append(x)
+    print(xg)
+
+    ciS = suhf.integr_beta(np.array(xg))
+    yg = xg / ciS
+    return xg, yg, ciS
+    
+
