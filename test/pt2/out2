@@ -32,7 +32,7 @@ System: uname_result(system='Linux', node='xn01', release='3.10.0-1127.el7.x86_6
 Python 3.7.4 (default, Aug 13 2019, 20:35:49) 
 [GCC 7.3.0]
 numpy 1.17.2  scipy 1.4.1
-Date: Tue Apr 27 00:56:00 2021
+Date: Tue Apr 27 17:29:14 2021
 PySCF version 1.7.6a1
 PySCF path  /share/home/srwang/pyscf/pyscf
 GIT HEAD      ref: refs/heads/master
@@ -55,7 +55,7 @@ number of NR pGTOs = 6
 number of NR cGTOs = 4
 basis = 3-21g
 ecp = {}
-CPU time:         1.05
+CPU time:         1.02
 
 
 ******** <class 'pyscf.scf.hf.RHF'> ********
@@ -71,8 +71,8 @@ SCF conv_tol_grad = None
 SCF max_cycles = 50
 direct_scf = True
 direct_scf_tol = 1e-13
-chkfile to save SCF result = /share/home/srwang/ExSCF/test/pt2/tmp59r36gmb
-max_memory 4000 MB (current use 107 MB)
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pt2/tmpybt4ukrs
+max_memory 4000 MB (current use 109 MB)
 Set gradient conv threshold to 0.00316228
 init E= -0.648815945420394
   HOMO = -0.244674774926751  LUMO = -0.0864459286574333
@@ -99,8 +99,8 @@ SCF conv_tol_grad = None
 SCF max_cycles = 5
 direct_scf = True
 direct_scf_tol = 1e-13
-chkfile to save SCF result = /share/home/srwang/ExSCF/test/pt2/tmpz27ve7kc
-max_memory 4000 MB (current use 114 MB)
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/pt2/tmpxpakwmtz
+max_memory 4000 MB (current use 120 MB)
 number electrons alpha = 1  beta = 1
 Set gradient conv threshold to 0.0316228
 init E= -1.69135654891561
@@ -120,13 +120,13 @@ cycle= 4 E= -0.997011162805863  delta_E= -2.87e-05  |g|= 0.000416  |ddm|= 0.0099
   beta  nocc = 1  HOMO = -0.494276181731493  LUMO = 0.120063979310052
 Extra cycle  E= -0.997011395695946  delta_E= -2.33e-07  |g|= 0.000167  |ddm|= 0.000476
 converged SCF energy = -0.997011395695946  <S^2> = 0.9101768  2S+1 = 2.1542301
-time for guess: 0.073
+time for guess: 0.071
 
 ******** <class 'pyphf.util.SUHF'> ********
 max_cycle = 15
 verbose: 6, debug
-chkfile0: 26109_ges.pchk # the file store hf for guess
-chkfile: 26109_su.pchk # the file store suhf info
+chkfile0: 13044_ges.pchk # the file store hf for guess
+chkfile: 13044_su.pchk # the file store suhf info
 conv_tol: 1e-07
 DIIS: <class 'pyscf.scf.diis.CDIIS'>
 diis_start_cyc = 10
@@ -176,7 +176,7 @@ hcore (ortho)
  [ 8.50105048e-17 -6.58935537e-01  4.05701508e-16  1.96745347e-01]
  [ 1.03744072e-01  4.21576640e-16  3.06545630e-01 -2.77570797e-16]
  [ 9.15077779e-17  1.96745347e-01 -1.99832916e-16  3.76082787e-01]]
-time for Preparation before cyc: 0.095
+time for Preparation before cyc: 0.096
 **** Start Cycle 1 ****
 dm (ortho)
 [[[ 0.6429814809 -0.4657323478 -0.0664680374  0.0907285861]
@@ -682,7 +682,7 @@ P_a, P_b
  [ 0.4687840933  0.3456028851 -0.0511949455 -0.0614986372]
  [-0.0694420595 -0.0511949455  0.0075836243  0.0091099337]
  [-0.0834182355 -0.0614986372  0.0091099337  0.010943434 ]]
-time for xg, H, S2, Yg, Feff: 0.021
+time for xg, H, S2, Yg, Feff: 0.020
  E =     -1.00993727, delta E = -3.41911e-05, MaxD(dm) = 0.00085563, RMSD(dm) = 0.000396604
 **** Start Cycle 4 ****
 dm (ortho)
@@ -1875,7 +1875,7 @@ P_a, P_b
  [ 0.4688681924  0.3455998295 -0.0510637558 -0.0609565285]
  [-0.069277149  -0.0510637558  0.007544874   0.0090065707]
  [-0.0826984706 -0.0609565285  0.0090065707  0.0107514473]]
-time for xg, H, S2, Yg, Feff: 0.022
+time for xg, H, S2, Yg, Feff: 0.021
  E =     -1.00994490, delta E =  -5.14e-10, MaxD(dm) = 3.67062e-06, RMSD(dm) = 1.71078e-06
 **** Start Cycle 11 ****
 dm (ortho)
@@ -2054,7 +2054,7 @@ P_a, P_b
  [ 0.4688686006  0.3455999823 -0.0510632441 -0.0609542043]
  [-0.0692764845 -0.0510632441  0.0075447194  0.009006133 ]
  [-0.0826953528 -0.0609542043  0.009006133   0.0107506227]]
-time for xg, H, S2, Yg, Feff: 0.022
+time for xg, H, S2, Yg, Feff: 0.021
  E =     -1.00994490, delta E = -1.08415e-10, MaxD(dm) = 3.11782e-06, RMSD(dm) =  1.453e-06
 **** Start Cycle 12 ****
 dm (ortho)
@@ -2257,7 +2257,7 @@ mo_reg
  [-0.0554777899 -0.9047664758  0.0668003056  1.0393364815]
  [-0.3732717745  0.0827862706  1.2513972121  0.1959491265]
  [-0.7026082992  0.2059771904 -1.119703327  -0.3413827732]]
-time for cyc: 0.668
+time for cyc: 0.664
 ******* suhf density *****
 time for Ngg: 0.002
 time for Pgg: 0.004
@@ -2296,7 +2296,7 @@ SUHF NO occ beta:   0.765393  0.234607  ...
 SUHF NO occ total:  1.530786  0.469214  ...
 core 0, active 2, external 2
 time for natorb: 0.002
-time tot: 0.781
+time tot: 0.777
 F0 (array([[-0.236126,  0.329186,  0.217224,  0.027923],
        [ 0.329186,  0.009899,  0.079134,  0.338558],
        [ 0.217224,  0.079134,  1.122656,  0.051251],
@@ -2318,6 +2318,13 @@ ca,cb [[ 1.        0.        0.        0.      ]
  [ 0.        0.961874 -0.090421 -0.258114]
  [ 0.        0.051464 -0.867066  0.495528]
  [ 0.       -0.268608 -0.489919 -0.829355]]
+ca,cb (sc) [[ 1.        0.        0.        0.      ]
+ [ 0.        0.961874 -0.051464 -0.268608]
+ [ 0.       -0.090421  0.867066 -0.489919]
+ [ 0.        0.258114  0.495528  0.829355]] [[ 1.        0.        0.        0.      ]
+ [ 0.        0.961874  0.051464 -0.268608]
+ [ 0.       -0.090421 -0.867066 -0.489919]
+ [ 0.       -0.258114  0.495528 -0.829355]]
 [-0.236126 -0.088879  1.085445  1.249653] [-0.236126 -0.088879  1.085445  1.249653]
 (array([[-0.236126,  0.297956,  0.144902,  0.215766],
        [ 0.297956, -0.088879, -0.      , -0.      ],
@@ -2361,3 +2368,5 @@ detNg [ 1.000893  1.023751  1.138451  1.488923  2.433599  4.898252  9.457099 11.
 xg [0.999108 0.9768   0.878386 0.671627 0.410914 0.204154 0.105741 0.083433]
 ciS 1.0825405950685425
 [0.9991078688282827, 0.9767999215870778, 0.8783861404846081, 0.6716265647161074, 0.4109140303524377, 0.20415445458393702, 0.10574067348146726, 0.08343272624026243]
+(3, 3)
+emp2 -0.0006084771859948112

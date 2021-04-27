@@ -6,7 +6,7 @@ Tsuchimochi, T.; Ten-no, S. L. J Chem Theory Comput 2019, 15, 6688–6702
 import numpy as np
 #import sympy as sym
 #import scipy
-from pyscf import gto, scf, mp
+from pyscf import gto, scf, mp, lib
 from pyphf import util, util2
 from pyphf.util import count0, eig
 #import os, sys
@@ -133,18 +133,22 @@ class EMP2():
         ca = util2.stack22(cao, np.zeros((na, nvira)), np.zeros((nvira, na)), cav)
         cb = util2.stack22(cbo, np.zeros((nb, nvirb)), np.zeros((nvirb, nb)), cbv)
         print('ca,cb', ca, cb)
-        #ca = einsum('ij,jk->ik', mo_ortho[0], ca)
-        #cb = einsum('ij,jk->ik', mo_ortho[1], cb)
-        #pa = einsum('ij,kj->ik', ca[:,:na], ca[:,:na])
-        #pb = einsum('ij,kj->ik', cb[:,:nb], cb[:,:nb])
-        #print(ca, cb)
+        #ca_sc = einsum('ij,kj->ik', mo_ortho[0], ca)
+        #cb_sc = einsum('ij,kj->ik', mo_ortho[1], cb)
+        ca_sc = ca.T
+        cb_sc = cb.T
+        #pa_sc = einsum('ij,kj->ik', ca_sc[:,:na], ca_sc[:,:na])
+        #pb_sc = einsum('ij,kj->ik', cb_sc[:,:nb], cb_sc[:,:nb])
+        print('ca,cb (sc)', ca_sc, cb_sc)
         ea = np.concatenate((eao, eav))
         eb = np.concatenate((ebo, ebv))
         print(ea,eb)
-        #F0 = defm_Fock(self.mol, suhf.hcore_ortho, [pa, pb], suhf.X)
         Fsc = (einsum('ji,jk,kl->il', ca, F0[0], ca), 
               einsum('ji,jk,kl->il', cb, F0[1], cb))
         print(Fsc)
+        #Fsc2 = defm_Fock(self.mol, suhf.hcore_ortho, [pa_sc, pb_sc], suhf.X)
+        #print(Fsc2)
+
         #print(e0)
         #for i in range(self.occ):
         #    for a in range(self.occ, self.norb):
@@ -157,23 +161,51 @@ class EMP2():
 
         xg, yg, ciS = get_xg(suhf, C_no, Dg, na+nb)
         #get_Mg2(suhf, Dg, na+nb)
-        mo = suhf.mo_ortho
-        '''
-        eris = mp.ao2mo(mo)
+        #mo = suhf.mo_ortho
+        ca_sc_ao = einsum('ij,jk,kl->il', suhf.X, mo_ortho[0], ca_sc)
+        cb_sc_ao = einsum('ij,jk,kl->il', suhf.X, mo_ortho[1], cb_sc)
+        eris = self.ao2mo([ca_sc_ao, cb_sc_ao])
         emp2 = 0.0
         
+        eia_a = ea[:na,None] - ea[None,na:]
+        eia_b = eb[:nb,None] - eb[None,nb:]
         for i in range(na):
-            eris_ovov = eris.ovov[i]
-    
+            if eris.ovov.ndim == 4:
+                eris_ovov = eris.ovov[i]
+            else:
+                eris_ovov = np.asarray(eris.ovov[i*nvira:(i+1)*nvira])
+            print(eris_ovov.shape)    
             eris_ovov = eris_ovov.reshape(nvira,na,nvira).transpose(1,0,2)
             t2i = eris_ovov.conj()/lib.direct_sum('a+jb->jab', eia_a[i], eia_a)
-            emp2 += numpy.einsum('jab,jab', t2i, eris_ovov) * .5
-            emp2 -= numpy.einsum('jab,jba', t2i, eris_ovov) * .5
-        '''
+            emp2 += einsum('jab,jab', t2i, eris_ovov) * .5
+            emp2 -= einsum('jab,jba', t2i, eris_ovov) * .5
+
+            if eris.ovOV.ndim == 4:
+                eris_ovov = eris.ovOV[i]
+            else:
+                eris_ovov = np.asarray(eris.ovOV[i*nvira:(i+1)*nvira])
+            eris_ovov = eris_ovov.reshape(nvira,nb,nvirb).transpose(1,0,2)
+            t2i = eris_ovov.conj()/lib.direct_sum('a+jb->jab', eia_a[i], eia_b)
+            emp2 += einsum('JaB,JaB', t2i, eris_ovov)
+        for i in range(nb):
+            if eris.OVOV.ndim == 4:
+                eris_ovov = eris.OVOV[i]
+            else:
+                eris_ovov = np.asarray(eris.OVOV[i*nvirb:(i+1)*nvirb])
+            eris_ovov = eris_ovov.reshape(nvirb,nb,nvirb).transpose(1,0,2)
+            t2i = eris_ovov.conj()/lib.direct_sum('a+jb->jab', eia_b[i], eia_b)
+            emp2 += einsum('jab,jab', t2i, eris_ovov) * .5
+            emp2 -= einsum('jab,jba', t2i, eris_ovov) * .5
+        print('emp2', emp2)
+        
+    def ao2mo(self, mo):
+        fakemp = mp.UMP2(self.suhf.guesshf, mo_coeff=mo, mo_occ=self.suhf.guesshf.mo_occ)
+        return fakemp.ao2mo()
+
 
 def Diag_F(F, occ, norb):
     Foo = F[:occ, :occ]
-    Fvv = F[occ:norb, occ:norb]
+    Fvv = F[occ:, occ:]
     eo, co = np.linalg.eigh(Foo)
     ev, cv = np.linalg.eigh(Fvv)
     return eo, ev, co, cv

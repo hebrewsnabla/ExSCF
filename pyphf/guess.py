@@ -111,8 +111,8 @@ def mix(xyz, bas, charge=0, conv='loose', cycle=5, skipstb=False):
     elif conv == 'tight':
         mf_mix.max_cycle = 100
     mf_mix.kernel(dm0=dm_mix)
-    if not mf_mix.converged:
-        raise ValueError('UHF not converged')
+    if not mf_mix.converged and conv == 'tight':
+        raise RuntimeError('UHF not converged')
     ss, s = mf_mix.spin_square()
     if s < 0.1:
         print('Warning: S too small, symmetry breaking may be failed')
