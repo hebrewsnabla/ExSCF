@@ -1,7 +1,7 @@
 from pyphf import util, util2
 from pyscf import dft
-#import pyscf.dft.numint as numint
-from pyphf import numint
+import pyscf.dft.numint as numint
+#from pyphf import numint
 
 import numpy as np
 from functools import partial
@@ -73,7 +73,7 @@ class SUDFT():
         print('\n******** %s ********' % self.__class__)
         self.suhf = suhf
         self.suxc = 'tpss'
-        self.grids = 'fine'
+        self.grids = 'default'
         self.output = None
         self.dens = 'deformed' # or relaxed
         self.trunc = None
@@ -99,6 +99,10 @@ class SUDFT():
         ks = dft.UKS(self.suhf.mol)
         if self.grids[:5] == 'ultra':
             ks.grids.atom_grid = (99, 590)
+        elif self.grids[:4] == 'fine':
+            ks.grids.atom_grid = (75, 302)
+        ks.grids.build()
+        print('grids: ', ks.grids.atom_grid, '\n', ks.grids.coords.shape)
         ni = numint.NumInt()
         if self.trunc is None:
             if self.suxc == 'CS':
@@ -253,7 +257,10 @@ def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, dmref2=None,
                     rho2 = make_rho2(idm, ao, mask, xctype)
                 exc, vxc = ni.eval_xc(xc_code, (rho_a, rho_b), spin=1,
                                       relativity=relativity, deriv=1,
-                                      verbose=verbose, special=special)[:2]
+                                      verbose=verbose)[:2]
+                #exc, vxc = ni.eval_xc(xc_code, (rho_a, rho_b), spin=1,
+                #                      relativity=relativity, deriv=1,
+                #                      verbose=verbose, special=special)[:2]
                 vrho, vsigma, vlapl, vtau = vxc[:4]
                 den_a = rho_a[0]*weight
                 nelec[0,idm] += den_a.sum()
