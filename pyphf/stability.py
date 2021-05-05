@@ -10,7 +10,7 @@ from pyscf.scf.stability import _rotate_mo
 
 def uhf_internal(mf, with_symmetry=True, verbose=None):
     log = logger.new_logger(mf, verbose)
-    log.note('checking UHF/UKS internal stability ...')
+    log.note('**** checking UHF/UKS internal stability ...')
     g, hop, hdiag = newton_ah.gen_g_hop_uhf(mf, mf.mo_coeff, mf.mo_occ,
                                             with_symmetry=with_symmetry)
     hdiag *= 2

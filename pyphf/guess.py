@@ -98,13 +98,16 @@ def mix(xyz, bas, charge=0, conv='loose', cycle=5, skipstb=False):
     t1 = time.time() 
     mf = scf.RHF(mol)
     mf.conv_tol = 1e-5
+    #mf.verbose = 4
     mf.kernel() # Guess by 1e is poor,
     #dm, mo_coeff, mo_energy, mo_occ = init_guess_by_1e(mf)
     #mf.init_guess_breaksym = True
     #mo = (mf.mo_coeff, mf.mo_coeff)
     #occ = (mf.mo_occ, mf.mo_occ)
+    print('**** generating mix guess ****')
     dm_mix = init_guess_mixed(mf.mo_coeff, mf.mo_occ)
     mf_mix = scf.UHF(mol)
+    #mf_mix.verbose = 4
     if conv == 'loose':
         mf_mix.conv_tol = 1e-3
         mf_mix.max_cycle = cycle
@@ -142,10 +145,11 @@ def check_stab(mf_mix):
         raise RuntimeError('Stablility Opt failed after %d attempts.' % cyc)
 
 
-def from_frag(xyz, bas, frags, chgs, spins, cycle=2, xc=None):
+def from_frag(xyz, bas, frags, chgs, spins, cycle=2, xc=None, verbose=4):
     mol = gto.Mole()
     mol.atom = xyz
     mol.basis = bas
+    mol.verbose = 4
     mol.build()
     
     t1 = time.time() 
@@ -155,7 +159,7 @@ def from_frag(xyz, bas, frags, chgs, spins, cycle=2, xc=None):
     else:
         mf = dft.UKS(mol)
         mf.xc = xc
-    mf.verbose = 4
+    mf.verbose = verbose
     #mf.conv_tol = 1e-2
     mf.max_cycle = cycle
     mf.kernel(dm0 = dm)
@@ -172,7 +176,7 @@ def guess_frag(mol, frags, chgs, spins):
     frags: e.g. [[0], [1]] for N2
     '''
     #mol.build()
-    print('generating fragment guess')
+    print('**** generating fragment guess ****')
     atom = mol.format_atom(mol.atom, unit=1)
     #print(atom)
     fraga, fragb = frags
@@ -268,6 +272,8 @@ def init_guess_mixed(mo_coeff, mo_occ, mixing_parameter=np.pi/4):
 
     #mix homo and lumo of alpha and beta coefficients
     q=mixing_parameter
+    angle = q / np.pi
+    print('rotating angle: %.2f pi' % angle)
 
     Ca[:,homo_idx] = np.cos(q)*psi_homo + np.sin(q)*psi_lumo
     Cb[:,homo_idx] = np.cos(q)*psi_homo - np.sin(q)*psi_lumo
