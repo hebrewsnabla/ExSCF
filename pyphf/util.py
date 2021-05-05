@@ -4,6 +4,7 @@ import scipy
 from pyscf import gto, scf
 from pyscf.scf import chkfile
 from pyscf.lib import temporary_env
+#from pyscf.lib.misc import repo_info
 from pyphf import sudm, util2
 import os, sys
 from functools import partial
@@ -537,8 +538,14 @@ class SUHF():
 
         self.E_suhf = None
 
-    def build(self):
-        print('\n******** %s ********' % self.__class__)
+    def dump_flags(self):
+        print('Date: %s' % time.ctime())
+        import pyphf
+        print('pyphf version %s' % pyphf.__version__)
+        info = util2.repo_info(os.path.join(__file__, '..', '..'))
+        print('pyphf path  %s' % info['path'])
+        if 'git' in info:
+            print(info['git'] )
         print('max_cycle = %d' % self.max_cycle)
         self.debug = False
         self.debug2 = False
@@ -551,6 +558,14 @@ class SUHF():
             self.debug = True
             self.debug2 = True
             print('verbose: %d, debug2' % self.verbose)
+        print('conv_tol: %g' % self.conv_tol)
+        if self.conv_tol > 1e-5:
+            print('Warning: conv_tol too large')
+
+
+    def build(self):
+        print('\n******** %s ********' % self.__class__)
+        self.dump_flags()
         if self.output is None:
             self.output = str(os.getpid())
         if self.guesshf is not None:
@@ -575,9 +590,6 @@ class SUHF():
         print('chkfile: %s # the file store suhf info' % self.chkfile)
         #self.chkfile2 = self.output + '_no.pchk'
         #print('chkfile2: %s # the file store suhf NO' % self.chkfile2)
-        print('conv_tol: %g' % self.conv_tol)
-        if self.conv_tol > 1e-5:
-            print('Warning: conv_tol too large')
 
         if self.diis_on:
             #assert issubclass(mf.DIIS, lib.diis.DIIS)
@@ -599,26 +611,20 @@ class SUHF():
         #    sys.stdout = open(self.output, 'a')
         S = scf.hf.get_ovlp(self.mol)
         Ca, Cb = self.guesshf.mo_coeff
-        #S_sqrt = scipy.linalg.sqrtm(S)
         if self.debug:
             print('S')
             print(S)
         #Se, Svec = scipy.linalg.eigh(S)
         #Se_msq = Se.real**(-0.5)
-        #print(Se_msq)
         #S_msq2 = einsum('ji,j,jk->ik',Svec,Se_msq, Svec)
         #S_msq = scipy.linalg.fractional_matrix_power(S, -0.5)
         
         Su, Ss, Sv = scipy.linalg.svd(S)
-        #print('SVD')
-        #print(Su,Ss,Sv)
         X = einsum('ij,j->ij', Su, Ss**(-0.5))
-        #Xd = einsum('i,ij->ij', Ss**(-0.5), Sv)
         if self.debug:
             print('SVD: S^(-1/2)')
             print(X)
         self.X = X
-        #print(Xd)
         XS = np.dot(X.T,S)
         if self.debug:
             print('S^(1/2)')

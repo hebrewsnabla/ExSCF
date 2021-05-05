@@ -99,3 +99,59 @@ def load(pchk):
 
 def dump_chk(mol, chkfile, moe, mo, dm):
     return 0
+
+def repo_info(repo_path):
+    '''
+    pyscf-2.0 lib/misc.py
+    Repo location, version, git branch and commit ID
+    '''
+
+    def git_version(orig_head, head, branch):
+        git_version = []
+        if orig_head:
+            git_version.append('GIT ORIG_HEAD %s' % orig_head)
+        if branch:
+            git_version.append('GIT HEAD (branch %s) %s' % (branch, head))
+        elif head:
+            git_version.append('GIT HEAD      %s' % head)
+        return '\n'.join(git_version)
+
+    repo_path = os.path.abspath(repo_path)
+
+    if os.path.isdir(os.path.join(repo_path, '.git')):
+        git_str = git_version(*git_info(repo_path))
+
+    elif os.path.isdir(os.path.abspath(os.path.join(repo_path, '..', '.git'))):
+        repo_path = os.path.abspath(os.path.join(repo_path, '..'))
+        git_str = git_version(*git_info(repo_path))
+
+    else:
+        git_str = None
+
+    info = {'path': repo_path}
+    if git_str:
+        info['git'] = git_str
+    return info
+
+def git_info(repo_path):
+    orig_head = None
+    head = None
+    branch = None
+    try:
+        with open(os.path.join(repo_path, '.git', 'ORIG_HEAD'), 'r') as f:
+            orig_head = f.read().strip()
+    except IOError:
+        pass
+
+    try:
+        head = os.path.join(repo_path, '.git', 'HEAD')
+        with open(head, 'r') as f:
+            head = f.read().splitlines()[0].strip()
+
+        if head.startswith('ref:'):
+            branch = os.path.basename(head)
+            with open(os.path.join(repo_path, '.git', head.split(' ')[1]), 'r') as f:
+                head = f.read().strip()
+    except IOError:
+        pass
+    return orig_head, head, branch
