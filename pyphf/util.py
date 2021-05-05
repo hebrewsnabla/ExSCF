@@ -539,6 +539,7 @@ class SUHF():
         self.E_suhf = None
 
     def dump_flags(self):
+        print('\n******** %s ********' % self.__class__)
         print('Date: %s' % time.ctime())
         import pyphf
         print('pyphf version %s' % pyphf.__version__)
@@ -564,7 +565,6 @@ class SUHF():
 
 
     def build(self):
-        print('\n******** %s ********' % self.__class__)
         self.dump_flags()
         if self.output is None:
             self.output = str(os.getpid())
@@ -883,6 +883,7 @@ class SUHF():
 
         t_end = time.time()
         print('time tot: %.3f' % (t_end-t_start))
+        print('Date: %s' % time.ctime())
         return E_suhf, self.conv
 
     def get_JKg(self):
