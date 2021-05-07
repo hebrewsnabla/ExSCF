@@ -1,4 +1,4 @@
-from pyphf import util, util2
+from pyphf import util, util2, sudm
 from pyscf import dft
 import pyscf.dft.numint as numint
 #from pyphf import numint
@@ -10,7 +10,7 @@ import time
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
-
+'''
 class CASDFT():
     def __init__(self, suhf):
         #suhf = util.SUHF(guesshf)
@@ -66,6 +66,7 @@ class CASDFT():
         t2 = time.time()
         print('time for DFT: %.3f' % (t2-t1))
         return exc, E_mcdft
+'''
 
 class SUDFT():
     def __init__(self, suhf):
@@ -77,6 +78,7 @@ class SUDFT():
         self.output = None
         self.dens = 'deformed' # or relaxed
         self.trunc = None
+        self.nref = None
 
     def kernel(self):
         if self.suhf.E_suhf is None:
@@ -118,7 +120,12 @@ class SUDFT():
             natocc = self.suhf.natocc[2]
             #natocc = natocc[0] + natocc[1]
             #print('natocc', natocc)
-            ref = [2.0 if occ > 1e-2 else 0.0 for occ in natocc]
+            if self.nref is None:
+                ref = [2.0 if occ > 1e-2 else 0.0 for occ in natocc]
+            else:
+                nref = self.nref
+                nmo = len(natocc)
+                ref = [2.0 if i < nref else 0.0 for i in range(nmo)]
             refdump, [refc, refa, refe] = util2.dump_occ(ref, 2.0)
             print('ref: ', refdump)
             ref = np.array(ref)
@@ -132,6 +139,22 @@ class SUDFT():
             else:
                 suxc = self.suxc
             n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, trunc='f', dmref=dm_ref, special=special)
+        elif self.trunc == 'fd':
+            # +fDFT with exact Garza style 
+            defm_no, defm_occ = sudm.natorb(self.suhf, dm)
+            no = defm_no[2]
+            nocc = defm_occ[2]
+            nref = self.nref
+            nmo = len(nocc)
+            #ref = [2.0 if occ > 1e-2 else 0.0 for occ in nocc]
+            ref = [2.0 if i < nref else 0.0 for i in range(nmo)]
+            refdump, [refc, refa, refe] = util2.dump_occ(ref, 2.0)
+            print('ref: ', refdump)
+            ref = np.array(ref)
+            dm_ref = einsum('ij,j,kj -> ik', no, ref, no)
+            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'% self.suxc, dm, trunc='f', dmref=dm_ref)
+
+
         if self.trunc == 'fc':
             core = [2.0 if occ > 1.99 else 0.0 for occ in natocc]
             print('core', core)
@@ -147,7 +170,7 @@ class SUDFT():
         print("E(SUHF) = %15.8f" % E_suhf)
         print("E_c(%s) = %15.8f" % (self.suxc.upper(), exc))
         print("E(SUHF+DFT) = %15.8f" % E_sudft)
-        if self.trunc == 'f' or self.trunc == 'fc':
+        if self.trunc[0] == 'f':
             E_sufdft = E_suhf + excf
             print("f E_c(%s) = %15.8f" % (self.suxc.upper(), excf))
             print("E(SUHF+fDFT) = %15.8f" % E_sufdft)

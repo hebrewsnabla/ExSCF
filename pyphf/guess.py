@@ -34,6 +34,7 @@ def from_fch_simp(fch, cycle=2):
     mf = scf.UHF(mol)
     #mf.init_guess = '1e'
     #mf.init_guess_breaksym = True
+    mf.verbose = 4
     mf.max_cycle = 1
     mf.kernel()
     
