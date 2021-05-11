@@ -79,6 +79,7 @@ class SUDFT():
         self.dens = 'deformed' # or relaxed
         self.trunc = None
         self.nref = None
+        self.ncore = None
 
     def kernel(self):
         if self.suhf.E_suhf is None:
@@ -97,6 +98,8 @@ class SUDFT():
             dm = self.suhf.dm_reg
         elif self.dens[:3] == 'rel':
             dm = self.suhf.suhf_dm
+        gamma = self.suhf.suhf_dm
+        gamma = gamma[0] + gamma[1]
 
         ks = dft.UKS(self.suhf.mol)
         if self.grids[:5] == 'ultra':
@@ -138,7 +141,7 @@ class SUDFT():
                 special=1
             else:
                 suxc = self.suxc
-            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, trunc='f', dmref=dm_ref, special=special)
+            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, trunc='f', gamma=gamma, dmref=dm_ref, special=special)
         elif self.trunc == 'fd':
             # +fDFT with exact Garza style 
             defm_no, defm_occ = sudm.natorb(self.suhf, dm)
@@ -156,14 +159,19 @@ class SUDFT():
 
 
         if self.trunc == 'fc':
-            core = [2.0 if occ > 1.99 else 0.0 for occ in natocc]
+            if self.ncore is None:
+                core = [2.0 if occ > 1.99 else 0.0 for occ in natocc]
+            else:
+                nmo = len(natocc)
+                core = [2.0 if i < self.ncore else 0.0 for i in range(nmo)]
             print('core', core)
             core = np.array(core)
             dm_core = einsum('ij,j,kj -> ik', natorb, core, natorb)
-            n1, exc1, core1 = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm_core, trunc='f', dmref=dm)
-            n2, exc2, core2 = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm_core, trunc='fc', dmref=dm_ref, dmref2=dm)
-            print('core1 %f, core2 %f' % (core1, core2))
-            dE_fc = core1 - core2
+            #n1, exc1, core1 = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm_core, trunc='f', dmref=dm)
+            n2, exc2, dE_fc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm_core, trunc='fc', gamma=gamma, dmref=dm_ref, dmcore=dm_core)
+            #print('core1 %f, core2 %f' % (core1, core2))
+            #dE_fc = core1 - core2
+            print('dE_fc: %f' % dE_fc)
             excfc = excf + dE_fc
 
         E_sudft = E_suhf + exc
@@ -183,7 +191,7 @@ class SUDFT():
         print('time for DFT: %.3f' % (t2-t1))
         return exc, E_sudft
 
-def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, dmref2=None,
+def get_exc(ni, mol, grids, xc_code, dms, trunc=None, gamma=None, dmref=None, dmcore=None,
             relativity=0, hermi=0, max_memory=2000, verbose=9, special=0):
     '''
     modified from pyscf.dft.numint.nr_uks
@@ -204,10 +212,12 @@ def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, dmref2=None,
     make_rhoa, nset = ni._gen_rho_evaluator(mol, dma, hermi)[:2]
     make_rhob       = ni._gen_rho_evaluator(mol, dmb, hermi)[0]
     make_rho_ref    = ni._gen_rho_evaluator(mol, dmref, hermi)[0]
+    make_gamma      = ni._gen_rho_evaluator(mol, gamma, hermi)[0]
     if trunc == 'fc':
-        make_rho2       = ni._gen_rho_evaluator(mol, dmref2, hermi)[0]
+        make_rho_core       = ni._gen_rho_evaluator(mol, dmcore, hermi)[0]
 
     nelec = np.zeros((2,nset))
+    nelec_g = np.zeros(nset)
     excsum = np.zeros(nset)
     excfsum = np.zeros(nset)
 #    vmat = np.zeros((2,nset,nao,nao), dtype=np.result_type(dma, dmb))
@@ -276,8 +286,9 @@ def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, dmref2=None,
                 rho_a = make_rhoa(idm, ao, mask, xctype)
                 rho_b = make_rhob(idm, ao, mask, xctype)
                 rho_ref = make_rho_ref(idm, ao, mask, xctype)
+                gamma = make_gamma(idm, ao, mask, xctype)
                 if trunc=='fc':
-                    rho2 = make_rho2(idm, ao, mask, xctype)
+                    rho_core = make_rho_core(idm, ao, mask, xctype)
                 exc, vxc = ni.eval_xc(xc_code, (rho_a, rho_b), spin=1,
                                       relativity=relativity, deriv=1,
                                       verbose=verbose)[:2]
@@ -294,12 +305,23 @@ def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, dmref2=None,
                 excsum[idm] += np.dot(den_b, exc)
                 rhoall = rho_a[0] + rho_b[0]
                 #print('f', f.shape)
-                if trunc == 'f':
-                    eta = get_eta(rho_ref[0], rhoall)
-                elif trunc == 'fc':
-                    eta = get_eta(rho_ref[0], rho2[0])
-                f = get_f(rhoall, eta)
+                #if trunc == 'f':
+                eta = get_eta(rho_ref[0], gamma[0])
+                print('rhoall', rhoall.min(), rhoall.max())
+                print('gamma', gamma[0].min(), gamma[0].max())
+                nelec_g[idm] += (gamma[0]*weight).sum()
+                print('eta', eta.min(), eta.max())
+                if trunc == 'fc':
+                    eta1 = get_eta(gamma[0], rho_core[0])
+                    print('eta1', eta1.min(), eta1.max())
+                    eta2 = get_eta(rho_ref[0], rho_core[0])
+                    print('eta2', eta2.min(), eta2.max())
+                #if trunc == 'f':
+                f = get_f(gamma[0], eta)
+                if trunc == 'fc':
+                    f = get_f(rho_core[0], eta1) - get_f(rho_core[0], eta2)
                 excfsum[idm] += einsum('i,i,i->', den_a+den_b, exc, f)
+                print('f', f.min(), f.max())
 
 #                wva, wvb = _uks_gga_wv0((rho_a,rho_b), vxc, weight)
 #                #:aow = np.einsum('npi,np->pi', ao[:4], wva, out=aow)
@@ -328,6 +350,7 @@ def get_exc(ni, mol, grids, xc_code, dms, trunc=None, dmref=None, dmref2=None,
 #        vmat = vmat[:,0]
         nelec = nelec.reshape(2)
         excsum = excsum[0]
+    print(nelec, nelec_g)
     if trunc is not None:
         return nelec, excsum , excfsum
     else:
@@ -338,7 +361,7 @@ def get_eta(rho1, rho2):
     eta = (rho1 / rho2)**(1.0/3)
     for i in range(len(rho2)):
         if rho2[i] < 1e-45:
-            rho2[i] = 1e-45
+            #rho2[i] = 1e-45
             eta[i] = 1.0
     return eta
 
@@ -354,9 +377,13 @@ def get_f(rho, eta):
     for m in range(6):
         for n in range(5):
             finv += b[m][n] * x**m * eta**n
-    for i in range(len(rho)):
-        if rho[i] < 1e-45:
-            #rho2[i] = 1e-45
-            finv[i] = 1.0
     f = finv**(-1)
+    for i in range(len(rho)):
+        #if rho[i] < 1e-45:
+        #    #rho2[i] = 1e-45
+        #    f[i] = 0.0
+        #if eta[i] > 5.0:
+        #    f[i] = 0.0
+        if f[i] > 1.0 or x[i] > 5.0:
+            f[i] = 1.0
     return f
