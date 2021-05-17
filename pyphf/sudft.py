@@ -10,63 +10,6 @@ import time
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
-'''
-class CASDFT():
-    def __init__(self, suhf):
-        #suhf = util.SUHF(guesshf)
-        self.mc = mc
-        self.mcxc = 'tpss'
-        self.output = None
-        #self.dens = 'deformed' # or relaxed
-        self.trunc = None
-
-    def kernel(self):
-        #if self.suhf.E_suhf is None:
-        #    self.suhf.kernel()
-        #if self.output is not None:
-        #    sys.stdout = open(self.output, 'a')
-        print('***** Start DFT Correlation for CAS+DFT **********')
-        #print('density: %s' % self.dens)
-        print('truncation: %s' % self.trunc)
-        t1 = time.time()
-        E_mc = self.mc.e_tot
-        dm = self.mc.make_rdm1()
-
-        ks = dft.UKS(self.suhf.mol)
-        ni = ks._numint
-        if self.trunc is None:
-            if self.mcxc == 'CS':
-                mcxc = 'MGGA_C_CS'
-                n, exc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%mcxc, dm)
-            else:
-                n, exc, vxc = ni.nr_uks(self.suhf.mol, ks.grids, 'HF,%s'%self.mcxc, dm)
-        elif self.trunc == 'f':
-            natorb = self.mc.natorb
-            natocc = self.mc.mo_occ
-            #natocc = natocc[0] + natocc[1]
-            print('natocc', natocc)
-            ref = [2.0 if occ > 1e-2 else 0.0 for occ in natocc]
-            print('ref', ref)
-            ref = np.array(ref)
-            dm_ref = einsum('ij,j,kj -> ik', natorb, ref, natorb)
-            if self.mcxc == 'CS':
-                mcxc = 'MGGA_C_CS'
-            else:
-                mcxc = self.mcxc
-            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%mcxc, dm, trunc='f', dmref=dm_ref)
-
-        E_mcdft = E_mc + exc
-        print("E(CAS) = %15.8f" % E_mc)
-        print("E_c(%s) = %15.8f" % (self.mcxc.upper(), exc))
-        print("E(CAS+DFT) = %15.8f" % E_mcdft)
-        if self.trunc == 'f':
-            E_mcfdft = E_mc + excf
-            print("f E_c(%s) = %15.8f" % (self.mcxc.upper(), excf))
-            print("E(CAS+fDFT) = %15.8f" % E_mcfdft)
-        t2 = time.time()
-        print('time for DFT: %.3f' % (t2-t1))
-        return exc, E_mcdft
-'''
 
 class SUDFT():
     def __init__(self, suhf):
@@ -90,6 +33,7 @@ class SUDFT():
         #    sys.stdout = open(self.output, 'a')
         print('***** Start DFT Correlation for SUHF+DFT **********')
         t1 = time.time()
+        mol = self.suhf.mol
         E_suhf = self.suhf.E_suhf
         #dm_ortho = self.suhf.dm_ortho
         #X = self.suhf.X
@@ -100,24 +44,18 @@ class SUDFT():
             dm = self.suhf.suhf_dm
         gamma = self.suhf.suhf_dm
         gamma = gamma[0] + gamma[1]
-
-        ks = dft.UKS(self.suhf.mol)
-        if self.grids[:5] == 'ultra':
-            ks.grids.atom_grid = (99, 590)
-        elif self.grids[:4] == 'fine':
-            ks.grids.atom_grid = (75, 302)
-        ks.grids.build()
-        print('grids: ', ks.grids.atom_grid, '\n', ks.grids.coords.shape)
+        
+        grids = set_grids(mol, self.grids)
         ni = numint.NumInt()
         if self.trunc is None:
             if self.suxc == 'CS':
                 suxc = 'MGGA_C_CS'
-                n, exc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm)
+                n, exc = get_exc(ni, mol, grids, 'HF,%s'%suxc, dm)
             elif self.suxc.upper() == 'TPSS_MOD':
                 suxc = 'TPSS'
-                n, exc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, special=1)
+                n, exc = get_exc(ni, mol, grids, 'HF,%s'%suxc, dm, special=1)
             else:
-                n, exc, vxc = ni.nr_uks(self.suhf.mol, ks.grids, 'HF,%s'%self.suxc, dm)
+                n, exc, vxc = ni.nr_uks(mol, grids, 'HF,%s'%self.suxc, dm)
         elif self.trunc == 'f' or self.trunc == 'fc':
             natorb = self.suhf.natorb[2]
             natocc = self.suhf.natocc[2]
@@ -141,7 +79,7 @@ class SUDFT():
                 special=1
             else:
                 suxc = self.suxc
-            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm, trunc='f', gamma=gamma, dmref=dm_ref, special=special)
+            n, exc, excf = get_exc(ni, mol, grids, 'HF,%s'%suxc, dm, trunc='f', gamma=gamma, dmref=dm_ref, special=special)
         elif self.trunc == 'fd':
             # +fDFT with exact Garza style 
             defm_no, defm_occ = sudm.natorb(self.suhf, dm)
@@ -155,7 +93,7 @@ class SUDFT():
             print('ref: ', refdump)
             ref = np.array(ref)
             dm_ref = einsum('ij,j,kj -> ik', no, ref, no)
-            n, exc, excf = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'% self.suxc, dm, trunc='f', dmref=dm_ref)
+            n, exc, excf = get_exc(ni, mol, grids, 'HF,%s'% self.suxc, dm, trunc='f', dmref=dm_ref)
 
 
         if self.trunc == 'fc':
@@ -168,7 +106,7 @@ class SUDFT():
             core = np.array(core)
             dm_core = einsum('ij,j,kj -> ik', natorb, core, natorb)
             #n1, exc1, core1 = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm_core, trunc='f', dmref=dm)
-            n2, exc2, dE_fc = get_exc(ni, self.suhf.mol, ks.grids, 'HF,%s'%suxc, dm_core, trunc='fc', gamma=gamma, dmref=dm_ref, dmcore=dm_core)
+            n2, exc2, dE_fc = get_exc(ni, mol, grids, 'HF,%s'%suxc, dm_core, trunc='fc', gamma=gamma, dmref=dm_ref, dmcore=dm_core)
             #print('core1 %f, core2 %f' % (core1, core2))
             #dE_fc = core1 - core2
             print('dE_fc: %f' % dE_fc)
@@ -190,6 +128,16 @@ class SUDFT():
         t2 = time.time()
         print('time for DFT: %.3f' % (t2-t1))
         return exc, E_sudft
+
+def set_grids(mol, self.grids):
+    ks = dft.UKS(mol)
+    if self.grids[:5] == 'ultra':
+        ks.grids.atom_grid = (99, 590)
+    elif self.grids[:4] == 'fine':
+        ks.grids.atom_grid = (75, 302)
+    ks.grids.build()
+    print('grids: ', ks.grids.atom_grid, '\n', ks.grids.coords.shape)
+    return ks.grids
 
 def get_exc(ni, mol, grids, xc_code, dms, trunc=None, gamma=None, dmref=None, dmcore=None,
             relativity=0, hermi=0, max_memory=2000, verbose=9, special=0):
