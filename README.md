@@ -1,14 +1,14 @@
 # ExSCF
 ## Pre-requisites
 * sympy
-* PySCF
+* PySCF (1.7.6 recommended)
 * libxc
 * [MOKIT](https://gitlab.com/jxzou/mokit) (optional)
 
 ## Installation
 * git clone
 * add `/path/to/ExSCF` to your `PYTHONPATH`
-* build(optional, only if you need modified DFT functional)
+* build(deprecated, only if you need modified DFT functional)
 ```
 cd ExSCF/pyphf
 cmake . -DCMAKE_INSTALL_PREFIX:PATH=$HOME/pyscf_deps # the directory above libxc's lib

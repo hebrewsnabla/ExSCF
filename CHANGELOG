@@ -1,11 +1,15 @@
-version 0.3.1 (May 07, 2021)
+version 0.3.2 (May 17, 2021)
 --------------------------
 * DFT
-  + subdirectory dft, copied from pyscf.dft and pyscf.lib.dft
-  + modified TPSS
+  + Cremer's CAS+fDFT, CAS-DFT2
+
+version 0.3.1 (May 11, 2021)
+--------------------------
+* DFT
+  + subdirectory dft, copied from pyscf.dft and pyscf.lib.dft, to modify TPSS (deprecated)
   + fine/ultrafine grid
   + trunc='fd': eta = (rho_ref / gamma)**(1/3)
-  + set nref = number of core+active orbitals
+  + introduce nref, ncore
   + fcDFT made right
 * EMP2 draft
 * fix bug in tofch

@@ -37,7 +37,7 @@ class CASDFT():
         dm = self.mc.make_rdm1()
 
         grids = sudft.set_grids(mol, self.grids)
-        ni = ks._numint
+        ni = numint.NumInt()
         if self.trunc is None:
             if self.mcxc == 'CS':
                 mcxc = 'MGGA_C_CS'

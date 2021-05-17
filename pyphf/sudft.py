@@ -129,11 +129,11 @@ class SUDFT():
         print('time for DFT: %.3f' % (t2-t1))
         return exc, E_sudft
 
-def set_grids(mol, self.grids):
+def set_grids(mol, grids):
     ks = dft.UKS(mol)
-    if self.grids[:5] == 'ultra':
+    if grids[:5] == 'ultra':
         ks.grids.atom_grid = (99, 590)
-    elif self.grids[:4] == 'fine':
+    elif grids[:4] == 'fine':
         ks.grids.atom_grid = (75, 302)
     ks.grids.build()
     print('grids: ', ks.grids.atom_grid, '\n', ks.grids.coords.shape)
