@@ -11,9 +11,9 @@ def cas(mf, crazywfn=False, max_memory=2000):
     # transform UHF canonical orbitals to UNO
     na = np.sum(mf.mo_occ[0]==1)
     nb = np.sum(mf.mo_occ[1]==1)
-    idx, noon, alpha_coeff = uno(nbf,nif,na,nb, mf.mo_coeff[0], mf.mo_coeff[1], S)
+    idx, noon, alpha_coeff = uno(nbf,nif,na,nb, mf.mo_coeff[0], mf.mo_coeff[1], S, 0.98)
     alpha_coeff = construct_vir(nbf, nif, idx[1], alpha_coeff, S)
-    print(alpha_coeff.shape)
+    #print(alpha_coeff.shape)
     mf = mf.to_rhf()
     mf.mo_coeff = alpha_coeff
     # done transform
