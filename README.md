@@ -16,16 +16,22 @@ make xc_itrf_mod
 ```
 
 ## Features
+Theoretial features:
 * SUHF
+  + energy
+  + density, natural orbital
 * SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
-* guess: 
+* automatic CAS: UHF -> UNO -> CASSCF
+* CAS+*f*DFT, CAS-DFT2
+
+Technical features:
+* guess
   + mix (`guess.mix`)
   + fragment (`guess.from_frag`)
-  + stablize (`guess.check_stab`)
+  + stablize UHF (`guess.check_stab`)
 * converging strategy
   + DIIS (`diis_on = True`)
   + `level_shift = ` (in a.u.)
-* SUHF relaxed density, natural orbitals
 * interface (require MOKIT)
   + read guess MO from fch (`guess.from_fch_simp`)
   + dump MO, NO to fch (`tofch = True`)
@@ -34,3 +40,4 @@ make xc_itrf_mod
 * SU-PDFT
 * SUPT2
 * TD-SUHF
+* SUHF gradient
