@@ -3,7 +3,7 @@
 * sympy
 * PySCF (1.7.6 recommended)
 * libxc
-* [MOKIT](https://gitlab.com/jxzou/mokit) (optional)
+* [MOKIT](https://gitlab.com/jxzou/mokit) (optional, for read/write fch and auto CAS calculation)
 
 ## Installation
 * git clone
