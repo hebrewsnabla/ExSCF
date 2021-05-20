@@ -4,7 +4,8 @@ from pyscf import lib
 import numpy as np
 import sys, os, contextlib
 
-from pyphf import util, casdft, guess, autocas
+from pyphf import util, casdft, guess
+from pyAutoMR import autocas
 
 #xyz = 'h2.xyz' #sys.argv[1]
 #fch = 'test_uhf.fchk' #sys.argv[2]

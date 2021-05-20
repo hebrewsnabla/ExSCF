@@ -7,7 +7,8 @@ from pyscf import lib
 import numpy as np
 import sys, os, contextlib
 
-from pyphf import util, casdft, guess, autocas
+from pyphf import util, casdft, guess
+from pyAutoMR import autocas
 
 #xyz = 'h2.xyz' #sys.argv[1]
 #fch = 'test_uhf.fchk' #sys.argv[2]
@@ -51,7 +52,7 @@ System: uname_result(system='Linux', node='xn01', release='3.10.0-1127.el7.x86_6
 Python 3.7.4 (default, Aug 13 2019, 20:35:49) 
 [GCC 7.3.0]
 numpy 1.17.2  scipy 1.4.1
-Date: Wed May 19 15:29:08 2021
+Date: Thu May 20 22:15:09 2021
 PySCF version 1.7.6a1
 PySCF path  /share/home/srwang/pyscf/pyscf
 GIT HEAD      ref: refs/heads/master
@@ -74,7 +75,7 @@ number of NR pGTOs = 84
 number of NR cGTOs = 60
 basis = cc-pvtz
 ecp = {}
-CPU time:         1.28
+CPU time:         1.35
 **** generating fragment guess ****
 fragments: [('N', [0.0, 0.0, 0.0])] [('N', [0.0, 0.0, 2.0])]
 converged SCF energy = -54.4006862065109  <S^2> = 3.7560899  2S+1 = 4.0030438
@@ -97,69 +98,67 @@ SCF conv_tol_grad = None
 SCF max_cycles = 50
 direct_scf = True
 direct_scf_tol = 1e-13
-chkfile to save SCF result = /share/home/srwang/ExSCF/test/dft/tmp19r_r1dc
-max_memory 4000 MB (current use 120 MB)
+chkfile to save SCF result = /share/home/srwang/ExSCF/test/dft/tmp91st4m8u
+max_memory 4000 MB (current use 122 MB)
 number electrons alpha = 7  beta = 7
 Set gradient conv threshold to 3.16228e-05
 init E= -108.888411705218
-  alpha nocc = 7  HOMO = -0.499803534259008  LUMO = 0.143320556821606
-  beta  nocc = 7  HOMO = -0.49980353425902  LUMO = 0.143320556821606
+  alpha nocc = 7  HOMO = -0.499803534259008  LUMO = 0.143320556821602
+  beta  nocc = 7  HOMO = -0.499803534259026  LUMO = 0.143320556821605
 cycle= 1 E= -108.785584426576  delta_E= 0.103  |g|= 0.0409  |ddm|= 0.258
-  alpha nocc = 7  HOMO = -0.541287915654487  LUMO = 0.141738465759094
-  beta  nocc = 7  HOMO = -0.541287915654493  LUMO = 0.141738465759094
+  alpha nocc = 7  HOMO = -0.541287915654488  LUMO = 0.141738465759094
+  beta  nocc = 7  HOMO = -0.541287915654496  LUMO = 0.141738465759091
 cycle= 2 E= -108.787610829853  delta_E= -0.00203  |g|= 0.0192  |ddm|= 0.0346
-  alpha nocc = 7  HOMO = -0.540081244424322  LUMO = 0.139877392679522
-  beta  nocc = 7  HOMO = -0.540081244424327  LUMO = 0.139877392679519
+  alpha nocc = 7  HOMO = -0.540081244424326  LUMO = 0.139877392679521
+  beta  nocc = 7  HOMO = -0.540081244424331  LUMO = 0.139877392679515
 cycle= 3 E= -108.788410530241  delta_E= -0.0008  |g|= 0.0103  |ddm|= 0.0293
-  alpha nocc = 7  HOMO = -0.539654361738258  LUMO = 0.138357877764018
-  beta  nocc = 7  HOMO = -0.539654361738263  LUMO = 0.138357877764011
+  alpha nocc = 7  HOMO = -0.539654361738253  LUMO = 0.13835787776402
+  beta  nocc = 7  HOMO = -0.539654361738261  LUMO = 0.138357877764021
 cycle= 4 E= -108.788632407082  delta_E= -0.000222  |g|= 0.00337  |ddm|= 0.0197
-  alpha nocc = 7  HOMO = -0.539053243477942  LUMO = 0.138507458966267
-  beta  nocc = 7  HOMO = -0.539053243477946  LUMO = 0.138507458966263
+  alpha nocc = 7  HOMO = -0.539053243477943  LUMO = 0.138507458966268
+  beta  nocc = 7  HOMO = -0.539053243477946  LUMO = 0.138507458966262
 cycle= 5 E= -108.788653527647  delta_E= -2.11e-05  |g|= 0.000696  |ddm|= 0.00623
-  alpha nocc = 7  HOMO = -0.539364745550795  LUMO = 0.138501643255876
-  beta  nocc = 7  HOMO = -0.539364745550803  LUMO = 0.138501643255872
+  alpha nocc = 7  HOMO = -0.539364745550791  LUMO = 0.138501643255877
+  beta  nocc = 7  HOMO = -0.539364745550804  LUMO = 0.138501643255877
 cycle= 6 E= -108.788654272414  delta_E= -7.45e-07  |g|= 0.000157  |ddm|= 0.00112
-  alpha nocc = 7  HOMO = -0.539334373932784  LUMO = 0.138535121317803
-  beta  nocc = 7  HOMO = -0.539334373932785  LUMO = 0.138535121317796
+  alpha nocc = 7  HOMO = -0.539334373932783  LUMO = 0.138535121317804
+  beta  nocc = 7  HOMO = -0.539334373932784  LUMO = 0.138535121317796
 cycle= 7 E= -108.788654305278  delta_E= -3.29e-08  |g|= 4.38e-05  |ddm|= 0.000251
-  alpha nocc = 7  HOMO = -0.539376880141259  LUMO = 0.138515000541121
-  beta  nocc = 7  HOMO = -0.539376880141268  LUMO = 0.138515000541121
+  alpha nocc = 7  HOMO = -0.539376880141255  LUMO = 0.138515000541123
+  beta  nocc = 7  HOMO = -0.539376880141264  LUMO = 0.138515000541123
 cycle= 8 E= -108.788654307652  delta_E= -2.37e-09  |g|= 1.05e-05  |ddm|= 6.27e-05
-  alpha nocc = 7  HOMO = -0.539382124931021  LUMO = 0.138516534953986
-  beta  nocc = 7  HOMO = -0.539382124931032  LUMO = 0.13851653495398
+  alpha nocc = 7  HOMO = -0.539382124931025  LUMO = 0.13851653495399
+  beta  nocc = 7  HOMO = -0.539382124931031  LUMO = 0.138516534953983
 cycle= 9 E= -108.78865430781  delta_E= -1.58e-10  |g|= 2.13e-06  |ddm|= 1.8e-05
-  alpha nocc = 7  HOMO = -0.539381859938191  LUMO = 0.138516483358985
-  beta  nocc = 7  HOMO = -0.539381859938194  LUMO = 0.138516483358977
-Extra cycle  E= -108.788654307813  delta_E= -3.65e-12  |g|= 8.53e-07  |ddm|= 2.53e-06
+  alpha nocc = 7  HOMO = -0.539381859938197  LUMO = 0.138516483358981
+  beta  nocc = 7  HOMO = -0.539381859938201  LUMO = 0.138516483358975
+Extra cycle  E= -108.788654307813  delta_E= -3.61e-12  |g|= 8.53e-07  |ddm|= 2.53e-06
 converged SCF energy = -108.788654307813  <S^2> = 2.7586824  2S+1 = 3.4691108
-time for guess: 0.361
+time for guess: 0.336
 **** checking UHF/UKS internal stability ...
 tol 0.0001  toloose 0.01
 max_cycle 50  max_space 12  max_memory 2000  incore True
-davidson 0 1  |r|= 3.33  e= [2.84910794]  max|de|= 2.85  lindep= 0.749
-davidson 1 2  |r|= 1.09  e= [2.07578831]  max|de|= -0.773  lindep= 0.984
-davidson 2 3  |r|= 0.697  e= [1.38134261]  max|de|= -0.694  lindep= 0.999
-davidson 3 4  |r|= 0.417  e= [0.8462383]  max|de|= -0.535  lindep= 0.974
-davidson 4 5  |r|= 0.376  e= [0.70363588]  max|de|= -0.143  lindep= 0.981
-davidson 5 6  |r|= 0.258  e= [0.58032146]  max|de|= -0.123  lindep= 0.989
-davidson 6 7  |r|= 0.114  e= [0.55015159]  max|de|= -0.0302  lindep= 0.932
-davidson 7 8  |r|= 0.0572  e= [0.5442194]  max|de|= -0.00593  lindep= 0.912
-davidson 8 9  |r|= 0.0257  e= [0.54290939]  max|de|= -0.00131  lindep= 0.955
-davidson 9 10  |r|= 0.0341  e= [0.54223063]  max|de|= -0.000679  lindep= 0.924
-davidson 10 11  |r|= 0.0361  e= [0.54135552]  max|de|= -0.000875  lindep= 0.937
-davidson 11 12  |r|= 0.0238  e= [0.54067059]  max|de|= -0.000685  lindep= 0.94
-davidson 12 1  |r|= 0.0238  e= [0.54067059]  max|de|= 1.44e-15  lindep= 0.997
-davidson 13 2  |r|= 0.0146  e= [0.5404941]  max|de|= -0.000176  lindep= 0.936
-davidson 14 3  |r|= 0.0137  e= [0.54034275]  max|de|= -0.000151  lindep= 0.975
-davidson 15 4  |r|= 0.0295  e= [0.53998869]  max|de|= -0.000354  lindep= 0.857
-davidson 16 5  |r|= 0.041  e= [0.53916291]  max|de|= -0.000826  lindep= 0.866
-davidson 17 6  |r|= 0.0166  e= [0.53862495]  max|de|= -0.000538  lindep= 0.926
-davidson 18 7  |r|= 0.0116  e= [0.53843544]  max|de|= -0.00019  lindep= 0.955
-davidson 19 8  |r|= 0.0141  e= [0.53829423]  max|de|= -0.000141  lindep= 0.917
-davidson 20 9  |r|= 0.0174  e= [0.5380918]  max|de|= -0.000202  lindep= 0.87
-root 0 converged  |r|= 0.00561  e= 0.5380068811184825  max|de|= -8.49e-05
-converged 21 10  |r|= 0.00561  e= [0.53800688]  max|de|= -8.49e-05
+davidson 0 1  |r|= 3.34  e= [2.84301163]  max|de|= 2.84  lindep= 0.756
+davidson 1 2  |r|= 1.08  e= [2.08216013]  max|de|= -0.761  lindep= 0.988
+davidson 2 3  |r|= 0.655  e= [1.39861323]  max|de|= -0.684  lindep= 0.968
+davidson 3 4  |r|= 0.347  e= [0.91380825]  max|de|= -0.485  lindep= 0.986
+davidson 4 5  |r|= 0.345  e= [0.81775074]  max|de|= -0.0961  lindep= 0.955
+davidson 5 6  |r|= 0.337  e= [0.62655203]  max|de|= -0.191  lindep= 0.989
+davidson 6 7  |r|= 0.181  e= [0.5667756]  max|de|= -0.0598  lindep= 0.92
+davidson 7 8  |r|= 0.0935  e= [0.55079622]  max|de|= -0.016  lindep= 0.933
+davidson 8 9  |r|= 0.0469  e= [0.54722331]  max|de|= -0.00357  lindep= 0.949
+davidson 9 10  |r|= 0.0564  e= [0.54499678]  max|de|= -0.00223  lindep= 0.925
+davidson 10 11  |r|= 0.0583  e= [0.54266818]  max|de|= -0.00233  lindep= 0.935
+davidson 11 12  |r|= 0.0317  e= [0.54118887]  max|de|= -0.00148  lindep= 0.961
+davidson 12 1  |r|= 0.0317  e= [0.54118887]  max|de|= -5.55e-16  lindep= 0.998
+davidson 13 2  |r|= 0.0162  e= [0.5408775]  max|de|= -0.000311  lindep= 0.935
+davidson 14 3  |r|= 0.012  e= [0.54071724]  max|de|= -0.00016  lindep= 0.983
+davidson 15 4  |r|= 0.0215  e= [0.54047944]  max|de|= -0.000238  lindep= 0.884
+davidson 16 5  |r|= 0.0453  e= [0.53971138]  max|de|= -0.000768  lindep= 0.935
+davidson 17 6  |r|= 0.0286  e= [0.53859896]  max|de|= -0.00111  lindep= 0.939
+davidson 18 7  |r|= 0.0126  e= [0.53813079]  max|de|= -0.000468  lindep= 0.94
+root 0 converged  |r|= 0.00585  e= 0.538043204787723  max|de|= -8.76e-05
+converged 19 8  |r|= 0.00585  e= [0.5380432]  max|de|= -8.76e-05
 UHF/UKS wavefunction is stable in the internal stability analysis
 Converting <class 'pyscf.scf.uhf.UHF'> to RHF
 
@@ -186,8 +185,8 @@ natorb = True
 canonicalization = True
 sorting_mo_energy = False
 ao2mo_level = 2
-chkfile = /share/home/srwang/ExSCF/test/dft/tmp19r_r1dc
-max_memory 1000 MB (current use 141 MB)
+chkfile = /share/home/srwang/ExSCF/test/dft/tmp91st4m8u
+max_memory 1000 MB (current use 139 MB)
 internal_rotation = False
 ******** <class 'pyscf.fci.direct_spin1.FCISolver'> ********
 max. cycles = 300
@@ -223,220 +222,220 @@ davidson 14 15  |r|= 0.000714  e= [-9.47891744]  max|de|= -3.54e-06  lindep= 0.9
 davidson 15 16  |r|= 0.00029  e= [-9.4789179]  max|de|= -4.64e-07  lindep= 0.987
 davidson 16 17  |r|= 9.7e-05  e= [-9.47891799]  max|de|= -8.13e-08  lindep= 0.99
 davidson 17 18  |r|= 7.21e-05  e= [-9.478918]  max|de|= -1.42e-08  lindep= 0.986
-root 0 converged  |r|= 2.85e-05  e= -9.47891800574126  max|de|= -6.02e-09
+root 0 converged  |r|= 2.85e-05  e= -9.478918005741269  max|de|= -6.02e-09
 converged 18 19  |r|= 2.85e-05  e= [-9.47891801]  max|de|= -6.02e-09
-    CPU time for FCI solver      1.18 sec, wall time      0.29 sec
+    CPU time for FCI solver      1.10 sec, wall time      0.27 sec
 CAS space CI energy = -9.47891800574126
 CASCI E = -108.807161679267  S^2 = 0.0000000
 Set conv_tol_grad to 0.000316228
-    CPU time for Initializing 1-step CASSCF      1.36 sec, wall time      0.34 sec
+    CPU time for Initializing 1-step CASSCF      1.26 sec, wall time      0.32 sec
     CPU time for CAS DM      0.00 sec, wall time      0.00 sec
     |g|=0.0844
-    CPU time for gen h_op      0.08 sec, wall time      0.02 sec
+    CPU time for gen h_op      0.07 sec, wall time      0.02 sec
     imic 1(3)  |g[o]|=0.0216  |dxi|=0.0287  max(|x|)=0.0262  |dr|=0.0287  eig=-0.0011  seig=0.00654
     CPU time for aug_hess in 1 inner iters      0.09 sec, wall time      0.02 sec
-    CPU time for orbital rotation      0.17 sec, wall time      0.04 sec
-    CPU time for update CAS DM      0.18 sec, wall time      0.05 sec
+    CPU time for orbital rotation      0.15 sec, wall time      0.04 sec
+    CPU time for update CAS DM      0.16 sec, wall time      0.04 sec
 micro 1  |u-1|=0.0406  |g[o]|=0.0844  |g[c]|=0.00555  |ddm|=0.025
     CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
     |g|=0.0227 (keyframe), |g-correction|=0.00305
-    CPU time for gen h_op      0.08 sec, wall time      0.02 sec
+    CPU time for gen h_op      0.09 sec, wall time      0.02 sec
     imic 2(4)  |g[o]|=0.00433  |dxi|=0.0133  max(|x|)=0.00909  |dr|=0.0133  eig=-0.000123  seig=0.00653
     CPU time for aug_hess in 2 inner iters      0.03 sec, wall time      0.01 sec
-    CPU time for orbital rotation      0.11 sec, wall time      0.03 sec
-    CPU time for update CAS DM      0.18 sec, wall time      0.04 sec
+    CPU time for orbital rotation      0.12 sec, wall time      0.03 sec
+    CPU time for update CAS DM      0.16 sec, wall time      0.04 sec
 micro 2  |u-1|=0.0591  |g[o]|=0.0227  |g[c]|=0.0032  |ddm|=0.0371
     CPU time for micro iter 2      0.00 sec, wall time      0.00 sec
     |g|=0.00486 (keyframe), |g-correction|=0.00143
-    CPU time for gen h_op      0.08 sec, wall time      0.02 sec
-    imic 3(5)  |g[o]|=0.00317  |dxi|=0.00317  max(|x|)=0.00145  |dr|=0.00317  eig=-9.34e-06  seig=0.00652
-    imic 4(6)  |g[o]|=0.00138  |dxi|=0.00151  max(|x|)=0.000813  |dr|=0.00431  eig=-2.3e-06  seig=0.00638
-    CPU time for aug_hess in 4 inner iters      0.06 sec, wall time      0.02 sec
-    CPU time for orbital rotation      0.14 sec, wall time      0.04 sec
-    CPU time for update CAS DM      0.19 sec, wall time      0.05 sec
+    CPU time for gen h_op      0.07 sec, wall time      0.02 sec
+    imic 3(5)  |g[o]|=0.00317  |dxi|=0.00317  max(|x|)=0.00145  |dr|=0.00317  eig=-9.35e-06  seig=0.00652
+    imic 4(6)  |g[o]|=0.00138  |dxi|=0.00151  max(|x|)=0.000813  |dr|=0.00432  eig=-2.3e-06  seig=0.00638
+    CPU time for aug_hess in 4 inner iters      0.06 sec, wall time      0.01 sec
+    CPU time for orbital rotation      0.13 sec, wall time      0.03 sec
+    CPU time for update CAS DM      0.15 sec, wall time      0.04 sec
 micro 3  |u-1|=0.0634  |g[o]|=0.00486  |g[c]|=0.00151  |ddm|=0.0407
     CPU time for micro iter 3      0.00 sec, wall time      0.00 sec
     |g|=0.00138 (keyframe), |g-correction|=0.000355
-    CPU time for gen h_op      0.08 sec, wall time      0.02 sec
+    CPU time for gen h_op      0.07 sec, wall time      0.02 sec
     imic 5(7)  |g[o]|=0.000847  |dxi|=0.000859  max(|x|)=0.000529  |dr|=0.000859  eig=-5.98e-07  seig=0.00632
     imic 6(8)  |g[o]|=0.000392  |dxi|=0.000331  max(|x|)=0.000163  |dr|=0.00098  eig=-1.7e-07  seig=0.00631
-    CPU time for aug_hess in 6 inner iters      0.07 sec, wall time      0.02 sec
-    CPU time for orbital rotation      0.15 sec, wall time      0.04 sec
+    CPU time for aug_hess in 6 inner iters      0.06 sec, wall time      0.01 sec
+    CPU time for orbital rotation      0.13 sec, wall time      0.03 sec
 micro 4  |u-1|=0.0644  |g[o]|=0.00138
-Active space overlap to initial guess, SVD = [0.99997375 0.99997375 0.99993718 0.99993718 0.99972628 0.99946361]
-Active space overlap to last step, SVD = [0.99997375 0.99997375 0.99993718 0.99993718 0.99972628 0.99946361]
-    CPU time for update eri      0.16 sec, wall time      0.04 sec
+Active space overlap to initial guess, SVD = [0.99997375 0.99997375 0.99993718 0.99993718 0.99972628 0.9994636 ]
+Active space overlap to last step, SVD = [0.99997375 0.99997375 0.99993718 0.99993718 0.99972628 0.9994636 ]
+    CPU time for update eri      0.15 sec, wall time      0.04 sec
 Start CASCI
     CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
-core energy = -99.3092886284219
+core energy = -99.3092883391064
     CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
-davidson 0 1  |r|= 0.000492  e= [-9.49911518]  max|de|= -9.5  lindep=    1
-davidson 1 2  |r|= 0.000465  e= [-9.49911543]  max|de|= -2.56e-07  lindep= 0.998
-davidson 2 3  |r|= 0.000224  e= [-9.49911555]  max|de|= -1.15e-07  lindep= 0.998
-davidson 3 4  |r|= 0.000104  e= [-9.49911558]  max|de|= -3.21e-08  lindep= 0.952
-davidson 4 5  |r|= 8.62e-05  e= [-9.49911559]  max|de|= -1.43e-08  lindep= 0.945
-root 0 converged  |r|= 3.05e-05  e= -9.49911560097055  max|de|= -6.82e-09
-converged 5 6  |r|= 3.05e-05  e= [-9.4991156]  max|de|= -6.82e-09
-    CPU time for FCI solver      0.55 sec, wall time      0.14 sec
-CAS space CI energy = -9.49911560097055
-macro iter 1 (11 JK  4 micro), CASSCF E = -108.808404229392  dE = -0.0012425501  S^2 = 0.0000000
-               |grad[o]|=0.0844  |grad[c]|= 0.0015121719677877654  |ddm|=0.0407
-    CPU time for CASCI solver      0.59 sec, wall time      0.15 sec
-    CPU time for macro iter 1      1.88 sec, wall time      0.47 sec
+davidson 0 1  |r|= 0.000493  e= [-9.49911547]  max|de|= -9.5  lindep=    1
+davidson 1 2  |r|= 0.000465  e= [-9.49911572]  max|de|= -2.56e-07  lindep= 0.998
+davidson 2 3  |r|= 0.000224  e= [-9.49911584]  max|de|= -1.15e-07  lindep= 0.998
+davidson 3 4  |r|= 0.000104  e= [-9.49911587]  max|de|= -3.22e-08  lindep= 0.952
+davidson 4 5  |r|= 8.62e-05  e= [-9.49911588]  max|de|= -1.43e-08  lindep= 0.945
+root 0 converged  |r|= 3.05e-05  e= -9.499115890197672  max|de|= -6.83e-09
+converged 5 6  |r|= 3.05e-05  e= [-9.49911589]  max|de|= -6.83e-09
+    CPU time for FCI solver      0.51 sec, wall time      0.13 sec
+CAS space CI energy = -9.49911589019767
+macro iter 1 (11 JK  4 micro), CASSCF E = -108.808404229304  dE = -0.00124255  S^2 = 0.0000000
+               |grad[o]|=0.0844  |grad[c]|= 0.0015120750750615103  |ddm|=0.0407
+    CPU time for CASCI solver      0.54 sec, wall time      0.14 sec
+    CPU time for macro iter 1      1.70 sec, wall time      0.42 sec
     |g|=0.000702
-    CPU time for gen h_op      0.08 sec, wall time      0.02 sec
+    CPU time for gen h_op      0.07 sec, wall time      0.02 sec
     imic 1(3)  |g[o]|=0.000173  |dxi|=0.000396  max(|x|)=0.000196  |dr|=0.000396  eig=-2.23e-07  seig=1.06e-07
     CPU time for aug_hess in 1 inner iters      0.09 sec, wall time      0.02 sec
-    CPU time for orbital rotation      0.19 sec, wall time      0.05 sec
-    CPU time for update CAS DM      0.18 sec, wall time      0.04 sec
+    CPU time for orbital rotation      0.18 sec, wall time      0.04 sec
+    CPU time for update CAS DM      0.16 sec, wall time      0.04 sec
 micro 1  |u-1|=0.00056  |g[o]|=0.000702  |g[c]|=5.43e-05  |ddm|=0.000317
     CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
     |g|=0.000178 (keyframe), |g-correction|=3.23e-05
-    CPU time for gen h_op      0.08 sec, wall time      0.02 sec
-    imic 2(4)  |g[o]|=7.28e-05  |dxi|=7.1e-05  max(|x|)=2.98e-05  |dr|=7.1e-05  eig=-8.38e-09  seig=1e-07
-    imic 3(5)  |g[o]|=2.33e-05  |dxi|=2.04e-05  max(|x|)=1.23e-05  |dr|=8.07e-05  eig=-7.52e-10  seig=9.98e-08
-    CPU time for orbital rotation      0.14 sec, wall time      0.04 sec
-    CPU time for update CAS DM      0.18 sec, wall time      0.04 sec
+    CPU time for gen h_op      0.07 sec, wall time      0.02 sec
+    imic 2(4)  |g[o]|=7.29e-05  |dxi|=7.11e-05  max(|x|)=2.99e-05  |dr|=7.11e-05  eig=-8.4e-09  seig=1e-07
+    imic 3(5)  |g[o]|=2.33e-05  |dxi|=2.04e-05  max(|x|)=1.23e-05  |dr|=8.07e-05  eig=-7.52e-10  seig=9.97e-08
+    CPU time for orbital rotation      0.13 sec, wall time      0.03 sec
+    CPU time for update CAS DM      0.16 sec, wall time      0.04 sec
 micro 2  |u-1|=0.000586  |g[o]|=0.000178  |g[c]|=2.76e-05  |ddm|=0.00039
     CPU time for micro iter 2      0.00 sec, wall time      0.00 sec
-Active space overlap to initial guess, SVD = [0.99997368 0.99997368 0.99993481 0.99993481 0.99972641 0.99945908]
+Active space overlap to initial guess, SVD = [0.99997368 0.99997368 0.99993481 0.99993481 0.99972641 0.99945907]
 Active space overlap to last step, SVD = [1.         1.         0.99999999 0.99999997 0.99999997 0.99999997]
-    CPU time for update eri      0.15 sec, wall time      0.04 sec
+    CPU time for update eri      0.13 sec, wall time      0.03 sec
 Start CASCI
     CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
-core energy = -99.3092440260069
+core energy = -99.309244001995
     CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
-davidson 0 1  |r|= 7.11e-06  e= [-9.49916044]  max|de|= -9.5  lindep=    1
-Linear dependency in trial subspace. |r| for each state [7.105907447102595e-06]
+davidson 0 1  |r|= 7.1e-06  e= [-9.49916047]  max|de|= -9.5  lindep=    1
+Linear dependency in trial subspace. |r| for each state [7.101489524387856e-06]
     CPU time for FCI solver      0.30 sec, wall time      0.07 sec
-CAS space CI energy = -9.49916044349692
-macro iter 2 (6 JK  2 micro), CASSCF E = -108.808404469504  dE = -2.4011139e-07  S^2 = 0.0000000
-               |grad[o]|=0.000702  |grad[c]|= 2.7571617252012253e-05  |ddm|=0.00039
-    CPU time for CASCI solver      0.33 sec, wall time      0.08 sec
-    CPU time for macro iter 2      1.16 sec, wall time      0.29 sec
+CAS space CI energy = -9.49916046750931
+macro iter 2 (6 JK  2 micro), CASSCF E = -108.808404469504  dE = -2.4020031e-07  S^2 = 0.0000000
+               |grad[o]|=0.000702  |grad[c]|= 2.7593154865736874e-05  |ddm|=0.00039
+    CPU time for CASCI solver      0.32 sec, wall time      0.08 sec
+    CPU time for macro iter 2      1.07 sec, wall time      0.27 sec
     |g|=2.44e-05
-    CPU time for gen h_op      0.08 sec, wall time      0.02 sec
-    CPU time for orbital rotation      0.10 sec, wall time      0.02 sec
-    CPU time for update CAS DM      0.18 sec, wall time      0.04 sec
-micro 1  |u-1|=    0  |g[o]|=2.44e-05  |g[c]|=7.11e-06  |ddm|=1.18e-05
+    CPU time for gen h_op      0.07 sec, wall time      0.02 sec
+    CPU time for orbital rotation      0.09 sec, wall time      0.02 sec
+    CPU time for update CAS DM      0.16 sec, wall time      0.04 sec
+micro 1  |u-1|=    0  |g[o]|=2.44e-05  |g[c]|=7.1e-06  |ddm|=1.18e-05
     CPU time for micro iter 1      0.00 sec, wall time      0.00 sec
-Active space overlap to initial guess, SVD = [0.99997368 0.99997368 0.99993481 0.99993481 0.99972641 0.99945908]
+Active space overlap to initial guess, SVD = [0.99997368 0.99997368 0.99993481 0.99993481 0.99972641 0.99945907]
 Active space overlap to last step, SVD = [1. 1. 1. 1. 1. 1.]
-    CPU time for update eri      0.15 sec, wall time      0.04 sec
+    CPU time for update eri      0.13 sec, wall time      0.03 sec
 Start CASCI
     CPU time for integral transformation to CAS space      0.00 sec, wall time      0.00 sec
-core energy = -99.3092440260069
+core energy = -99.309244001995
     CPU time for effective h1e in CAS space      0.00 sec, wall time      0.00 sec
-davidson 0 1  |r|= 1.95e-06  e= [-9.49916044]  max|de|= -9.5  lindep=    1
-Linear dependency in trial subspace. |r| for each state [1.9481608118372646e-06]
-    CPU time for FCI solver      0.29 sec, wall time      0.07 sec
-CAS space CI energy = -9.49916044355474
-macro iter 3 (1 JK  1 micro), CASSCF E = -108.808404469562  dE = -5.7838179e-11  S^2 = 0.0000000
-               |grad[o]|=2.44e-05  |grad[c]|= 7.105907447076553e-06  |ddm|=1.18e-05
+davidson 0 1  |r|= 1.95e-06  e= [-9.49916047]  max|de|= -9.5  lindep=    1
+Linear dependency in trial subspace. |r| for each state [1.9456048585016698e-06]
+    CPU time for FCI solver      0.30 sec, wall time      0.07 sec
+CAS space CI energy = -9.49916046756707
+macro iter 3 (1 JK  1 micro), CASSCF E = -108.808404469562  dE = -5.7738703e-11  S^2 = 0.0000000
+               |grad[o]|=2.44e-05  |grad[c]|= 7.101489524393201e-06  |ddm|=1.18e-05
     CPU time for CASCI solver      0.33 sec, wall time      0.08 sec
-    CPU time for macro iter 3      0.75 sec, wall time      0.19 sec
+    CPU time for macro iter 3      0.71 sec, wall time      0.18 sec
 1-step CASSCF converged in 3 macro (18 JK 7 micro) steps
 CASSCF canonicalization
 where_natorb [0, 2, 1, 4, 3, 5]
-Natural occ [1.64520234 1.29702928 1.29702928 0.70295435 0.70295435 0.35483039]
+Natural occ [1.64520235 1.2970293  1.2970293  0.70295434 0.70295434 0.35483038]
 Natural orbital (expansion on meta-Lowdin AOs) in CAS space
                #1        #2        #3        #4        #5       
-  0 N 1s      -0.00121  -0.00000   0.00000   0.00000  -0.00000
-  0 N 2s      -0.00353   0.00000   0.00000  -0.00000   0.00000
-  0 N 3s      -0.02214  -0.00000  -0.00000  -0.00000  -0.00000
-  0 N 4s       0.00267  -0.00000   0.00000   0.00000   0.00000
-  0 N 2px      0.00000   0.44454   0.54887   0.55875   0.43318
-  0 N 2py     -0.00000  -0.54887   0.44454   0.43318  -0.55875
-  0 N 2pz     -0.70614   0.00000   0.00000   0.00000   0.00000
-  0 N 3px     -0.00000  -0.01894  -0.02338  -0.00861  -0.00667
-  0 N 3py      0.00000   0.02338  -0.01894  -0.00667   0.00861
-  0 N 3pz      0.01916  -0.00000  -0.00000  -0.00000  -0.00000
-  0 N 4px      0.00000   0.00097   0.00120  -0.00322  -0.00249
-  0 N 4py     -0.00000  -0.00120   0.00097  -0.00249   0.00322
-  0 N 4pz      0.00502   0.00000   0.00000   0.00000   0.00000
-  0 N 3dxy     0.00000  -0.00000  -0.00000  -0.00000   0.00000
-  0 N 3dyz     0.00000  -0.01104   0.00894   0.00248  -0.00321
-  0 N 3dz^2   -0.02103   0.00000   0.00000   0.00000   0.00000
-  0 N 3dxz     0.00000   0.00894   0.01104   0.00321   0.00248
- 0 N 3dx2-y2   0.00000   0.00000   0.00000   0.00000  -0.00000
-  0 N 4dxy     0.00000   0.00000  -0.00000   0.00000  -0.00000
-  0 N 4dyz    -0.00000  -0.00308   0.00250  -0.00037   0.00048
-  0 N 4dz^2   -0.00407   0.00000   0.00000   0.00000   0.00000
-  0 N 4dxz     0.00000   0.00250   0.00308  -0.00048  -0.00037
- 0 N 4dx2-y2   0.00000   0.00000  -0.00000  -0.00000  -0.00000
-  0 N 4f-3     0.00000  -0.00000   0.00000   0.00000  -0.00000
-  0 N 4f-2     0.00000   0.00000   0.00000  -0.00000  -0.00000
-  0 N 4f-1    -0.00000  -0.00130   0.00106  -0.00100   0.00129
-  0 N 4f 0    -0.00294  -0.00000   0.00000   0.00000  -0.00000
-  0 N 4f 1     0.00000   0.00106   0.00130  -0.00129  -0.00100
-  0 N 4f 2    -0.00000   0.00000  -0.00000   0.00000   0.00000
-  0 N 4f 3     0.00000  -0.00000  -0.00000  -0.00000  -0.00000
-  1 N 1s      -0.00121   0.00000  -0.00000   0.00000   0.00000
-  1 N 2s      -0.00352  -0.00000  -0.00000   0.00000  -0.00000
-  1 N 3s      -0.02214   0.00000   0.00000   0.00000   0.00000
-  1 N 4s       0.00267  -0.00000  -0.00000  -0.00000   0.00000
-  1 N 2px      0.00000   0.44454   0.54887  -0.55875  -0.43318
-  1 N 2py     -0.00000  -0.54887   0.44454  -0.43318   0.55875
-  1 N 2pz      0.70614  -0.00000   0.00000   0.00000   0.00000
-  1 N 3px      0.00000  -0.01894  -0.02338   0.00861   0.00667
-  1 N 3py      0.00000   0.02338  -0.01894   0.00667  -0.00861
-  1 N 3pz     -0.01915  -0.00000  -0.00000  -0.00000  -0.00000
-  1 N 4px     -0.00000   0.00097   0.00120   0.00322   0.00249
-  1 N 4py     -0.00000  -0.00120   0.00097   0.00249  -0.00322
-  1 N 4pz     -0.00502   0.00000   0.00000   0.00000  -0.00000
-  1 N 3dxy     0.00000   0.00000  -0.00000   0.00000  -0.00000
-  1 N 3dyz     0.00000   0.01104  -0.00894   0.00248  -0.00321
-  1 N 3dz^2   -0.02103   0.00000  -0.00000  -0.00000   0.00000
-  1 N 3dxz     0.00000  -0.00894  -0.01104   0.00321   0.00248
- 1 N 3dx2-y2   0.00000   0.00000  -0.00000  -0.00000  -0.00000
-  1 N 4dxy     0.00000  -0.00000  -0.00000  -0.00000   0.00000
-  1 N 4dyz     0.00000   0.00308  -0.00250  -0.00037   0.00048
-  1 N 4dz^2   -0.00407   0.00000  -0.00000  -0.00000   0.00000
-  1 N 4dxz     0.00000  -0.00250  -0.00308  -0.00048  -0.00037
- 1 N 4dx2-y2   0.00000   0.00000   0.00000   0.00000   0.00000
-  1 N 4f-3     0.00000  -0.00000   0.00000  -0.00000   0.00000
-  1 N 4f-2    -0.00000   0.00000   0.00000  -0.00000  -0.00000
-  1 N 4f-1     0.00000  -0.00130   0.00106   0.00100  -0.00129
-  1 N 4f 0     0.00294  -0.00000   0.00000   0.00000  -0.00000
-  1 N 4f 1    -0.00000   0.00106   0.00130   0.00129   0.00100
-  1 N 4f 2    -0.00000   0.00000  -0.00000   0.00000   0.00000
-  1 N 4f 3     0.00000  -0.00000  -0.00000   0.00000   0.00000
+  0 N 1s      -0.00121   0.00000   0.00000   0.00000   0.00000
+  0 N 2s      -0.00353  -0.00000  -0.00000  -0.00000   0.00000
+  0 N 3s      -0.02214  -0.00000   0.00000   0.00000  -0.00000
+  0 N 4s       0.00267   0.00000   0.00000   0.00000   0.00000
+  0 N 2px     -0.00000   0.32556  -0.62680  -0.64358   0.29266
+  0 N 2py     -0.00000  -0.62680  -0.32556  -0.29266  -0.64358
+  0 N 2pz     -0.70614  -0.00000   0.00000   0.00000  -0.00000
+  0 N 3px      0.00000  -0.01387   0.02670   0.00992  -0.00451
+  0 N 3py      0.00000   0.02670   0.01387   0.00451   0.00992
+  0 N 3pz      0.01916  -0.00000   0.00000   0.00000  -0.00000
+  0 N 4px      0.00000   0.00071  -0.00137   0.00370  -0.00168
+  0 N 4py     -0.00000  -0.00137  -0.00071   0.00168   0.00370
+  0 N 4pz      0.00502   0.00000  -0.00000  -0.00000   0.00000
+  0 N 3dxy    -0.00000  -0.00000   0.00000   0.00000   0.00000
+  0 N 3dyz    -0.00000  -0.01261  -0.00655  -0.00168  -0.00369
+  0 N 3dz^2   -0.02103  -0.00000  -0.00000  -0.00000  -0.00000
+  0 N 3dxz     0.00000   0.00655  -0.01261  -0.00369   0.00168
+ 0 N 3dx2-y2   0.00000   0.00000   0.00000  -0.00000  -0.00000
+  0 N 4dxy    -0.00000   0.00000   0.00000  -0.00000  -0.00000
+  0 N 4dyz    -0.00000  -0.00352  -0.00183   0.00025   0.00055
+  0 N 4dz^2   -0.00407   0.00000  -0.00000  -0.00000  -0.00000
+  0 N 4dxz     0.00000   0.00183  -0.00352   0.00055  -0.00025
+ 0 N 4dx2-y2   0.00000   0.00000   0.00000   0.00000  -0.00000
+  0 N 4f-3    -0.00000  -0.00000  -0.00000  -0.00000  -0.00000
+  0 N 4f-2    -0.00000   0.00000  -0.00000   0.00000  -0.00000
+  0 N 4f-1    -0.00000  -0.00149  -0.00077   0.00067   0.00148
+  0 N 4f 0    -0.00294  -0.00000  -0.00000  -0.00000  -0.00000
+  0 N 4f 1     0.00000   0.00077  -0.00149   0.00148  -0.00067
+  0 N 4f 2     0.00000   0.00000   0.00000  -0.00000   0.00000
+  0 N 4f 3     0.00000  -0.00000   0.00000   0.00000  -0.00000
+  1 N 1s      -0.00121   0.00000   0.00000   0.00000   0.00000
+  1 N 2s      -0.00352  -0.00000   0.00000  -0.00000  -0.00000
+  1 N 3s      -0.02214  -0.00000  -0.00000  -0.00000  -0.00000
+  1 N 4s       0.00267   0.00000   0.00000   0.00000   0.00000
+  1 N 2px     -0.00000   0.32556  -0.62680   0.64358  -0.29266
+  1 N 2py     -0.00000  -0.62680  -0.32556   0.29266   0.64358
+  1 N 2pz      0.70614  -0.00000  -0.00000   0.00000  -0.00000
+  1 N 3px      0.00000  -0.01387   0.02670  -0.00992   0.00451
+  1 N 3py      0.00000   0.02670   0.01387  -0.00451  -0.00992
+  1 N 3pz     -0.01915   0.00000   0.00000   0.00000   0.00000
+  1 N 4px     -0.00000   0.00071  -0.00137  -0.00370   0.00168
+  1 N 4py      0.00000  -0.00137  -0.00071  -0.00168  -0.00370
+  1 N 4pz     -0.00502  -0.00000  -0.00000  -0.00000  -0.00000
+  1 N 3dxy    -0.00000   0.00000   0.00000  -0.00000  -0.00000
+  1 N 3dyz    -0.00000   0.01261   0.00655  -0.00168  -0.00369
+  1 N 3dz^2   -0.02103   0.00000   0.00000   0.00000   0.00000
+  1 N 3dxz     0.00000  -0.00655   0.01261  -0.00369   0.00168
+ 1 N 3dx2-y2  -0.00000   0.00000  -0.00000   0.00000  -0.00000
+  1 N 4dxy    -0.00000  -0.00000   0.00000   0.00000   0.00000
+  1 N 4dyz     0.00000   0.00352   0.00183   0.00025   0.00055
+  1 N 4dz^2   -0.00407   0.00000   0.00000   0.00000   0.00000
+  1 N 4dxz     0.00000  -0.00183   0.00352   0.00055  -0.00025
+ 1 N 4dx2-y2   0.00000   0.00000  -0.00000  -0.00000   0.00000
+  1 N 4f-3    -0.00000  -0.00000  -0.00000   0.00000   0.00000
+  1 N 4f-2     0.00000  -0.00000  -0.00000   0.00000  -0.00000
+  1 N 4f-1     0.00000  -0.00149  -0.00077  -0.00067  -0.00148
+  1 N 4f 0     0.00294  -0.00000  -0.00000  -0.00000  -0.00000
+  1 N 4f 1    -0.00000   0.00077  -0.00149  -0.00148   0.00067
+  1 N 4f 2    -0.00000   0.00000  -0.00000  -0.00000   0.00000
+  1 N 4f 3    -0.00000  -0.00000   0.00000  -0.00000   0.00000
                #6       
   0 N 1s       0.00025
   0 N 2s      -0.12202
   0 N 3s       0.01357
   0 N 4s       0.00186
-  0 N 2px      0.00000
+  0 N 2px     -0.00000
   0 N 2py     -0.00000
   0 N 2pz     -0.69631
-  0 N 3px     -0.00000
+  0 N 3px      0.00000
   0 N 3py      0.00000
   0 N 3pz     -0.00058
-  0 N 4px      0.00000
+  0 N 4px     -0.00000
   0 N 4py     -0.00000
   0 N 4pz      0.00778
-  0 N 3dxy     0.00000
+  0 N 3dxy    -0.00000
   0 N 3dyz    -0.00000
   0 N 3dz^2    0.00144
   0 N 3dxz    -0.00000
- 0 N 3dx2-y2  -0.00000
+ 0 N 3dx2-y2   0.00000
   0 N 4dxy    -0.00000
   0 N 4dyz    -0.00000
   0 N 4dz^2    0.00342
   0 N 4dxz    -0.00000
- 0 N 4dx2-y2  -0.00000
+ 0 N 4dx2-y2   0.00000
   0 N 4f-3    -0.00000
-  0 N 4f-2     0.00000
+  0 N 4f-2    -0.00000
   0 N 4f-1    -0.00000
   0 N 4f 0     0.00261
   0 N 4f 1    -0.00000
-  0 N 4f 2     0.00000
+  0 N 4f 2    -0.00000
   0 N 4f 3    -0.00000
   1 N 1s      -0.00025
   1 N 2s       0.12202
   1 N 3s      -0.01357
   1 N 4s      -0.00186
-  1 N 2px     -0.00000
+  1 N 2px      0.00000
   1 N 2py      0.00000
   1 N 2pz     -0.69631
   1 N 3px     -0.00000
@@ -445,7 +444,7 @@ Natural orbital (expansion on meta-Lowdin AOs) in CAS space
   1 N 4px      0.00000
   1 N 4py      0.00000
   1 N 4pz      0.00778
-  1 N 3dxy    -0.00000
+  1 N 3dxy     0.00000
   1 N 3dyz    -0.00000
   1 N 3dz^2   -0.00144
   1 N 3dxz    -0.00000
@@ -454,31 +453,31 @@ Natural orbital (expansion on meta-Lowdin AOs) in CAS space
   1 N 4dyz    -0.00000
   1 N 4dz^2   -0.00342
   1 N 4dxz    -0.00000
- 1 N 4dx2-y2  -0.00000
-  1 N 4f-3    -0.00000
-  1 N 4f-2     0.00000
+ 1 N 4dx2-y2   0.00000
+  1 N 4f-3     0.00000
+  1 N 4f-2    -0.00000
   1 N 4f-1     0.00000
   1 N 4f 0     0.00261
   1 N 4f 1     0.00000
-  1 N 4f 2     0.00000
-  1 N 4f 3    -0.00000
-<CAS-nat-orb|mo-hf>  5  5    0.99945908
-<CAS-nat-orb|mo-hf>  6  7    0.99560083
-<CAS-nat-orb|mo-hf>  7  6    0.99560083
-<CAS-nat-orb|mo-hf>  8  9    0.99343440
-<CAS-nat-orb|mo-hf>  9  8    0.99343440
+  1 N 4f 2    -0.00000
+  1 N 4f 3     0.00000
+<CAS-nat-orb|mo-hf>  5  5    0.99945907
+<CAS-nat-orb|mo-hf>  6  7    0.97297160
+<CAS-nat-orb|mo-hf>  7  6    0.97297160
+<CAS-nat-orb|mo-hf>  8  9    0.95963275
+<CAS-nat-orb|mo-hf>  9  8    0.95963275
 <CAS-nat-orb|mo-hf>  10  10    0.99972641
 i = 1  <i|F|i> = -15.65413407
 i = 2  <i|F|i> = -15.65403570
 i = 3  <i|F|i> =  -1.01003991
 i = 4  <i|F|i> =  -0.90833158
-i = 5  <i|F|i> =  -0.38518623
+i = 5  <i|F|i> =  -0.38518624
 i = 6  <i|F|i> =  -0.26556378
 i = 7  <i|F|i> =  -0.26556378
 i = 8  <i|F|i> =  -0.11325253
 i = 9  <i|F|i> =  -0.11325253
-i = 10  <i|F|i> =   0.05846132
-i = 11  <i|F|i> =   0.58152623
+i = 10  <i|F|i> =   0.05846133
+i = 11  <i|F|i> =   0.58152622
 i = 12  <i|F|i> =   0.61793684
 i = 13  <i|F|i> =   0.61793684
 i = 14  <i|F|i> =   0.66510662
@@ -497,10 +496,10 @@ i = 26  <i|F|i> =   1.56373285
 i = 27  <i|F|i> =   1.56373285
 i = 28  <i|F|i> =   2.01276813
 i = 29  <i|F|i> =   3.14797999
-i = 30  <i|F|i> =   3.21041691
-i = 31  <i|F|i> =   3.21041691
-i = 32  <i|F|i> =   3.27294297
-i = 33  <i|F|i> =   3.27294297
+i = 30  <i|F|i> =   3.21041692
+i = 31  <i|F|i> =   3.21041692
+i = 32  <i|F|i> =   3.27294298
+i = 33  <i|F|i> =   3.27294298
 i = 34  <i|F|i> =   3.42493510
 i = 35  <i|F|i> =   4.07628261
 i = 36  <i|F|i> =   4.07628261
@@ -518,19 +517,19 @@ i = 47  <i|F|i> =   4.38521715
 i = 48  <i|F|i> =   4.53126515
 i = 49  <i|F|i> =   4.79247409
 i = 50  <i|F|i> =   4.79247409
-i = 51  <i|F|i> =   4.79811701
+i = 51  <i|F|i> =   4.79811702
 i = 52  <i|F|i> =   4.79811702
 i = 53  <i|F|i> =   4.86738333
 i = 54  <i|F|i> =   4.86738333
 i = 55  <i|F|i> =   4.99340858
-i = 56  <i|F|i> =   5.12349306
-i = 57  <i|F|i> =   5.12349306
+i = 56  <i|F|i> =   5.12349307
+i = 57  <i|F|i> =   5.12349307
 i = 58  <i|F|i> =   5.62315061
 i = 59  <i|F|i> =   5.85441306
 i = 60  <i|F|i> =   6.40845123
-    CPU time for 1-step CASSCF      5.61 sec, wall time      1.43 sec
+    CPU time for 1-step CASSCF      5.02 sec, wall time      1.27 sec
 CASSCF energy = -108.808404469562
-CASCI E = -108.808404469562  E(CI) = -9.49916044355474  S^2 = 0.0000000
+CASCI E = -108.808404469562  E(CI) = -9.49916046756707  S^2 = 0.0000000
 
 ******** <class 'pyphf.casdft.CASDFT'> ********
 truncation: fc
@@ -538,8 +537,8 @@ truncation: fc
 tot grids = 28092
 grids:  {} 
  (28092, 3)
-natocc [2.         2.         2.         2.         1.64520234 1.29702928
- 1.29702928 0.70295435 0.70295435 0.35483039 0.         0.
+natocc [2.         2.         2.         2.         1.64520235 1.2970293
+ 1.2970293  0.70295434 0.70295434 0.35483038 0.         0.
  0.         0.         0.         0.         0.         0.
  0.         0.         0.         0.         0.         0.
  0.         0.         0.         0.         0.         0.
@@ -549,18 +548,18 @@ natocc [2.         2.         2.         2.         1.64520234 1.29702928
  0.         0.         0.         0.         0.         0.
  0.         0.         0.         0.         0.         0.        ]
 ref [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-rhoall 0.0 198.42503966195176
-gamma 0.0 198.42503966195176
-eta 1.0 1.2864579712284276
-f 0.5823323129223263 1.0
+rhoall 0.0 198.42503973326785
+gamma 0.0 198.42503973326785
+eta 1.0 1.2864579465169461
+f 0.5823323100823715 1.0
 [7.00000044 7.00000044] [14.00000088]
 core [2.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-rhoall 0.0 198.3874141077508
-gamma 0.0 198.42503966195176
-eta 1.0 1.2864579712284276
-eta1 1.0 14.260773666094677
-eta2 1.0 16.53682202065468
-f 0.0 0.2642355899186518
+rhoall 0.0 198.3874141753934
+gamma 0.0 198.42503973326785
+eta 1.0 1.2864579465169461
+eta1 1.0 14.260775646202523
+eta2 1.0 16.53682425911657
+f 0.0 0.26423554393187226
 [3.99999998 3.99999998] [14.00000088]
 dE_fc: -0.019225
 E(CAS) =   -108.80840447
@@ -570,4 +569,4 @@ f E_c(TPSS) =     -0.32263688
 E(CAS+fDFT) =   -109.13104135
 fc E_c(TPSS) =     -0.34186208
 E(CAS+fcDFT) =   -109.15026654
-time for DFT: 0.685
+time for DFT: 0.683
