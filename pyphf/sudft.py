@@ -129,7 +129,7 @@ class SUDFT():
         print('time for DFT: %.3f' % (t2-t1))
         return exc, E_sudft
 
-def set_grids(mol, grids):
+def set_grids(mol, grids='fine'):
     ks = dft.UKS(mol)
     if grids[:5] == 'ultra':
         ks.grids.atom_grid = (99, 590)
@@ -308,7 +308,7 @@ def get_eta(rho1, rho2):
     ''' eta = (rho1/rho2)**(1/3)'''
     eta = (rho1 / rho2)**(1.0/3)
     for i in range(len(rho2)):
-        if rho2[i] < 1e-45:
+        if rho2[i] < 1e-45 or eta[i] < 1.0:
             #rho2[i] = 1e-45
             eta[i] = 1.0
     return eta

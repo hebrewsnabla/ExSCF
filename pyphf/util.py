@@ -4,8 +4,9 @@ import scipy
 from pyscf import gto, scf
 from pyscf.scf import chkfile
 from pyscf.lib import temporary_env
+from pyscf.dft import numint
 #from pyscf.lib.misc import repo_info
-from pyphf import sudm, util2
+from pyphf import sudm, util2, sudft
 import os, sys
 from functools import partial
 import time
@@ -530,6 +531,8 @@ class SUHF():
         self.diis_on = True
         self.diis_start_cyc = None
         self.level_shift = None
+
+        self.dft = False
         self.makedm = True
         self.tofch = False
         self.oldfch = None
@@ -637,6 +640,7 @@ class SUHF():
             print('C (ortho)\n', Ca_ortho, '\n', Cb_ortho)
         self.mo_ortho = Ca_ortho, Cb_ortho
         self.dm_ortho = scf.uhf.make_rdm1(self.mo_ortho, self.guesshf.mo_occ)
+        self.dm_reg = None
         if self.debug:
             print('density matrix (ortho)')
             print(self.dm_ortho)
@@ -665,6 +669,9 @@ class SUHF():
         if self.debug:
             print('hcore (ortho)\n', self.hcore_ortho)
         self.vhfopt = hf.init_direct_scf()
+
+        if self.dft:
+            self.ksgrids = sudft.set_grids(self.mol)
 
         self.built = True
 
@@ -752,12 +759,19 @@ class SUHF():
             Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
             Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
             E_suhf = self.energy_nuc + H_suhf
-            self.E_suhf = E_suhf
             #print('E(SUHF) = %15.8f' % E_suhf)
-
             Faa = F_mod_ortho[:norb, :norb]
             Fbb = F_mod_ortho[norb:, norb:]
             F_mod_ortho = np.array([Faa,Fbb])
+            if self.dft:
+                if self.dm_reg is None:
+                    self.dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
+                ni = numint.NumInt()
+                n, exc, vxc = ni.nr_uks(self.mol, self.ksgrids, 'HF,%s'%self.xc, self.dm_reg)
+                E_suhf += exc
+                F_mod_ortho = F_mod_ortho + vxc
+
+            self.E_suhf = E_suhf
             if self.diis_on and cyc >= self.diis_start_cyc:
                 s1e = np.eye(norb)
                 F_mod_ortho = self.diis.update(s1e, self.dm_ortho, F_mod_ortho)
@@ -778,6 +792,14 @@ class SUHF():
             self.dm_ortho = dm_ortho
             self.mo_ortho = mo_ortho
             self.mo_e = mo_e
+            dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
+            mo_ortho = np.array(self.mo_ortho)
+            mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
+            self.dm_reg = dm_reg
+            self.mo_reg = mo_reg
+            if self.debug:
+                print('dm_reg\n', dm_reg)
+                print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
             t10 = time.time()
             print('time for xg, H, S2, Yg, Feff: %.3f' % (t10-t06))
         
@@ -786,7 +808,7 @@ class SUHF():
                 ddm = dm_ortho - old_dm
                 conv = conv_check(E_suhf, dE, ddm, thresh, cyc)
             else:
-                print(' E(SUHF) = %15.8f' % E_suhf)
+                print(' E = %15.8f' % E_suhf)
             self.conv = conv
             util2.dump_chk(self.mol, self.chkfile, self.mo_e, self.mo_ortho, self.dm_ortho)
             cyc += 1
@@ -799,14 +821,6 @@ class SUHF():
         old_dm = self.dm_ortho
         #old_Pgao = Pgao
         #old_Ggao = Ggao
-        dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
-        mo_ortho = np.array(self.mo_ortho)
-        mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
-        self.dm_reg = dm_reg
-        self.mo_reg = mo_reg
-        if self.debug:
-            print('dm_reg\n', dm_reg)
-            print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
         if self.level_shift is not None:
             print('**** Extra Cycle %d ****' % cyc)
             veff = scf.uhf.get_veff(self.mol, dm_reg, vhfopt=self.vhfopt)
