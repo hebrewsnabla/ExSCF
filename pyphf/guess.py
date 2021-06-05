@@ -43,8 +43,8 @@ def from_fch_simp(fch, cycle=2):
     nif = mf.mo_coeff[0].shape[1]
     S = mol.intor_symmetric('int1e_ovlp')
     Sdiag = S.diagonal()
-    alpha_coeff = fch2py(fch, nbf, nif, Sdiag, 'a')
-    beta_coeff  = fch2py(fch, nbf, nif, Sdiag, 'b')
+    alpha_coeff = fch2py(fch, nbf, nif, 'a')
+    beta_coeff  = fch2py(fch, nbf, nif, 'b')
     mf.mo_coeff = (alpha_coeff, beta_coeff)
     # read done
     dm = mf.make_rdm1()
@@ -74,8 +74,8 @@ def from_fchk(xyz, bas, fch, cycle=2):
     nif = mf.mo_coeff[0].shape[1]
     S = mol.intor_symmetric('int1e_ovlp')
     Sdiag = S.diagonal()
-    alpha_coeff = fch2py(fch, nbf, nif, Sdiag, 'a')
-    beta_coeff  = fch2py(fch, nbf, nif, Sdiag, 'b')
+    alpha_coeff = fch2py(fch, nbf, nif, 'a')
+    beta_coeff  = fch2py(fch, nbf, nif, 'b')
     mf.mo_coeff = (alpha_coeff, beta_coeff)
     # read done
     
