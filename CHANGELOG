@@ -1,7 +1,14 @@
-version 0.3.2 (May 17, 2021)
+version 0.4.0 (Jun 23, 2021)
+--------------------------
+* DeltaSCF-MOM
+  + add mo_occ, move util -> suscf
+
+version 0.3.2 (May 28, 2021)
 --------------------------
 * CASDFT
   + Cremer's CAS+fDFT, CAS-DFT2
+  + move autocas to pyAutoMR
+* experimental self-consistent SUKS
 
 version 0.3.1 (May 11, 2021)
 --------------------------

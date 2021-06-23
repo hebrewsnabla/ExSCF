@@ -1,4 +1,4 @@
-from pyphf import util, util2, sudm
+from pyphf import util2, sudm
 from pyscf import dft
 import pyscf.dft.numint as numint
 #from pyphf import numint
