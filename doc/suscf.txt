@@ -1,0 +1,12 @@
+
+    SUHF Attributes:
+        X: 
+            transformation matrix (regular AO -> orthonormal AO)
+            It's asymmetric, as X in G09
+        nbeta: number of grids for beta
+        grids: integration grids for beta
+        weights:
+        d_expr: SymPy expr for Wigner d 
+        d_func: NumPy function for Wigner d
+        d     : array
+            current values of Wigner d, on given grids

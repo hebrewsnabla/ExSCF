@@ -3,11 +3,10 @@ import sympy as sym
 import scipy
 from pyscf import gto, scf
 from pyscf.scf import chkfile
-from pyscf.lib import temporary_env
 from pyscf.dft import numint
 #from pyscf.lib.misc import repo_info
-from pyphf import sudm, util2, sudft, deltascf
-import os, sys
+from pyphf import sudm, util2, sudft, deltascf, jk
+import os
 from functools import partial
 import time
 
@@ -172,151 +171,6 @@ def get_Ng(grids, no, dm, occ):
         #print(pg)
         Pg.append(pg)
     return Dg, Ng, Pg
-
-def get_JKg(mol, Pg, no, X):
-    Jg = []
-    Kg = []
-    Pg_ortho = []
-    for pg in Pg:
-        pg_ortho = einsum('ij,jk,lk->il', no, pg, no)
-        #print(pg_ortho)
-        Pg_ortho.append(pg_ortho)
-    norb = int(Pg_ortho[0].shape[0]/2)
-    Pgaa_ao = []
-    Pgab_ao = []
-    Pgba_ao = []
-    Pgbb_ao = []
-    for pg in Pg_ortho:
-        pgaa = pg[:norb, :norb] # ortho ao
-        #print(pgaa)
-        pgab = pg[:norb, norb:]
-        pgba = pg[norb:, :norb]
-        pgbb = pg[norb:, norb:]
-        # X . P(g) . X^H
-        pgaa_ao = einsum('ij,jk,lk->il', X, pgaa, X) # regular ao
-        #print(pgaa_ao)
-        pgab_ao = einsum('ij,jk,lk->il', X, pgab, X)
-        pgba_ao = einsum('ij,jk,lk->il', X, pgba, X)
-        pgbb_ao = einsum('ij,jk,lk->il', X, pgbb, X)
-        Pgaa_ao.append(pgaa_ao)
-        Pgbb_ao.append(pgbb_ao)
-        Pgab_ao.append(pgab_ao)
-        Pgba_ao.append(pgba_ao)
-    Pgaabb_ao = Pgaa_ao + Pgbb_ao
-    #print(Pgaabb_ao.shape)
-    ndm = len(Pgab_ao)
-    vj,vk = scf.hf.get_jk(mol, Pgaabb_ao, hermi=0)
-    #print(vj.shape)
-    Jgaa_ao = vj[:ndm] + vj[ndm:] 
-    Kgaa_ao = - vk[:ndm]
-    Jgbb_ao = Jgaa_ao
-    Kgbb_ao = - vk[ndm:]
-    Kgab_ao = scf.hf.get_jk(mol, Pgab_ao, hermi=0)[1] *(-1)
-    Kgba_ao = scf.hf.get_jk(mol, Pgba_ao, hermi=0)[1] *(-1)
-    for i in range(len(Jgaa_ao)):
-        jgaa = einsum('ji,jk,kl->il', X, Jgaa_ao[i], X)  # ortho ao
-        kgaa = einsum('ji,jk,kl->il', X, Kgaa_ao[i], X)  # ortho ao
-        #print(ggaa)
-        kgab = einsum('ji,jk,kl->il', X, Kgab_ao[i], X) 
-        kgba = einsum('ji,jk,kl->il', X, Kgba_ao[i], X) 
-        jgbb = einsum('ji,jk,kl->il', X, Jgbb_ao[i], X) 
-        kgbb = einsum('ji,jk,kl->il', X, Kgbb_ao[i], X) 
-        jg = util2.stack22(jgaa, np.zeros(kgab.shape), 
-                           np.zeros(kgba.shape), jgbb)
-        kg = util2.stack22(kgaa, kgab, kgba, kgbb)
-        jg_no = einsum('ji,jk,kl->il', no, jg, no)
-        kg_no = einsum('ji,jk,kl->il', no, kg, no)
-        Jg.append(jg_no)
-        Kg.append(kg_no)
-    return Jg, Kg, Pg_ortho
-
-def get_jk(mol, dm, hermi=1, opt=None):
-    return scf.hf.get_jk(mol, dm, hermi, opt)
-
-def get_k(mol, dm, hermi=1, opt=None):
-    with temporary_env(opt, prescreen='CVHFnrs8_vk_prescreen'):
-        vk = scf.hf.get_jk(mol, dm, hermi, opt, with_j=False)[1]
-    return vk
-
-def get_Gg(mol, Pg, no, X, dm_last=None, Ggao_last=None, opt=None):
-    Gg = []
-    Pg_ortho = []
-    for pg in Pg:
-        pg_ortho = einsum('ij,jk,lk->il', no, pg, no)
-        #print(pg_ortho)
-        Pg_ortho.append(pg_ortho)
-    norb = int(Pg_ortho[0].shape[0]/2)
-    Pgaa_ao = []
-    Pgab_ao = []
-    Pgba_ao = []
-    Pgbb_ao = []
-    for pg in Pg_ortho:
-        pgaa = pg[:norb, :norb] # ortho ao
-        #print(pgaa)
-        pgab = pg[:norb, norb:]
-        pgba = pg[norb:, :norb]
-        pgbb = pg[norb:, norb:]
-        # X . P(g) . X^H
-        pgaa_ao = einsum('ij,jk,lk->il', X, pgaa, X) # regular ao
-        #print(pgaa_ao)
-        pgab_ao = einsum('ij,jk,lk->il', X, pgab, X)
-        pgba_ao = einsum('ij,jk,lk->il', X, pgba, X)
-        pgbb_ao = einsum('ij,jk,lk->il', X, pgbb, X)
-        Pgaa_ao.append(pgaa_ao)
-        Pgbb_ao.append(pgbb_ao)
-        Pgab_ao.append(pgab_ao)
-        Pgba_ao.append(pgba_ao)
-    Pgaabb_ao = Pgaa_ao + Pgbb_ao
-    Pgao = [Pgaabb_ao, Pgab_ao, Pgba_ao]
-    if dm_last is not None:
-        old_Pgaabb_ao, old_Pgab_ao, old_Pgba_ao = dm_last
-        old_vj, old_vk, old_Ggab_ao, old_Ggba_ao = Ggao_last
-    #print(Pgaabb_ao.shape)
-    #nao = Pgaabb_ao.shape[-1]
-    if dm_last is None:
-        vj,vk = get_jk(mol, Pgaabb_ao, hermi=0, opt=opt)
-        Ggab_ao = get_k(mol, Pgab_ao, hermi=0, opt=opt)
-        Ggba_ao = get_k(mol, Pgba_ao, hermi=0, opt=opt)
-    else:
-        d_aabb = util2.dmlist(Pgaabb_ao, old_Pgaabb_ao)
-        d_ab = util2.dmlist(Pgab_ao, old_Pgab_ao)
-        d_ba = util2.dmlist(Pgba_ao, old_Pgba_ao)
-        vj,vk = get_jk(mol, d_aabb, hermi=0, opt=opt) 
-        #vj = util2.dmlist(vj, old_vj, 1)
-        #vk = util2.dmlist(vk, old_vk, 1)
-        vj += old_vj
-        vk += old_vk
-        Ggab_ao = get_jk(mol, d_ab, hermi=0, opt=opt)[1] + old_Ggab_ao
-        #Ggab_ao = util2.dmlist(Ggab_ao, old_Ggab_ao, 1)
-        Ggba_ao = get_jk(mol, d_ba, hermi=0, opt=opt)[1] + old_Ggba_ao
-        #Ggba_ao = util2.dmlist(Ggba_ao, old_Ggba_ao, 1)
-    ndm = len(Pgab_ao)
-    #print(vj.shape)
-    #print(vj)
-    Ggaa_ao = vj[:ndm] + vj[ndm:] - vk[:ndm]
-    Ggbb_ao = vj[:ndm] + vj[ndm:] - vk[ndm:]
-    #Ggbb_ao = scf.hf.get_jk(mol, Pgbb_ao, hermi=0)
-    #print(ggaa_ao)
-    Ggao = [vj,vk,Ggab_ao, Ggba_ao]
-    #ggbb_ao = scf.uhf.get_veff(mol, [pgaa_ao, pgbb_ao], hermi=0)[1]
-        # X^H . G(g) . X
-    Ggab_ao *= -1
-    Ggba_ao *= -1
-    for i,ggab_ao in enumerate(Ggab_ao):
-        #ggab_ao = Ggab_ao[i]
-        ggba_ao = Ggba_ao[i]
-        ggaa_ao = Ggaa_ao[i]
-        ggbb_ao = Ggbb_ao[i]
-        ggaa = einsum('ji,jk,kl->il', X, ggaa_ao, X)  # ortho ao
-        #print(ggaa)
-        ggab = einsum('ji,jk,kl->il', X, ggab_ao, X) 
-        ggba = einsum('ji,jk,kl->il', X, ggba_ao, X) 
-        ggbb = einsum('ji,jk,kl->il', X, ggbb_ao, X) 
-        gg = util2.stack22(ggaa, ggab, ggba, ggbb)
-        gg_no = einsum('ji,jk,kl->il', no, gg, no)
-        Gg.append(gg_no)
-    return Gg, Pg_ortho, Pgao, Ggao
-
 
 def get_xg(suhf, no, mo_occ, Ng):
     C_a, C_b = suhf.mo_ortho
@@ -535,21 +389,20 @@ def make_dm(mo_coeff, mo_occ):
 
 class SUHF():
     '''
-    Attributes:
+    Required input:
         guesshf: UHF object
-        X: 
-            transformation matrix (regular AO -> orthonormal AO)
-            It's asymmetric, as X in G09
-        S, Sz:
-        nbeta: number of grids for beta
-        grids: integration grids for beta
-        weights:
-        d_expr: SymPy expr for Wigner d 
-        d_func: NumPy function for Wigner d
-        d     : array
-            current values of Wigner d, on given grids
-
+    Options:
+        verbose: 4,6,8
+        conv_tol: 1e-7 for RMSD
+        max_cycle: 70
+        diis_on: 
+        level_shift:
+        setmom:
+    Output:
         E_suhf:
+        mo_reg:
+        dm_reg: deformed density matrix
+        suhf_dm:
         natocc: SUHF natural orbital occupation number
         natorb: SUHF natural orbital (regular basis) 
     '''
@@ -608,7 +461,6 @@ class SUHF():
         if self.conv_tol > 1e-5:
             print('Warning: conv_tol too large')
 
-
     def build(self):
         self.dump_flags()
         if self.output is None:
@@ -638,14 +490,12 @@ class SUHF():
 
         if self.diis_on:
             #assert issubclass(mf.DIIS, lib.diis.DIIS)
-            #DIIS = lib.diis.SCF_DIIS
             self.diis_space = 8
             if self.diis_start_cyc is None:
                 self.diis_start_cyc = 10
             self.diis_file = None
             #mf_diis.rollback = mf.diis_space_rollback
             self.diis = scf.diis.CDIIS()
-            #self.max_cycle = self.diis_start_cyc + 30
             print('DIIS: %s' % self.diis.__class__)
             print('diis_start_cyc = %d' % self.diis_start_cyc)
         if self.level_shift is not None:
@@ -657,34 +507,24 @@ class SUHF():
         S = scf.hf.get_ovlp(self.mol)
         self.ovlp = S
         Ca, Cb = self.guesshf.mo_coeff
-        if self.debug:
-            print('S')
-            print(S)
-        #Se, Svec = scipy.linalg.eigh(S)
-        #Se_msq = Se.real**(-0.5)
-        #S_msq2 = einsum('ji,j,jk->ik',Svec,Se_msq, Svec)
-        #S_msq = scipy.linalg.fractional_matrix_power(S, -0.5)
         
         Su, Ss, Sv = scipy.linalg.svd(S)
         X = einsum('ij,j->ij', Su, Ss**(-0.5))
-        if self.debug:
-            print('SVD: S^(-1/2)')
-            print(X)
         self.X = X
         XS = np.dot(X.T,S)
-        if self.debug:
-            print('S^(1/2)')
-            print(XS)
         self.XS = XS
+        if self.debug:
+            print('S\n', S)
+            print('SVD: S^(-1/2)\n', X)
+            print('S^(1/2)\n', XS)
         
         Ca_ortho = np.dot(XS, Ca)
         Cb_ortho = np.dot(XS, Cb)
-        if self.debug:
-            print('C (ortho)\n', Ca_ortho, '\n', Cb_ortho)
         self.mo_ortho = Ca_ortho, Cb_ortho
         self.dm_ortho = scf.uhf.make_rdm1(self.mo_ortho, self.guesshf.mo_occ)
         self.dm_reg = None
         if self.debug:
+            print('C (ortho)\n', Ca_ortho, '\n', Cb_ortho)
             print('density matrix (ortho)')
             print(self.dm_ortho)
         self.norb = len(self.dm_ortho[0])
@@ -797,7 +637,7 @@ class SUHF():
                 print('P(g) (NO)\n', Pg[0])
             t05 = time.time()
             print('time for NO, Ng: %.3f' % (t05-t01))
-            Gg, Pg_ortho, Pgao, Ggao = get_Gg(self.mol, Pg, self.no, X, dm_last=old_Pgao, Ggao_last=old_Ggao, opt=self.vhfopt)
+            Gg, Pg_ortho, Pgao, Ggao = jk.get_Gg(self.mol, Pg, self.no, X, dm_last=old_Pgao, Ggao_last=old_Ggao, opt=self.vhfopt)
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
@@ -828,13 +668,13 @@ class SUHF():
                 s1e = np.eye(norb)
                 F_mod_ortho = self.diis.update(s1e, self.dm_ortho, F_mod_ortho)
                 print('F(mod,ortho) updated with CDIIS')
-                if self.debug:
-                    print(F_mod_ortho)
+                if self.debug: print(F_mod_ortho)
             if self.level_shift is not None:
                 shift = self.level_shift
                 s1e = np.eye(norb)
                 print('level shift: %.3f a.u.' % shift)
                 F_mod_ortho = lev_shift(s1e, self.dm_ortho, F_mod_ortho, shift)
+
             mo_e, mo_ortho = Diag_Feff(F_mod_ortho)
             if self.mom and cyc >= self.mom_start_cyc:
                 mo_occ = deltascf.mom_occ(self, self.mom_reforb, self.setocc)
@@ -901,7 +741,7 @@ class SUHF():
                 print('D(g) (NO)\n', Dg[0])
                 print('N(g) (NO)\n', Ng[0])
                 print('P(g) (NO)\n', Pg[0])
-            Gg, Pg_ortho, _, _ = get_Gg(self.mol, Pg, self.no, X, opt=self.vhfopt)
+            Gg, Pg_ortho, _, _ = jk.get_Gg(self.mol, Pg, self.no, X, opt=self.vhfopt)
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
@@ -964,7 +804,7 @@ class SUHF():
         return E_suhf, self.conv
 
     def get_JKg(self):
-        return get_JKg(self.mol, self.Pg, self.no, self.X)[:2]
+        return jk.get_JKg(self.mol, self.Pg, self.no, self.X)[:2]
 
     def get_EX(self):
         Jg, Kg = self.get_JKg()
