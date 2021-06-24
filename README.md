@@ -22,8 +22,8 @@ Theoretial features:
   + energy
   + density, natural orbital
 * SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
-* automatic CAS: UHF -> UNO -> CASSCF
 * CAS+*f*DFT, CAS-DFT2
+* DeltaSCF with MOM
 
 Technical features:
 * guess

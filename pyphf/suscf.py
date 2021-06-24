@@ -101,7 +101,7 @@ def find_NO(suhf, dm, mo_occ):
     occa, occb = mo_occ
     vira, virb = get_vir(occa, occb)
     na, nb = suhf.nelec
-    print(occa,occb,vira, virb)
+    #print(occa,occb,vira, virb)
     ev_a, v_a = eig(dm[0]*(-1))
     ev_b, v_b = eig(dm[1]*(-1))
     pa = count0(ev_a)

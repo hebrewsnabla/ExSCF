@@ -44,11 +44,12 @@ def mom_occ(mf, occorb, setocc):
     nocc_b = int(np.sum(setocc[1]))
     s_a = reduce(np.dot, (coef_occ_a.T, mf.ovlp, mo_coeff[0]))
     s_b = reduce(np.dot, (coef_occ_b.T, mf.ovlp, mo_coeff[1]))
-    print(s_a,'\n',s_b)
+    if mf.debug:
+        print(s_a,'\n',s_b)
     #choose a subset of mo_coeff, which maximizes <old|now>
     ss_a = np.einsum('ij,ij->j', s_a, s_a)
     ss_b = np.einsum('ij,ij->j', s_b, s_b)
-    print(ss_a, '\n', ss_b)
+    print('Overlap: ', ss_a, '\n', ss_b)
     idx_a = np.argsort(ss_a)[::-1]
     idx_b = np.argsort(ss_b)[::-1]
     mo_occ[0][idx_a[:nocc_a]] = 1.
