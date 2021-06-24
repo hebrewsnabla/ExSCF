@@ -1,70 +1,17 @@
 import numpy as np
-import sympy as sym
 import scipy
-from pyscf import gto, scf
+from pyscf import scf
 from pyscf.scf import chkfile
 from pyscf.dft import numint
 #from pyscf.lib.misc import repo_info
-from pyphf import sudm, util2, sudft, deltascf, jk
+from pyphf import sudm, sudft, deltascf
+from pyphf import util2, jk, wigner
 import os
 from functools import partial
 import time
 
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
-
-
-def get_beta(n):
-    # Gauss-Legendre quadrature
-    PI = np.pi
-    b0,b1 = 0.0, PI
-    m = (n+1)//2
-    bm = 0.5*(b1+b0)
-    bl = 0.5*(b1-b0)
-    grid = np.zeros(n)
-    weight = np.zeros(n)
-    for i in range(m):
-        z = np.cos(PI*(i+1-0.25) / (n + 0.5))
-        while(True):
-            p1, p2 = 1.0, 0.0
-            for j in range(n):
-                p3 = p2
-                p2 = p1
-                p1 = ((2*j + 1)*z*p2 - (j)*p3)/(j+1)
-            pp = n*(z*p1 - p2)/(z*z-1)
-            z = z - p1/pp
-            if (abs(p1/pp) < 3e-14): 
-                break
-        grid[i] = bm - bl*z
-        grid[n-1-i] = bm + bl*z
-        weight[i] = 2*bl / ((1 - z*z)*pp*pp)
-        weight[n-1-i] = weight[i]
-        # Note: We did not perform weight *= sin(beta) here. That's left in get_xg().
-    return grid, weight
-
-def WignerSmall(j,m):
-    #j = sym.symbols('j')
-    #m = sym.symbols('m')
-    j = sym.sympify(j)/2
-    m = sym.sympify(m)/2
-    s = sym.symbols('s')
-    beta = sym.symbols('beta')
-    if j==0:
-        d_simp = 1
-    else:
-        d = (-1)**s * sym.binomial(j+m,s) * sym.binomial(j-m,s) * sym.cos(beta/2)**(2*j-2*s) * sym.sin(beta/2)**(2*s)
-        upper = min(j-m,j+m)
-        d = sym.Sum(d, (s, 0, upper)).doit()
-        d_simp = sym.trigsimp(d)
-    f = sym.lambdify(beta, d_simp, 'numpy')
-    return d_simp, f
-
-def count0(vals):
-    non0 = 0
-    for i in vals:
-        if abs(i)>1e-10:
-            non0 += 1
-    return non0
 
 def eig(A):
     return np.linalg.eigh(A)
@@ -92,10 +39,16 @@ def get_vir(occa, occb):
     virb = np.ones(len(occb), dtype=int) - occb
     return vira, virb
 
+def count0(vals):
+    non0 = 0
+    for i in vals:
+        if abs(i)>1e-10:
+            non0 += 1
+    return non0
+
 def find_NO(suhf, dm, mo_occ):
     cut_no = suhf.cut_no
     #dm = dm*(-1)
-    #np.set_printoptions(precision=16, linewidth=200, suppress=False)
     #print(dm)
     occa, occb = mo_occ
     vira, virb = get_vir(occa, occb)
@@ -205,8 +158,6 @@ def get_xg(suhf, no, mo_occ, Ng):
     print('detNg', detNg)
     xg = 1.0 / (detC * detNg * detC)
     print('xg', xg)
-    #sinbeta = np.sin(grids)
-    #ciS = einsum('i,i,i,i->', weights, sinbeta, xg, d)
     ciS = suhf.integr_beta(xg)
     #print(weights, xg, d)
     print('ciS', ciS)
@@ -219,7 +170,6 @@ def integr_beta(q, d, grids, weights, fac='normal', xg=None, ciS=None):
         weights = weights * xg / ciS
         #print(xg, ciS, xg/ciS**2)
         #weights *= (xg / ciS**2)
-        #print(weights)
     elif fac=='ci':
         weights = weights / ciS
 
@@ -236,7 +186,6 @@ def integr_beta(q, d, grids, weights, fac='normal', xg=None, ciS=None):
 
 def get_H(suhf, hcore_ortho, no, Pg, Gg, xg):
     #print(hcore_ortho)
-    #hcore_ortho = suhf.hcore_ortho
     hcore_ortho = np.vstack((
         np.hstack((hcore_ortho, np.zeros(hcore_ortho.shape))),
         np.hstack((np.zeros(hcore_ortho.shape), hcore_ortho))
@@ -251,8 +200,6 @@ def get_H(suhf, hcore_ortho, no, Pg, Gg, xg):
         #H = H * xg[i]
         trHg[i] = H
         #print(i, H*xg[i])
-    #sinbeta = np.sin(grids)
-    #ciH = einsum('i,i,i,i->', weights, sinbeta, Hg, d)
     ciH = suhf.integr_beta(trHg*xg)
     print('ciH', ciH)
     return trHg, ciH
@@ -262,8 +209,6 @@ def get_EX(suhf, no, Pg, Kg, xg):
     for i, pg in enumerate(Pg):
         trXg[i] = 0.5 * np.trace(np.dot(Kg[i], pg))
         #H = H * xg[i]
-    #ciH = suhf.integr_beta(trHg*xg)
-    #print('ciH', ciH)
     X = suhf.integr_beta(trXg, fac='xg')
     return trXg, X
 
@@ -317,7 +262,6 @@ def get_Yg(suhf, Dg, Ng, dm_no, occ):
         print('X(g) int')
         print(Xg_int)
     Yg = Xg - Xg_int
-    #print(Yg.shape)
     return Xg, Xg_int, Yg
 
 def get_Feff(suhf, trHg, Gg, Ng, Pg, Dg, occ, Yg, Xg, F_ortho):
@@ -530,7 +474,7 @@ class SUHF():
         self.norb = len(self.dm_ortho[0])
 
         self.nbeta = 8
-        self.grids, self.weights = get_beta(self.nbeta)
+        self.grids, self.weights = wigner.get_beta(self.nbeta)
         print('grids: ', self.grids, '\nweights: ', self.weights)
         spin = self.mol.spin
         na, nb = self.guesshf.nelec
@@ -538,13 +482,7 @@ class SUHF():
         sz = (na-nb)/2
         print('S = %.1f, Sz = %.1f' % (spin/2, sz))
         self.S, self.Sz = spin/2, sz
-        Wignerd_expr, Wignerd = WignerSmall(int(spin), int(2*sz))
-        print('Wigner small d: ', Wignerd_expr)
-        d = np.zeros(self.nbeta)
-        for g in range(self.nbeta):
-            d[g] = Wignerd(self.grids[g])
-        print('value :', d)
-        self.d_expr, self.d_func, self.d = Wignerd_expr, Wignerd, d
+        self.d_expr, self.d_func, self.d = wigner.wigner(spin, sz, self.nbeta, self.grids)
         self.E_suhf = None
         self.energy_nuc = self.mol.energy_nuc()
         hcore = hf.get_hcore()

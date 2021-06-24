@@ -6,15 +6,12 @@
 * [MOKIT](https://gitlab.com/jxzou/mokit) (optional, for read/write fch and CASDFT)
 * [pyAutoMR](https://github.com/hebrewsnabla/pyAutoMR) (optional, for CASDFT)
 
+Of course we need numpy, scipy, etc., but these are also required by PySCF, so they are not listed here.
+libxc is optional in PySCF, but it's required here. Usually you've installed that when installing PySCF.
+
 ## Installation
 * git clone
 * add `/path/to/ExSCF` to your `PYTHONPATH`
-* build(deprecated, only if you need modified DFT functional)
-```
-cd ExSCF/pyphf
-cmake . -DCMAKE_INSTALL_PREFIX:PATH=$HOME/pyscf_deps # the directory above libxc's lib
-make xc_itrf_mod
-```
 
 ## Features
 Theoretial features:
