@@ -6,7 +6,7 @@ from pyscf.scf import chkfile
 from pyscf.lib import temporary_env
 from pyscf.dft import numint
 #from pyscf.lib.misc import repo_info
-from pyphf import sudm, util2, sudft
+from pyphf import sudm, util2, sudft, deltascf
 import os, sys
 from functools import partial
 import time
@@ -100,6 +100,7 @@ def find_NO(suhf, dm, mo_occ):
     #print(dm)
     occa, occb = mo_occ
     vira, virb = get_vir(occa, occb)
+    na, nb = suhf.nelec
     print(occa,occb,vira, virb)
     ev_a, v_a = eig(dm[0]*(-1))
     ev_b, v_b = eig(dm[1]*(-1))
@@ -108,10 +109,14 @@ def find_NO(suhf, dm, mo_occ):
     if suhf.debug:
         print('NO eigenvalue')
         print(ev_a, '\n', ev_b)
-    v_a1 = v_a[:,occa == 1]
-    v_a2 = v_a[:,vira == 1]
-    v_b1 = v_b[:,occb == 1]
-    v_b2 = v_b[:,virb == 1]
+#    v_a1 = v_a[:,occa == 1]
+#    v_a2 = v_a[:,vira == 1]
+#    v_b1 = v_b[:,occb == 1]
+#    v_b2 = v_b[:,virb == 1]
+    v_a1 = v_a[:,:na]
+    v_a2 = v_a[:,na:]
+    v_b1 = v_b[:,:nb]
+    v_b2 = v_b[:,nb:]
     #print(v_a1, v_a2, v_b1, v_b2)
     v_a1 = np.vstack((v_a1, np.zeros(v_a1.shape)))
     v_a2 = np.vstack((v_a2, np.zeros(v_a2.shape)))
@@ -553,8 +558,9 @@ class SUHF():
         self.guesshf = guesshf
 
         self.cut_no = False
-        self.use_no = True
+        #self.use_no = True
         self.verbose = 4
+        self.printmo = False
         #self.debug = False
         self.output = None # since 0.3.1, define output is important, it decides self.chkfile
         self.restart = False
@@ -568,6 +574,10 @@ class SUHF():
         self.makedm = True
         self.tofch = False
         self.oldfch = None
+
+        self.setmom = None
+        self.mom_reforb = None
+        self.mom_start_cyc = 5
 
         self.built = False
 
@@ -645,6 +655,7 @@ class SUHF():
         #    os.system("echo '' > %s" % self.output)
         #    sys.stdout = open(self.output, 'a')
         S = scf.hf.get_ovlp(self.mol)
+        self.ovlp = S
         Ca, Cb = self.guesshf.mo_coeff
         if self.debug:
             print('S')
@@ -705,6 +716,14 @@ class SUHF():
         if self.dft:
             self.ksgrids = sudft.set_grids(self.mol)
 
+        mo_occ = get_occ(self)
+        self.mo_occ = mo_occ
+        self.mom = False
+        if self.setmom is not None:
+            self.mom = True
+            aexci, bexci = self.setmom
+            self.setocc = deltascf.set_occ(mo_occ, aexci, bexci)
+
         self.built = True
 
     def integr_beta(self, q, fac='normal'):
@@ -725,10 +744,10 @@ class SUHF():
             np.set_printoptions(precision=10, linewidth=200, suppress=False)
         X = self.X
         na, nb = self.nelec
-        mo_occ = get_occ(self)
         norb = self.norb
         #mf = self.guesshf
-        
+        mo_occ = self.mo_occ
+
         thresh = self.conv_tol
         max_cycle = self.max_cycle
         cyc = 1
@@ -817,12 +836,15 @@ class SUHF():
                 print('level shift: %.3f a.u.' % shift)
                 F_mod_ortho = lev_shift(s1e, self.dm_ortho, F_mod_ortho, shift)
             mo_e, mo_ortho = Diag_Feff(F_mod_ortho)
-            mo_occ = get_occ(self, mo_e)
+            if self.mom and cyc >= self.mom_start_cyc:
+                mo_occ = deltascf.mom_occ(self, self.mom_reforb, self.setocc)
+            else:
+                mo_occ = get_occ(self, mo_e)
             self.mo_occ = mo_occ
             dm_ortho = make_dm(mo_ortho, mo_occ)
             util2.dump_moe(mo_e, na, nb)
-            if self.debug:
-                print('e_a, e_b\n', mo_e[0], '\n', mo_e[1])
+            if self.debug or self.printmo:
+                #print('e_a, e_b\n', mo_e[0], '\n', mo_e[1])
                 print('v_a, v_b\n', mo_ortho[0], '\n', mo_ortho[1])
                 print('P_a, P_b\n', dm_ortho[0],'\n', dm_ortho[1])
             self.dm_ortho = dm_ortho
@@ -833,7 +855,7 @@ class SUHF():
             mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
             self.dm_reg = dm_reg
             self.mo_reg = mo_reg
-            if self.debug:
+            if self.debug or self.printmo:
                 print('dm_reg\n', dm_reg)
                 print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
             t10 = time.time()
@@ -896,7 +918,10 @@ class SUHF():
             Fbb = F_mod_ortho[norb:, norb:]
             F_mod_ortho = np.array([Faa,Fbb])
             mo_e, mo_ortho, dm_ortho = Diag_Feff(F_mod_ortho)
-            mo_occ = get_occ(self, mo_e)
+            if self.mom and cyc >= self.mom_start_cyc:
+                mo_occ = deltascf.mom_occ(self, self.mom_reforb, self.setocc)
+            else:
+                mo_occ = get_occ(self, mo_e)
             self.mo_occ = mo_occ
             util2.dump_moe(mo_e, na, nb)
             if self.debug:
