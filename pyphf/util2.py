@@ -5,6 +5,8 @@ except:
     print('py2fch not found. Interface with fch is disabled. Install MOKIT if you need that.')
 import os
 from functools import partial
+from pyscf.lib.chkfile import dump, save
+from pyscf.lib.chkfile import load_mol, save_mol
 
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
@@ -97,8 +99,15 @@ def dump_occ(occ, full=1.0):
 def load(pchk):
     return 0
 
-def dump_chk(mol, chkfile, moe, mo, dm):
-    return 0
+def dump_chk(mol, chkfile, e_tot, mo_e, mo, mo_occ, dm):
+    save_mol(mol, chkfile)
+
+    scf_dic = {'e_tot'    : e_tot,
+               'mo_energy': mo_e,
+               'mo_coeff' : mo,
+               'mo_occ'   : mo_occ,
+               'dm'       : dm}
+    save(chkfile, 'scf', scf_dic)
 
 def repo_info(repo_path):
     '''

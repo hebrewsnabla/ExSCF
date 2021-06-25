@@ -1,6 +1,6 @@
 import numpy as np
 import scipy
-from pyscf import scf
+from pyscf import scf, lib
 from pyscf.scf import chkfile
 from pyscf.dft import numint
 #from pyscf.lib.misc import repo_info
@@ -413,11 +413,21 @@ class SUHF():
             hf = self.guesshf
             self.mol = hf.mol
             self.chkfile0 = self.output + '_ges.pchk'
-            #chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
-            #                     hf.mo_coeff, hf.mo_occ)
+            chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
+                                 hf.mo_coeff, hf.mo_occ)
             print('chkfile0: %s # the file store hf for guess' % self.chkfile0)
         elif self.chkfile0 is not None:
-            pass ## todo
+            chkfile1 = self.output + '_ges.pchk'
+            os.system('cp %s %s' % (self.chkfile0, chkfile1))
+            print('Load UHF from %s, new chkfile %s' % (self.chkfile0, chkfile1))
+            mol = lib.chkfile.load_mol(chkfile1)
+            hf = scf.UHF(mol)
+            hf.chkfile = chkfile1
+            hf.init_guess = 'chkfile'
+            hf.kernel()
+            self.mol = hf.mol
+            self.guesshf = hf
+            print('****** End of UHF ********')
         elif self.chkfile is not None:
             self.mol, suinfo = util2.load(self.chkfile)
         else:
@@ -499,6 +509,8 @@ class SUHF():
         self.mom = False
         if self.setmom is not None:
             self.mom = True
+            if self.mom_reforb is None:
+                raise AttributeError('You need to provide mom_reforb, i.e. MOs from a previous SUHF obj')
             aexci, bexci = self.setmom
             self.setocc = deltascf.set_occ(mo_occ, aexci, bexci)
 
@@ -561,8 +573,8 @@ class SUHF():
             F_ortho = Fa_ortho, Fb_ortho
             if self.debug:
                 print('Fock (ortho)\n', F_ortho)
-                e_uhf, e_uhf_coul = scf.uhf.energy_elec(self.guesshf, self.dm_ortho, self.hcore_ortho, veff_ortho)
-                print('E(UHF) = %12.6f' % e_uhf)
+                #e_uhf, e_uhf_coul = scf.uhf.energy_elec(self.guesshf, self.dm_ortho, self.hcore_ortho, veff_ortho)
+                #print('E(UHF) = %12.6f' % e_uhf)
 #            if self.use_no:
             dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, mo_occ)
             self.dm_no = dm_no
@@ -614,20 +626,15 @@ class SUHF():
                 F_mod_ortho = lev_shift(s1e, self.dm_ortho, F_mod_ortho, shift)
 
             mo_e, mo_ortho = Diag_Feff(F_mod_ortho)
-            if self.mom and cyc >= self.mom_start_cyc:
-                mo_occ = deltascf.mom_occ(self, self.mom_reforb, self.setocc)
-            else:
-                mo_occ = get_occ(self, mo_e)
-            self.mo_occ = mo_occ
-            dm_ortho = make_dm(mo_ortho, mo_occ)
+            self.mo_e = mo_e
             util2.dump_moe(mo_e, na, nb)
+            dm_ortho = make_dm(mo_ortho, mo_occ)
             if self.debug or self.printmo:
                 #print('e_a, e_b\n', mo_e[0], '\n', mo_e[1])
                 print('v_a, v_b\n', mo_ortho[0], '\n', mo_ortho[1])
                 print('P_a, P_b\n', dm_ortho[0],'\n', dm_ortho[1])
             self.dm_ortho = dm_ortho
             self.mo_ortho = mo_ortho
-            self.mo_e = mo_e
             dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
             mo_ortho = np.array(self.mo_ortho)
             mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
@@ -636,6 +643,11 @@ class SUHF():
             if self.debug or self.printmo:
                 print('dm_reg\n', dm_reg)
                 print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
+            if self.mom and cyc >= self.mom_start_cyc:
+                mo_occ = deltascf.mom_occ(self, self.mom_reforb, self.setocc)
+            else:
+                mo_occ = get_occ(self, mo_e)
+            self.mo_occ = mo_occ
             t10 = time.time()
             print('time for xg, H, S2, Yg, Feff: %.3f' % (t10-t06))
         
@@ -646,7 +658,6 @@ class SUHF():
             else:
                 print(' E = %15.8f' % E_suhf)
             self.conv = conv
-            util2.dump_chk(self.mol, self.chkfile, self.mo_e, self.mo_ortho, self.dm_ortho)
             cyc += 1
             if cyc >= max_cycle:
                 print('SUHF not converged')
@@ -723,6 +734,7 @@ class SUHF():
         t_aftercyc = time.time()
         print('time for cyc: %.3f' % (t_aftercyc-t_pre))
 
+        util2.dump_chk(self.mol, self.chkfile, self.E_suhf, self.mo_e, self.mo_reg, self.mo_occ, self.dm_reg)
         if self.makedm:
             suhf_dm = sudm.make_1pdm(self, Dg, self.dm_no, C_no)
             t_dm = time.time()
