@@ -1,4 +1,4 @@
-from pyphf import util, guess
+from pyphf import suscf, guess
 from pyscf import lib
 
 lib.num_threads(24)
@@ -7,6 +7,6 @@ lib.num_threads(24)
 #mf = guess.mix(mol.atom, mol.basis, conv='tight')
 mf = guess.from_fch_simp('anthracene_uhf.fch')
 
-mf2 = util.SUHF(mf)
+mf2 = suscf.SUHF(mf)
 mf2.kernel()
 

@@ -1,5 +1,5 @@
 from pyscf import lib
-from pyphf import util, guess
+from pyphf import suscf, guess
 
 lib.num_threads(4)
 
@@ -9,9 +9,9 @@ bas = 'def2svp'
 
 mf = guess.from_fchk(xyz, bas, fch)
 
-mf2 = util.SUHF(mf)
+mf2 = suscf.SUHF(mf)
 #mf2.debug = False
-mf2.diis_on = True
+#mf2.diis_on = True
 #mf2.diis_start_cyc = 20
 mf2.max_cycle = 100
 mf2.tofch = True
