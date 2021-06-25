@@ -13,6 +13,11 @@ import time
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
+'''
+SUHF
+Jiménez-Hoyos, C. A.; Henderson, T. M.; Tsuchimochi, T.; Scuseria, G. E. J Chem Phys 2012, 136, 164109
+'''
+
 def eig(A):
     return np.linalg.eigh(A)
     #return scipy.linalg.eigh(A)

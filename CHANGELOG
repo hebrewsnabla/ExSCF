@@ -3,6 +3,8 @@ version 0.4.0 (Jun 23, 2021)
 * DeltaSCF
   + add mo_occ, move util -> suscf
   + MOM
+* Restart SUHF from
+  + UHF chkfile
 
 version 0.3.2 (May 28, 2021)
 --------------------------
