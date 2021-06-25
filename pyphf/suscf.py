@@ -394,19 +394,20 @@ class SUHF():
         print('pyphf path  %s' % info['path'])
         if 'git' in info:
             print(info['git'] )
-        print('max_cycle = %d' % self.max_cycle)
+        print('max_cycle: %d' % self.max_cycle)
         self.debug = False
         self.debug2 = False
         if self.verbose <= 4:
-            print('verbose: %d, normal' % self.verbose)
+            print('verbose: %d                # normal' % self.verbose)
         elif self.verbose <= 6:
             self.debug = True
-            print('verbose: %d, debug' % self.verbose)
+            print('verbose: %d                # debug' % self.verbose)
         else:
             self.debug = True
             self.debug2 = True
-            print('verbose: %d, debug2' % self.verbose)
-        print('conv_tol: %g' % self.conv_tol)
+            print('verbose: %d                # debug2' % self.verbose)
+        print('conv_tol: %g           # %g for RMSD(dm), %g for MaxD(dm), %g for dE' % (
+            self.conv_tol, self.conv_tol, self.conv_tol*1e2, self.conv_tol*1e-2))
         if self.conv_tol > 1e-5:
             print('Warning: conv_tol too large')
 
@@ -443,7 +444,7 @@ class SUHF():
             '''
             raise AttributeError('You must provide one of below as a guess:' + guess)
         self.chkfile = self.output + '_su.pchk'
-        print('chkfile: %s # the file store suhf info' % self.chkfile)
+        print('chkfile:  %s  # the file store suhf info' % self.chkfile)
         #self.chkfile2 = self.output + '_no.pchk'
         #print('chkfile2: %s # the file store suhf NO' % self.chkfile2)
 
@@ -754,6 +755,7 @@ class SUHF():
             print('time for natorb: %.3f' % (t_nat-t_dm))
 
         t_end = time.time()
+        print('***** End of SUHF *****')
         print('time tot: %.3f' % (t_end-t_start))
         print('Date: %s' % time.ctime())
         return E_suhf, self.conv

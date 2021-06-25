@@ -7,6 +7,6 @@ bas = '3-21g'
 mf = guess.mix(xyz, bas, conv='tight')
 
 mf2 = suscf.SUHF(mf)
-mf2.verbose = 8
+#mf2.verbose = 8
 mf2.kernel()
 
