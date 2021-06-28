@@ -5,6 +5,7 @@ tmp*
 *.pchk
 /test/test_dm/B3/
 /test/mom/
+/test/io/
 /phf/
 .vscode/
 __pycache__/

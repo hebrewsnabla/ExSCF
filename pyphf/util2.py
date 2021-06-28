@@ -96,6 +96,9 @@ def dump_occ(occ, full=1.0):
             ext += 1
     return s + '...', [core, act, ext]
 
+def warn(s):
+    return "\033[43;34m Warning: " + s + "\033[0m"
+
 def load(pchk):
     return 0
 

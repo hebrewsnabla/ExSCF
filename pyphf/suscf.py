@@ -409,7 +409,7 @@ class SUHF():
         print('conv_tol: %g           # %g for RMSD(dm), %g for MaxD(dm), %g for dE' % (
             self.conv_tol, self.conv_tol, self.conv_tol*1e2, self.conv_tol*1e-2))
         if self.conv_tol > 1e-5:
-            print('Warning: conv_tol too large')
+            print(util2.warn("conv_tol too large"))
 
     def build(self):
         self.dump_flags()
@@ -666,7 +666,7 @@ class SUHF():
             self.conv = conv
             cyc += 1
             if cyc >= max_cycle:
-                print('SUHF not converged')
+                print(util2.warn('SUHF not converged'))
                 break
 
         # extra cycle to remove level shift
