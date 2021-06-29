@@ -4,7 +4,7 @@ from pyscf import lib
 #import numpy as np
 #import sys
 
-from pyphf import util, guess, pt2
+from pyphf import suscf, guess, pt2
 
 lib.num_threads(4)
 
@@ -16,7 +16,7 @@ bas = '3-21g'
 #mf = util.guess_from_fchk(xyz, bas, fch)
 mf = guess.mix(xyz, bas, cycle=2)
 
-mf2 = util.SUHF(mf)
+mf2 = suscf.SUHF(mf)
 mf2.cut_no = False
 mf2.verbose = 6
 mf2.diis_on = True

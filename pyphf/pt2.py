@@ -8,7 +8,7 @@ import numpy as np
 #import scipy
 from pyscf import gto, scf, mp, lib
 from pyphf import suscf, util2
-from pyphf.util import count0, eig
+from pyphf.suscf import count0, eig
 #import os, sys
 from functools import partial
 import time
@@ -157,7 +157,7 @@ class EMP2():
         #print('D(g) (NO)\n', Dg[0])
         #print('N(g) (NO)\n', Ng[0])
         #print('P(g) (NO)\n', Pg[0])
-        C_no = suscf.get_xg(suhf, no, na, nb, Ng)[-1]
+        C_no = suscf.get_xg(suhf, no, suhf.mo_occ, Ng)[-1]
 
         xg, yg, ciS = get_xg(suhf, C_no, Dg, na+nb)
         #get_Mg2(suhf, Dg, na+nb)
@@ -265,7 +265,7 @@ def get_xg(suhf, C_no, Dg, occ):
         x = np.linalg.det(mg)
         Mg.append(mg)
         xg.append(x)
-    print(xg)
+    print('xg', xg)
 
     ciS = suhf.integr_beta(np.array(xg))
     yg = xg / ciS

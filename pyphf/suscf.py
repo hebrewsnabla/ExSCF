@@ -130,8 +130,8 @@ def get_Ng(grids, no, dm, occ):
         Pg.append(pg)
     return Dg, Ng, Pg
 
-def get_xg(suhf, no, mo_occ, Ng):
-    C_a, C_b = suhf.mo_ortho
+def expd(mo, mo_occ):
+    C_a, C_b = mo
     occa, occb = mo_occ
     vira, virb = get_vir(occa, occb)
     C_a1 = C_a[:,occa==1]
@@ -144,6 +144,10 @@ def get_xg(suhf, no, mo_occ, Ng):
         np.vstack((C_a2, np.zeros(C_a2.shape))),
         np.vstack((np.zeros(C_b2.shape), C_b2))
     ))
+    return C_org
+
+def get_xg(suhf, no, mo_occ, Ng):
+    C_org = expd(suhf.mo_ortho, mo_occ)
     #print(C_org)
     C_no = einsum('ji,jk->ik', no, C_org)
     if suhf.debug:
