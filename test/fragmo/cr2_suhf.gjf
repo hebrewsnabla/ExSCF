@@ -1,8 +1,0 @@
-%subst l530 /share/home/srwang/ExSCF/phf
-%nproc=1
-%mem=1gb
-%oldchk=cr2.chk
-%chk=cr2_suhf.chk
-#p uhf/def2svp guess=read geom=allcheck scf=conver=2
-# extralink=l530 iop(5/206=4, 5/207=4, 5/216=1, 5/218=5, 5/215=-300) pop=none
-

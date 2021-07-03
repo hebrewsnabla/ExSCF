@@ -1,11 +1,8 @@
 core.*
 tmp*
-/test/scan*/*.log
+/test/
 *.chk
 *.pchk
-/test/test_dm/B3/
-/test/mom/
-/test/io/
 /phf/
 .vscode/
 __pycache__/

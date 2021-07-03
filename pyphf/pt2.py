@@ -7,7 +7,7 @@ import numpy as np
 #import sympy as sym
 #import scipy
 from pyscf import gto, scf, mp, lib
-from pyphf import suscf, util2
+from pyphf import suscf, util2, noci
 from pyphf.suscf import count0, eig
 #import os, sys
 from functools import partial
@@ -152,16 +152,19 @@ class EMP2():
         #print(e0)
         #for i in range(self.occ):
         #    for a in range(self.occ, self.norb):
-        dm_no, _, no = find_NO(suhf, suhf.dm_ortho, na, nb)
-        Dg, Ng, Pg = suscf.get_Ng(suhf.grids, no, dm_no, na+nb)
+#        dm_no, _, no = find_NO(suhf, suhf.dm_ortho, na, nb)
+#        Dg, Ng, Pg = suscf.get_Ng(suhf.grids, no, dm_no, na+nb)
         #print('D(g) (NO)\n', Dg[0])
         #print('N(g) (NO)\n', Ng[0])
         #print('P(g) (NO)\n', Pg[0])
-        C_no = suscf.get_xg(suhf, no, suhf.mo_occ, Ng)[-1]
+#        C_no = suscf.get_xg(suhf, no, suhf.mo_occ, Ng)[-1]
 
-        xg, yg, ciS = get_xg(suhf, C_no, Dg, na+nb)
+#        xg, yg, ciS = get_xg(suhf, C_no, Dg, na+nb)
         #get_Mg2(suhf, Dg, na+nb)
+        ca_sc_ortho = einsum('ij,jk->ik', mo_ortho[0], ca_sc)
+        cb_sc_ortho = einsum('ij,jk->ik', mo_ortho[1], cb_sc)
         #mo = suhf.mo_ortho
+        get_tau1(suhf, na, nb, nvira, nvirb, (ca_sc_ortho, cb_sc_ortho))
         ca_sc_ao = einsum('ij,jk,kl->il', suhf.X, mo_ortho[0], ca_sc)
         cb_sc_ao = einsum('ij,jk,kl->il', suhf.X, mo_ortho[1], cb_sc)
         eris = self.ao2mo([ca_sc_ao, cb_sc_ao])
@@ -209,6 +212,39 @@ def Diag_F(F, occ, norb):
     eo, co = np.linalg.eigh(Foo)
     ev, cv = np.linalg.eigh(Fvv)
     return eo, ev, co, cv
+
+def get_tau1(mf, na, nb, nvira, nvirb, mo):
+    tau1_aa = np.zeros((na,nvira, na,nvira))
+    for i in range(na):
+        for a in range(na, na+nvira):
+            for j in range(na):
+                if j==i: continue
+                for b in range(na, na+nvira):
+                    if b==a: continue
+                    ciS, ciH = noci.ci_cross(mf, [[i,j],[a,b]], [[],[]], mo)
+                    print(i,a,j,b, ciS)
+                    tau1_aa[i,a,j,b] = ciS
+    tau1_bb = np.zeros((nb,nvirb, nb,nvirb))
+    for i in range(nb):
+        for a in range(nb, nb+nvirb):
+            for j in range(nb):
+                if j==i: continue
+                for b in range(nb, nb+nvirb):
+                    if b==a: continue
+                    ciS, ciH = noci.ci_cross(mf, [[],[]], [[i,j],[a,b]], mo)
+                    print(i,a,j,b, ciS)
+                    tau1_bb[i,a,j,b] = ciS
+    tau1_ab = np.zeros((na,nvira, nb,nvirb))
+    for i in range(na):
+        for a in range(na, na+nvira):
+            for j in range(nb):
+                #if j==i: continue
+                for b in range(nb, nb+nvirb):
+                    #if b==a: continue
+                    ciS, ciH = noci.ci_cross(mf, [[i],[a]], [[j],[b]], mo)
+                    print('cis ',i,a,j,b, ciS)
+                    tau1_bb[i,a-na,j,b-nb] = ciS
+                    
 
 def find_NO(suhf, dm, na, nb, i=0, a=0):
     cut_no = suhf.cut_no

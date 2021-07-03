@@ -380,6 +380,9 @@ class SUHF():
         self.makedm = True
         self.tofch = False
         self.oldfch = None
+        self.dumpchk = False
+        self.chkfile0 = None
+        self.chkfile = None
 
         self.setmom = None
         self.mom_reforb = None
@@ -422,10 +425,11 @@ class SUHF():
         if self.guesshf is not None:
             hf = self.guesshf
             self.mol = hf.mol
-            self.chkfile0 = self.output + '_ges.pchk'
-            chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
+            if self.dumpchk:
+                self.chkfile0 = self.output + '_ges.pchk'
+                chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
                                  hf.mo_coeff, hf.mo_occ)
-            print('chkfile0: %s # the file store hf for guess' % self.chkfile0)
+                print('chkfile0: %s # the file store hf for guess' % self.chkfile0)
         elif self.chkfile0 is not None:
             chkfile1 = self.output + '_ges.pchk'
             os.system('cp %s %s' % (self.chkfile0, chkfile1))
@@ -447,8 +451,9 @@ class SUHF():
             chkfile: SUHF chkfile
             '''
             raise AttributeError('You must provide one of below as a guess:' + guess)
-        self.chkfile = self.output + '_su.pchk'
-        print('chkfile:  %s  # the file store suhf info' % self.chkfile)
+        if self.dumpchk:
+            self.chkfile = self.output + '_su.pchk'
+            print('chkfile:  %s  # the file store suhf info' % self.chkfile)
         #self.chkfile2 = self.output + '_no.pchk'
         #print('chkfile2: %s # the file store suhf NO' % self.chkfile2)
 
@@ -744,7 +749,8 @@ class SUHF():
         t_aftercyc = time.time()
         print('time for cyc: %.3f' % (t_aftercyc-t_pre))
 
-        util2.dump_chk(self.mol, self.chkfile, self.E_suhf, self.mo_e, self.mo_reg, self.mo_occ, self.dm_reg)
+        if self.dumpchk:
+            util2.dump_chk(self.mol, self.chkfile, self.E_suhf, self.mo_e, self.mo_reg, self.mo_occ, self.dm_reg)
         if self.makedm:
             suhf_dm = sudm.make_1pdm(self, Dg, self.dm_no, C_no)
             t_dm = time.time()

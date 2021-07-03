@@ -68,17 +68,31 @@ def get_jk(mol, dm, hermi=1, opt=None):
     return scf.hf.get_jk(mol, dm, hermi, opt)
 
 def get_k(mol, dm, hermi=1, opt=None):
-    with temporary_env(opt, prescreen='CVHFnrs8_vk_prescreen'):
+    if opt is not None:
+        with temporary_env(opt, prescreen='CVHFnrs8_vk_prescreen'):
+            vk = scf.hf.get_jk(mol, dm, hermi, opt, with_j=False)[1]
+    else:
         vk = scf.hf.get_jk(mol, dm, hermi, opt, with_j=False)[1]
+
     return vk
 
-def get_Gg(mol, Pg, no, X, dm_last=None, Ggao_last=None, opt=None):
-    Gg = []
+def no2ortho(Pg, no):
     Pg_ortho = []
     for pg in Pg:
         pg_ortho = einsum('ij,jk,lk->il', no, pg, no)
         #print(pg_ortho)
         Pg_ortho.append(pg_ortho)
+    return Pg_ortho
+
+def get_Gg(mol, Pg, no, X, dm_last=None, Ggao_last=None, opt=None):
+    Pg_ortho = no2ortho(Pg, no)
+    Gg_ortho, Pgao, Ggao = get_Gg_ortho(mol, Pg_ortho, X, dm_last, Ggao_last, opt)
+    Gg = ortho2no(Gg_ortho, no)
+    return Gg, Pg_ortho, Pgao, Ggao
+
+
+def get_Gg_ortho(mol, Pg_ortho, X, dm_last=None, Ggao_last=None, opt=None):
+    #Pg_ortho = no2ortho(Pg)
     norb = int(Pg_ortho[0].shape[0]/2)
     Pgaa_ao = []
     Pgab_ao = []
@@ -136,6 +150,7 @@ def get_Gg(mol, Pg, no, X, dm_last=None, Ggao_last=None, opt=None):
         # X^H . G(g) . X
     Ggab_ao *= -1
     Ggba_ao *= -1
+    Gg_ortho = []
     for i,ggab_ao in enumerate(Ggab_ao):
         #ggab_ao = Ggab_ao[i]
         ggba_ao = Ggba_ao[i]
@@ -147,7 +162,13 @@ def get_Gg(mol, Pg, no, X, dm_last=None, Ggao_last=None, opt=None):
         ggba = einsum('ji,jk,kl->il', X, ggba_ao, X) 
         ggbb = einsum('ji,jk,kl->il', X, ggbb_ao, X) 
         gg = util2.stack22(ggaa, ggab, ggba, ggbb)
+        Gg_ortho.append(gg)
+    return Gg_ortho, Pgao, Ggao
+
+
+def ortho2no(Gg_ortho, no):    
+    Gg = []
+    for gg in Gg_ortho:
         gg_no = einsum('ji,jk,kl->il', no, gg, no)
         Gg.append(gg_no)
-    return Gg, Pg_ortho, Pgao, Ggao
-
+    return Gg

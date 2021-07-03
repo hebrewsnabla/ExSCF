@@ -1,6 +1,0 @@
-%nproc=1
-%mem=1gb
-#p casscf/def2svp 
-
-mokit{readuhf='cr2.fchk', crazywfn, ist=2}
-
