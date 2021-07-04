@@ -164,7 +164,8 @@ class EMP2():
         ca_sc_ortho = einsum('ij,jk->ik', mo_ortho[0], ca_sc)
         cb_sc_ortho = einsum('ij,jk->ik', mo_ortho[1], cb_sc)
         #mo = suhf.mo_ortho
-        get_tau1(suhf, na, nb, nvira, nvirb, (ca_sc_ortho, cb_sc_ortho))
+        Sia, Siajb = noci.all_cross(suhf, na, nb, nvira, nvirb, (ca_sc_ortho, cb_sc_ortho))
+        #get_tau1(suhf, na, nb, nvira, nvirb, (ca_sc_ortho, cb_sc_ortho))
         ca_sc_ao = einsum('ij,jk,kl->il', suhf.X, mo_ortho[0], ca_sc)
         cb_sc_ao = einsum('ij,jk,kl->il', suhf.X, mo_ortho[1], cb_sc)
         eris = self.ao2mo([ca_sc_ao, cb_sc_ao])
@@ -172,6 +173,24 @@ class EMP2():
         
         eia_a = ea[:na,None] - ea[None,na:]
         eia_b = eb[:nb,None] - eb[None,nb:]
+        print(eris.ovov.shape)
+        eris_ovov = eris.ovov.reshape(na,nvira,na,nvira)
+        eris_ovOV = eris.ovOV.reshape(na,nvira,nb,nvirb)
+
+        Via = einsum('iaqs, qs->ia', eris_ovov, Sia) - einsum('isqa,qs->ia', eris_ovov, Sia)
+        Via += einsum('iaqs, qs->ia', eris_ovOV, Sia) #- einsum('isqa,qs->ia', eris_ovov, Sia)
+        Via *= 0.5
+        print('Via', Via)
+        Viajb_aa0 = eris_ovov - eris_ovov.transpose(0,3,2,1) 
+        Viajb_aa1 = -0.5 * einsum('iaqs, qsjb->iajb', eris_ovOV, Siajb) #- einsum('isqa,qsjb->iajb', eris_ovov, Siajb)
+        Viajb_aa = Viajb_aa0 + Viajb_aa1
+        Viajb_ab0 = eris_ovOV
+        Viajb_ab1 = 0.5*(einsum('iaqs, qsjb->iajb', eris_ovov, Siajb) - einsum('isqa,qsjb->iajb', eris_ovov, Siajb))
+        Viajb_ab = Viajb_ab0 + Viajb_ab1
+
+        print('Viajb_aa', Viajb_aa)
+        print('Viajb_ab', Viajb_ab)
+        '''
         for i in range(na):
             if eris.ovov.ndim == 4:
                 eris_ovov = eris.ovov[i]
@@ -200,7 +219,8 @@ class EMP2():
             emp2 += einsum('jab,jab', t2i, eris_ovov) * .5
             emp2 -= einsum('jab,jba', t2i, eris_ovov) * .5
         print('emp2', emp2)
-        
+        '''  
+
     def ao2mo(self, mo):
         fakemp = mp.UMP2(self.suhf.guesshf, mo_coeff=mo, mo_occ=self.suhf.guesshf.mo_occ)
         return fakemp.ao2mo()

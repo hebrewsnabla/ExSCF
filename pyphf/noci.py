@@ -17,8 +17,8 @@ def ci_cross(mf, aexci, bexci, mo=None, doW=False):
     #C2 = Ca[:,occ2[0]], Cb[:,occ2[1]]
     C1_expd = suscf.expd(C1, occ)
     C2_expd = suscf.expd(C1, occ2)
-    print(C1_expd)
-    print(C2_expd)
+#    print(C1_expd)
+#    print(C2_expd)
 
     #dm_no, _, no = suscf.find_NO(mf, mf.dm_ortho, mf.mo_occ)
     #Dg, Ng, Pg = get_Ng(mf.grids, no, dm_no)
@@ -31,17 +31,21 @@ def ci_cross(mf, aexci, bexci, mo=None, doW=False):
 #    trHg, ciH = get_H(mf, mf.hcore_ortho,  Pg, Gg, xg)
     return ciS, ciH
 
-def all_cross(mf, na, nb, nvira, nvirb):
+def all_cross(mf, na, nb, nvira, nvirb, mo=None):
     #na, nb = mf.nelec
-    C1 = mf.mo_ortho
+    if mo is None:
+        C1 = mf.mo_ortho
+    else:
+        C1 = mo
     C1_expd = suscf.expd(C1, mf.mo_occ)
     Dg, Mg, xg, Pg = get_DxP(mf, mf.norb, C1_expd, C1_expd, na+nb)
     
     #Cg = Diag_Mg(Mg, C1_expd, na+nb)
     #check_ortho(Cg, Dg)
     Sia = get_Sia(mf, na, nb, nvira, nvirb)
+    Siajb = get_Siajb(mf, na, nb, nvira, nvirb)
 
-    return 0
+    return Sia, Siajb
 
 def get_Sia(mf, na, nb, nvira, nvirb):
     #occ = 
@@ -55,9 +59,25 @@ def get_Sia(mf, na, nb, nvira, nvirb):
     print('Sia\n', Sia)
     return Sia
 
+def get_Siajb(mf, na, nb, nvira, nvirb):
+    #occ = 
+    Siajb_ab = np.zeros((na, nvira, nb, nvirb))
+    for i in range(na):
+        for a in range(nvira):
+            for j in range(nb):
+                for b in range(nvirb):
+                    Siajb_ab[i,a,j,b] = ci_cross(mf, [[i],[a+na]], [[j],[b+nb]])[0]
+    if na > 1:
+        Siajb_aa = np.zeros((na, nvira, na, nvira))
+        for i in range(na):
+            for a in range(na, na+nvira):
+                Siajb_aa[i,a-na] = ci_cross(mf, [[i],[a]], [[],[]])[0]
+    print('Siajb\n', Siajb_ab)
+    return Siajb_ab
+
 def expd_occ(occ, na, nvira):
     newocc = occ[0].copy()
-    newocc 
+     
 
 def Diag_Mg(Mg, C, occ):
     Cg = []

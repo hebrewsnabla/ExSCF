@@ -694,8 +694,8 @@ class SUHF():
             F_ortho = Fa_ortho, Fb_ortho
             if self.debug:
                 print('Fock (ortho)\n', F_ortho)
-                e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, self.hcore_ortho, veff_ortho)
-                print('E(UHF) = %12.6f' % e_uhf)
+                #e_uhf, e_uhf_coul = scf.uhf.energy_elec(mf, self.dm_ortho, self.hcore_ortho, veff_ortho)
+                #print('E(UHF) = %12.6f' % e_uhf)
             dm_no, dm_expanded, no = find_NO(self, self.dm_ortho, mo_occ)
             self.dm_no = dm_no
             self.no = no
