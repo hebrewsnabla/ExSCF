@@ -14,16 +14,17 @@ libxc is optional in PySCF, but it's required here. Usually you've installed tha
 * add `/path/to/ExSCF` to your `PYTHONPATH`
 
 ## Features
-Theoretial features:
+**Theoretial features**:
 * SUHF
   + energy
   + density, natural orbital
+
 not fully tested:
 * SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
 * CAS+*f*DFT, CAS-DFT2
 * DeltaSCF with MOM
 
-Technical features:
+**Technical features**:
 * guess
   + mix (`guess.mix`)
   + fragment (`guess.from_frag`)
