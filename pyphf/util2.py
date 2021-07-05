@@ -44,7 +44,7 @@ def tofch(oldfch, natorb, natocc, S, flag='SUHFNO'):
     #nifa = natorb_a.shape[1]
     nbf = natorb.shape[0]
     nif = natorb.shape[1]
-    py2fch(fch, nbf, nif, natorb, Sdiag, 'a', natocc, True)
+    py2fch(fch, nbf, nif, natorb, 'a', natocc, True)
     #nbfb = natorb_b.shape[0]
     #nifb = natorb_b.shape[1]
     #py2fch(fch, nbfb, nifb, natorb_b, Sdiag, 'b', natocc_b)

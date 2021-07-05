@@ -721,7 +721,8 @@ class SUHF():
             Faa = F_mod_ortho[:norb, :norb]
             Fbb = F_mod_ortho[norb:, norb:]
             F_mod_ortho = np.array([Faa,Fbb])
-            mo_e, mo_ortho, dm_ortho = Diag_Feff(F_mod_ortho)
+            mo_e, mo_ortho = Diag_Feff(F_mod_ortho)
+            dm_ortho = make_dm(mo_ortho, mo_occ)
             if self.mom and cyc >= self.mom_start_cyc:
                 mo_occ = deltascf.mom_occ(self, self.mom_reforb, self.setocc)
             else:
@@ -729,7 +730,7 @@ class SUHF():
             self.mo_occ = mo_occ
             util2.dump_moe(mo_e, na, nb)
             if self.debug:
-                print('e_a, e_b\n', mo_e[0], '\n', mo_e[1])
+                #print('e_a, e_b\n', mo_e[0], '\n', mo_e[1])
                 print('v_a, v_b\n', mo_ortho[0], '\n', mo_ortho[1])
                 print('P_a, P_b\n', dm_ortho[0],'\n', dm_ortho[1])
             self.dm_ortho = dm_ortho

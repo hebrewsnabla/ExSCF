@@ -244,7 +244,7 @@ def init_guess_by_1e(rhf, mol=None):
     mo_occ = rhf.get_occ(mo_energy, mo_coeff)
     return rhf.make_rdm1(mo_coeff, mo_occ), mo_coeff, mo_energy, mo_occ
 
-def init_guess_mixed(mo_coeff, mo_occ, mixing_parameter=np.pi/4):
+def init_guess_mixed(mo_coeff, mo_occ, mixing_parameter=np.pi/4, pairs=1):
     ''' Generate density matrix with broken spatial and spin symmetry by mixing
     HOMO and LUMO orbitals following ansatz in Szabo and Ostlund, Sec 3.8.7.
     
@@ -265,23 +265,27 @@ def init_guess_mixed(mo_coeff, mo_occ, mixing_parameter=np.pi/4):
         if mo_occ[i]>0 and mo_occ[i+1]<0.1:
             homo_idx=i
             lumo_idx=i+1
-
-    psi_homo=mo_coeff[:, homo_idx]
-    psi_lumo=mo_coeff[:, lumo_idx]
-    
     Ca=copy.deepcopy(mo_coeff)
     Cb=copy.deepcopy(mo_coeff)
-
-    #mix homo and lumo of alpha and beta coefficients
-    q=mixing_parameter
-    angle = q / np.pi
-    print('rotating angle: %.2f pi' % angle)
-
-    Ca[:,homo_idx] = np.cos(q)*psi_homo + np.sin(q)*psi_lumo
-    Cb[:,homo_idx] = np.cos(q)*psi_homo - np.sin(q)*psi_lumo
-
-    Ca[:,lumo_idx] = -np.sin(q)*psi_homo + np.cos(q)*psi_lumo
-    Cb[:,lumo_idx] =  np.sin(q)*psi_homo + np.cos(q)*psi_lumo
+    for i in range(pairs):
+        homo_idx -= i
+        lumo_idx += i
+        psi_homo=mo_coeff[:, homo_idx]
+        psi_lumo=mo_coeff[:, lumo_idx]
+        
+        Ca=copy.deepcopy(Ca)
+        Cb=copy.deepcopy(Cb)
+    
+        #mix homo and lumo of alpha and beta coefficients
+        q=mixing_parameter
+        angle = q / np.pi
+        print('rotating angle: %.2f pi' % angle)
+    
+        Ca[:,homo_idx] = np.cos(q)*psi_homo + np.sin(q)*psi_lumo
+        Cb[:,homo_idx] = np.cos(q)*psi_homo - np.sin(q)*psi_lumo
+    
+        Ca[:,lumo_idx] = -np.sin(q)*psi_homo + np.cos(q)*psi_lumo
+        Cb[:,lumo_idx] =  np.sin(q)*psi_homo + np.cos(q)*psi_lumo
 
     dm = scf.uhf.make_rdm1( (Ca,Cb), (mo_occ,mo_occ) )
     return dm
