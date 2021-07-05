@@ -1,4 +1,6 @@
 # ExSCF
+ExSCF is a program for methods based on Projected Hartree-Fock, which aims to achieve multireference accuracy with SCF cost.
+
 ## Pre-requisites
 * sympy
 * PySCF (1.7.6 recommended)
@@ -7,7 +9,6 @@
 * [pyAutoMR](https://github.com/hebrewsnabla/pyAutoMR) (optional, for CASDFT)
 
 Of course we need numpy, scipy, etc., but these are also required by PySCF, so they are not listed here.
-libxc is optional in PySCF, but it's required here. Usually you've installed that when installing PySCF.
 
 ## Installation
 * git clone
@@ -15,11 +16,11 @@ libxc is optional in PySCF, but it's required here. Usually you've installed tha
 
 ## Features
 **Theoretial features**:
-* SUHF
+* SUHF (Spin-projected Unrestricted Hartree-Fock)
   + energy
   + density, natural orbital
 
-not fully tested:
+ not fully tested:
 * SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
 * CAS+*f*DFT, CAS-DFT2
 * DeltaSCF with MOM

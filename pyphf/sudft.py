@@ -10,6 +10,11 @@ import time
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
+'''
+SUHF+DFT, SUHF+fDFT, SUHF+fcDFT
+ Garza, A. J.; Jiménez-Hoyos, C. A.; Scuseria, G. E. J Chem Phys 2013, 138, 134102
+ Garza, A. J.; Jiménez-Hoyos, C. A.; Scuseria, G. E. J Chem Phys 2014, 140, 244102
+'''
 
 class SUDFT():
     def __init__(self, suhf):
