@@ -18,6 +18,7 @@ Theoretial features:
 * SUHF
   + energy
   + density, natural orbital
+not fully tested:
 * SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
 * CAS+*f*DFT, CAS-DFT2
 * DeltaSCF with MOM
