@@ -6,6 +6,62 @@ from functools import partial
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
+
+def ci0(mf, excis):
+    ndet = len(excis) 
+    S = np.zeros((ndet+1, ndet+1))
+    H = np.zeros((ndet+1, ndet+1))
+    S[0,0] = mf.ciS
+    H[0,0] = mf.ciH
+    for r in range(ndet):
+        exc = excis[r]
+        s, h = ci_cross(mf, exc[0], exc[1]) 
+        S[0,1+r] = s
+        H[0,1+r] = h
+    
+    for r in range(ndet):
+        excr = excis[r]
+        for t in range(r,ndet):
+            exct = excis[t]
+            s, h = ci_2cross(mf, excr[0], excr[1], exct[0], exct[1])
+            S[1+r, 1+t] = s
+            H[1+r, 1+t] = h
+    #print('S and H\n', S, '\n', H)
+    S = S + np.tril(S.T,-1)
+    H = H + np.tril(H.T,-1)
+    print('S and H\n', S, '\n', H)
+    e, c = scipy.linalg.eigh(H, S)
+    print(e, '\n', c)
+    return 0
+
+def ci_2cross(mf, aexci, bexci, aexci2, bexci2, mo=None, doW=False):
+    if mo is None:
+        C1 = mf.mo_ortho
+    else:
+        C1 = mo
+    occ = mf.mo_occ
+    occ1 = deltascf.set_occ(occ, aexci, bexci)
+    occ2 = deltascf.set_occ(occ, aexci2, bexci2)
+    #C1 = Ca[:,occ[0]], Cb[:,occ[1]]
+    #C2 = Ca[:,occ2[0]], Cb[:,occ2[1]]
+    C1_expd = suscf.expd(C1, occ1)
+    C2_expd = suscf.expd(C1, occ2)
+#    print(C1_expd)
+#    print(C2_expd)
+
+    ciS, ciH = cross(mf, C1_expd, C2_expd, doW)
+    return ciS, ciH
+
+def all_cross(mf, na, nb, nvira, nvirb, mo=None):
+    #na, nb = mf.nelec
+    if mo is None:
+        C1 = mf.mo_ortho
+    else:
+        C1 = mo
+    C1_expd = suscf.expd(C1, mf.mo_occ)
+    Dg, Mg, xg, Pg = get_DxP(mf, mf.norb, C1_expd, C1_expd, na+nb)
+    
+
 def ci_cross(mf, aexci, bexci, mo=None, doW=False):
     if mo is None:
         C1 = mf.mo_ortho

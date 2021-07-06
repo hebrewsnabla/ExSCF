@@ -612,6 +612,7 @@ class SUHF():
             self.xg, self.ciS = xg, ciS
             #yg, ciS = util.get_yg(self, xg)
             trHg, ciH = get_H(self, self.hcore_ortho, self.no, Pg, Gg, xg)
+            self.ciH = ciH
             S2 = get_S2(self, Pg_ortho)
             Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
             Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
@@ -713,6 +714,7 @@ class SUHF():
             self.xg, self.ciS = xg, ciS
             #yg, ciS = util.get_yg(self, xg)
             trHg, ciH = get_H(self, self.hcore_ortho, self.no, Pg, Gg, xg)
+            self.ciH = ciH
             S2 = get_S2(self, Pg_ortho)
             Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
             Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
