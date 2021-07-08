@@ -2,17 +2,21 @@ from pyphf import suscf, deltascf, jk, util2
 import numpy as np
 import scipy
 from functools import partial
+import time
 
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
 
 def ci0(mf, excis):
+    t0=time.time()
     ndet = len(excis) 
     S = np.zeros((ndet+1, ndet+1))
     H = np.zeros((ndet+1, ndet+1))
-    S[0,0] = mf.ciS
-    H[0,0] = mf.ciH
+    #S[0,0] = mf.ciS
+    #H[0,0] = mf.integr_beta(mf.trHg)
+    #H[0,0] = mf.ciH
+    S[0,0], H[0,0] = ci_cross(mf, [[],[]], [[],[]])
     for r in range(ndet):
         exc = excis[r]
         s, h = ci_cross(mf, exc[0], exc[1]) 
@@ -30,9 +34,33 @@ def ci0(mf, excis):
     S = S + np.tril(S.T,-1)
     H = H + np.tril(H.T,-1)
     print('S and H\n', S, '\n', H)
+    t1 = time.time()
+    print('time for ci elements: %.3f' % (t1-t0))
+    #print('Sqq, Hqq')
+    #Sdiag = S.diagonal()
+    #Hdiag = H.diagonal()
+    #print(Sdiag, '\n', Hdiag)
+    get_spec(S, H, ndet)
     e, c = scipy.linalg.eigh(H, S)
     print(e, '\n', c)
-    return 0
+    t2 = time.time()
+    print('time for ci diag: %.3f' % (t2-t1))
+    return e, c
+
+def get_spec(S, H, ndet):
+    E0 = H.diagonal()
+    A = S**(-1)
+    E1 = []
+    E2 = []
+    for q in range(ndet):
+        e1 = einsum('r, rs, s->', S[1+q,:1+q], A[:1+q,:1+q], H[:1+q,1+q])
+        e2 = einsum('r, rs, st, tu, u -> ', S[1+q,:1+q], A[:1+q,:1+q], H[:1+q,:1+q], A[:1+q,:1+q], S[:1+q,1+q])
+        E1.append(e1)
+        E2.append(e2)
+    print(E0)
+    print(E1)
+    print(E2)
+
 
 def ci_2cross(mf, aexci, bexci, aexci2, bexci2, mo=None, doW=False):
     if mo is None:
@@ -229,9 +257,10 @@ def get_DxP(mf, norb, C1, C2, occ):
         pg = einsum('ij,jk,kl,ml->im', dg, C2o, np.linalg.inv(mg), C1o)
         #print(pg)
         Pg.append(pg)
-    print('xg', xg)
-    print('mg\n', Mg[0], '\n', Mg[-1])
-    print('pg\n', Pg[0])
+    if mf.debug:
+        print('xg', xg)
+        print('mg\n', Mg[0], '\n', Mg[-1])
+        print('pg\n', Pg[0])
 
 #    Mg_avg, _, _, _ = get_M(mf, Mg, Mgov, Mgvo, Mgvv)
     #ciS = suhf.integr_beta(np.array(xg))

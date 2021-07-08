@@ -211,6 +211,7 @@ def get_H(suhf, hcore_ortho, no, Pg, Gg, xg):
         #print(i, H*xg[i])
     ciH = suhf.integr_beta(trHg*xg)
     print('ciH', ciH)
+    suhf.trHg = trHg
     return trHg, ciH
 
 def get_EX(suhf, no, Pg, Kg, xg):
