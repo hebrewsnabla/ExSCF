@@ -49,6 +49,9 @@ mf2 = suscf.SUHF(mf)
 mf2.kernel()
 ```
 
+## Contact
+For bug report or comments, please contact the author via srwang20@fudan.edu.cn or open an issue.
+
 ## TODO
 * SU-PDFT
 * SUPT2
