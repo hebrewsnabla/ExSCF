@@ -205,14 +205,17 @@ def get_H(suhf, hcore_ortho, no, Pg, Gg, xg):
         print(hcore_no)
     trHg = np.zeros(len(Pg))
     for i, pg in enumerate(Pg):
-        H = np.trace(np.dot(hcore_no, pg)) + 0.5 * np.trace(np.dot(Gg[i], pg))
+        H0 = np.trace(np.dot(hcore_no, pg)) 
+        H1 = 0.5 * np.trace(np.dot(Gg[i], pg))
         #H = H * xg[i]
-        trHg[i] = H
+        trHg[i] = H0 + H1
         #print(i, H*xg[i])
     ciH = suhf.integr_beta(trHg*xg)
     print('ciH', ciH)
     suhf.trHg = trHg
-    return trHg, ciH
+    H = suhf.integr_beta(trHg, fac='xg')
+    print('Hsp + Hph = ', H)
+    return trHg, ciH, H
 
 def get_EX(suhf, no, Pg, Kg, xg):
     trXg = np.zeros(len(Pg))
@@ -305,8 +308,6 @@ def get_Feff(suhf, trHg, Gg, Ng, Pg, Dg, occ, Yg, Xg, F_ortho):
     Feff_ortho = einsum('ij,jk,lk->il', no, Feff, no)
     Feff_ortho = 0.5 * (Feff_ortho + Feff_ortho.T)
     if suhf.debug2: print('Feff (ortho)\n', Feff_ortho)
-    H = suhf.integr_beta(trHg, fac='xg')
-    print('Hsp + Hph = ', H)
 
     lenf = len(F_ortho[0])
     F_ortho = np.array(F_ortho)
@@ -329,7 +330,7 @@ def get_Feff(suhf, trHg, Gg, Ng, Pg, Dg, occ, Yg, Xg, F_ortho):
     if suhf.debug:
         print('Feff (mod,ortho)')
         print(F_mod_ortho)
-    return Feff_ortho, H, F_mod_ortho
+    return Feff_ortho, F_mod_ortho
 
 def Diag_Feff(F):
     e_a, v_a = np.linalg.eigh(F[0])
@@ -604,6 +605,7 @@ class SUHF():
             t05 = time.time()
             print('time for NO, Ng: %.3f' % (t05-t01))
             Gg, Pg_ortho, Pgao, Ggao = jk.get_Gg(self.mol, Pg, self.no, X, dm_last=old_Pgao, Ggao_last=old_Ggao, opt=self.vhfopt)
+            self.Gg = Gg
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
@@ -612,11 +614,11 @@ class SUHF():
             xg, yg, ciS, C_no = get_xg(self, self.no, mo_occ, Ng)
             self.xg, self.ciS = xg, ciS
             #yg, ciS = util.get_yg(self, xg)
-            trHg, ciH = get_H(self, self.hcore_ortho, self.no, Pg, Gg, xg)
+            trHg, ciH, H_suhf = get_H(self, self.hcore_ortho, self.no, Pg, Gg, xg)
             self.ciH = ciH
             S2 = get_S2(self, Pg_ortho)
             Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
-            Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
+            Feff_ortho,  F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
             E_suhf = self.energy_nuc + H_suhf
             #print('E(SUHF) = %15.8f' % E_suhf)
             Faa = F_mod_ortho[:norb, :norb]
@@ -708,17 +710,18 @@ class SUHF():
                 print('N(g) (NO)\n', Ng[0])
                 print('P(g) (NO)\n', Pg[0])
             Gg, Pg_ortho, _, _ = jk.get_Gg(self.mol, Pg, self.no, X, opt=self.vhfopt)
+            self.Gg = Gg
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
             xg, yg, ciS, C_no = get_xg(self, self.no, mo_occ, Ng)
             self.xg, self.ciS = xg, ciS
             #yg, ciS = util.get_yg(self, xg)
-            trHg, ciH = get_H(self, self.hcore_ortho, self.no, Pg, Gg, xg)
+            trHg, ciH, H_suhf = get_H(self, self.hcore_ortho, self.no, Pg, Gg, xg)
             self.ciH = ciH
             S2 = get_S2(self, Pg_ortho)
             Xg, Xg_int, Yg = get_Yg(self, Dg, Ng, self.dm_no, na+nb)
-            Feff_ortho, H_suhf, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
+            Feff_ortho, F_mod_ortho = get_Feff(self, trHg, Gg, Ng, Pg, Dg, na+nb, Yg, Xg, F_ortho)
             E_suhf = self.energy_nuc + H_suhf
             self.E_suhf = E_suhf
             Faa = F_mod_ortho[:norb, :norb]
