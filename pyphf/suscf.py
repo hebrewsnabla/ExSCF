@@ -513,6 +513,7 @@ class SUHF():
         self.E_suhf = None
         self.energy_nuc = self.mol.energy_nuc()
         hcore = hf.get_hcore()
+        self.hcore_reg = hcore
         self.hcore_ortho = einsum('ji,jk,kl->il', X, hcore, X)
         if self.debug:
             print('hcore (ortho)\n', self.hcore_ortho)

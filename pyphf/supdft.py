@@ -1,4 +1,4 @@
-from pyphf import suscf
+from pyphf import suscf, jk
 from pyscf import dft
 import pyscf.dft.numint as numint
 
@@ -17,14 +17,38 @@ class PDFT():
         return kernel(self, self.suhf, self.ot)
 
 def kernel(pdft, suhf, ot):
+    print('\n******** %s ********' % pdft.__class__)
     dm1 = suhf.suhf_dm
     #dm2 = get_2CDM_from_2RDM(suhf.suhf_dm2, )
+    print('energy decomposition')
+    if suhf.debug:
+        old_decomp(suhf, dm1)
+    enuc = suhf.energy_nuc
+    dm1t = dm1[0] + dm1[1]
+    Ecore = np.trace(np.dot(suhf.hcore_reg, dm1t))
+    print('E0 %.6f' % Ecore)
+    vj, vk = jk.get_jk(suhf.mol, dm1)
+    veffj = vj[0] + vj[1] 
+    veffk = -vk
+    Ej = np.trace(np.dot(veffj, dm1[0]) + np.dot(veffj, dm1[1])) * 0.5
+    Ek = np.trace(np.dot(veffk[0], dm1[0]) + np.dot(veffk[1], dm1[1])) * 0.5
+    print('Ej %.6f' % Ej)
+    print('Ek %.6f' % Ek)
+    Ejk = Ej + Ek
+    print('Ejk %.6f' % Ejk)
+    Ec = suhf.E_suhf - enuc - Ecore - Ejk
+    print('Ec %.6f' % Ec)
 
+def old_decomp(suhf, dm1):
+    dm1t = dm1[0] + dm1[1]
+    enuc = suhf.energy_nuc
+    print('E_nuc %.6f' % enuc)
     #omega, alpha, hyb = ot._numint.rsh_and_hybrid_coeff(ot.otxc, spin=spin)
     Jg, Kg = suhf.get_JKg()
     #hfx = suhf.get_EX()
-    get_H(suhf, suhf.hcore_ortho, suhf.no, suhf.Pg, suhf.Gg, Jg, Kg, suhf.xg)
-
+    E0, Ejk, E1j, E1k = get_H(suhf, suhf.hcore_ortho, suhf.no, suhf.Pg, suhf.Gg, Jg, Kg, suhf.xg)
+    E_suhf = enuc + E0 + Ejk
+    print('E_suhf %.6f' % E_suhf)
 
 def get_H(suhf, hcore_ortho, no, Pg, Gg, Jg, Kg, xg):
     #print(hcore_ortho)
@@ -52,10 +76,16 @@ def get_H(suhf, hcore_ortho, no, Pg, Gg, Jg, Kg, xg):
         trHg1j[i] = H1j
         trHg1k[i] = H1k
         #print(i, H*xg[i])
-    ciH0 = suhf.integr_beta(trHg0*xg)
-    ciH1 = suhf.integr_beta(trHg1*xg)
-    ciH1j = suhf.integr_beta(trHg1j*xg)
-    ciH1k = suhf.integr_beta(trHg1k*xg)
-    print('ciH', ciH0, ciH1, ciH1j, ciH1k)
+    H0 = suhf.integr_beta(trHg0, fac='xg')
+    H1 = suhf.integr_beta(trHg1, fac='xg')
+    H1j = suhf.integr_beta(trHg1j, fac='xg')
+    H1k = suhf.integr_beta(trHg1k, fac='xg')
+    #H0 = suhf.integr_beta(trHg, fac='xg')
+    #print('H ', H0, H1, H1j, H1k)
+    print('E_core %.6f' % H0)
+    print('E_jk %.6f' % H1)
+    print('E_j %.6f' % H1j)
+    print('E_k %.6f' % H1k)
+    #print('ciH', ciH0, ciH1, ciH1j, ciH1k)
     #suhf.trHg = trHg
-    return ciH0, ciH1
+    return H0, H1, H1j, H1k
