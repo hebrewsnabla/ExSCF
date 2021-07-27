@@ -1,5 +1,5 @@
-from pyphf import suscf, jk
-from pyscf import dft
+from pyphf import suscf, jk, sudft
+#from pyscf import dft
 import pyscf.dft.numint as numint
 
 import numpy as np
@@ -12,32 +12,43 @@ einsum = partial(np.einsum, optimize=True)
 class PDFT():
     def __init__(self, suhf):
         self.suhf = suhf
-        self.ot = 'tpbe'
+        self.xc = 'pbe'
     def kernel(self):
-        return kernel(self, self.suhf, self.ot)
+        return kernel(self, self.suhf)
 
-def kernel(pdft, suhf, ot):
+def kernel(pdft, suhf):
     print('\n******** %s ********' % pdft.__class__)
+    mol = suhf.mol
     dm1 = suhf.suhf_dm
+    dmdefm = suhf.dm_reg
     #dm2 = get_2CDM_from_2RDM(suhf.suhf_dm2, )
     print('energy decomposition')
     if suhf.debug:
         old_decomp(suhf, dm1)
+    new_decomp(suhf, dm1)
+    grids = sudft.set_grids(mol)
+    ni = numint.NumInt()
+    n, exc, vxc = ni.nr_uks(mol, grids, pdft.xc, dmdefm)
+    print('E_xcdft %.6f' % exc)
+
+def new_decomp(suhf, dm1):
     enuc = suhf.energy_nuc
+    print('E_nuc %.6f' % enuc)
     dm1t = dm1[0] + dm1[1]
     Ecore = np.trace(np.dot(suhf.hcore_reg, dm1t))
-    print('E0 %.6f' % Ecore)
+    print('E_core %.6f' % Ecore)
     vj, vk = jk.get_jk(suhf.mol, dm1)
     veffj = vj[0] + vj[1] 
     veffk = -vk
     Ej = np.trace(np.dot(veffj, dm1[0]) + np.dot(veffj, dm1[1])) * 0.5
     Ek = np.trace(np.dot(veffk[0], dm1[0]) + np.dot(veffk[1], dm1[1])) * 0.5
-    print('Ej %.6f' % Ej)
-    print('Ek %.6f' % Ek)
+    print('E_j %.6f' % Ej)
+    print('E_k %.6f' % Ek)
     Ejk = Ej + Ek
-    print('Ejk %.6f' % Ejk)
+    if suhf.debug:
+        print('E_jk %.6f' % Ejk)
     Ec = suhf.E_suhf - enuc - Ecore - Ejk
-    print('Ec %.6f' % Ec)
+    print('E_c %.6f' % Ec)
 
 def old_decomp(suhf, dm1):
     dm1t = dm1[0] + dm1[1]
