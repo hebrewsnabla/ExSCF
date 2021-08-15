@@ -22,8 +22,6 @@ Of course we need numpy, scipy, etc., but these are also required by PySCF, so t
 
  not fully tested:
 * SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
-* CAS+*f*DFT, CAS-DFT2
-* DeltaSCF with MOM
 
 **Technical features**:
 * guess
@@ -53,7 +51,6 @@ mf2.kernel()
 For bug report or comments, please contact the author via srwang20@fudan.edu.cn or open an issue.
 
 ## TODO
-* SU-PDFT
 * SUPT2
 * TD-SUHF
 * SUHF gradient
