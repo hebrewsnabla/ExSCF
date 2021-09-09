@@ -374,6 +374,7 @@ class SUHF():
         self.restart = False
         self.conv_tol = 1e-7 # For RMSD
         self.max_cycle = 70
+        self.noiter = False
         self.diis_on = True
         self.diis_start_cyc = None
         self.level_shift = None
@@ -558,8 +559,10 @@ class SUHF():
 
         thresh = self.conv_tol
         max_cycle = self.max_cycle
+        noiter = self.noiter
         cyc = 1
         conv = False
+        self.conv = conv
         
         Pgao = None
         #print(vhfopt)
@@ -644,7 +647,8 @@ class SUHF():
                 s1e = np.eye(norb)
                 print('level shift: %.3f a.u.' % shift)
                 F_mod_ortho = lev_shift(s1e, self.dm_ortho, F_mod_ortho, shift)
-
+            if noiter:
+                break  
             mo_e, mo_ortho = Diag_Feff(F_mod_ortho)
             self.mo_e = mo_e
             util2.dump_moe(mo_e, na, nb)
