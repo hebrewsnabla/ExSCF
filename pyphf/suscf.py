@@ -522,7 +522,7 @@ class SUHF():
 
         if self.dft:
             self.ksgrids = sudft.set_grids(self.mol)
-
+            self.xc = self.guesshf.xc
         mo_occ = get_occ(self)
         self.mo_occ = mo_occ
         self.mom = False
@@ -632,7 +632,7 @@ class SUHF():
                 if self.dm_reg is None:
                     self.dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
                 ni = numint.NumInt()
-                n, exc, vxc = ni.nr_uks(self.mol, self.ksgrids, 'HF,%s'%self.xc, self.dm_reg)
+                n, exc, vxc = ni.nr_uks(self.mol, self.ksgrids, '%s'%self.xc, self.dm_reg)
                 E_suhf += exc
                 F_mod_ortho = F_mod_ortho + vxc
 
@@ -648,8 +648,11 @@ class SUHF():
                 print('level shift: %.3f a.u.' % shift)
                 F_mod_ortho = lev_shift(s1e, self.dm_ortho, F_mod_ortho, shift)
             if noiter:
+                self.regular()
+                print(' E = %15.8f' % E_suhf)
                 break  
             mo_e, mo_ortho = Diag_Feff(F_mod_ortho)
+            mo_ortho = np.array(mo_ortho)
             self.mo_e = mo_e
             util2.dump_moe(mo_e, na, nb)
             dm_ortho = make_dm(mo_ortho, mo_occ)
@@ -659,14 +662,7 @@ class SUHF():
                 print('P_a, P_b\n', dm_ortho[0],'\n', dm_ortho[1])
             self.dm_ortho = dm_ortho
             self.mo_ortho = mo_ortho
-            dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
-            mo_ortho = np.array(self.mo_ortho)
-            mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
-            self.dm_reg = dm_reg
-            self.mo_reg = mo_reg
-            if self.debug or self.printmo:
-                print('dm_reg\n', dm_reg)
-                print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
+            self.regular()
             if self.mom and cyc >= self.mom_start_cyc:
                 mo_occ = deltascf.mom_occ(self, self.mom_reforb, self.setocc)
             else:
@@ -733,6 +729,7 @@ class SUHF():
             Fbb = F_mod_ortho[norb:, norb:]
             F_mod_ortho = np.array([Faa,Fbb])
             mo_e, mo_ortho = Diag_Feff(F_mod_ortho)
+            mo_ortho = np.array(mo_ortho)
             dm_ortho = make_dm(mo_ortho, mo_occ)
             if self.mom and cyc >= self.mom_start_cyc:
                 mo_occ = deltascf.mom_occ(self, self.mom_reforb, self.setocc)
@@ -747,11 +744,7 @@ class SUHF():
             self.dm_ortho = dm_ortho
             self.mo_ortho = mo_ortho
             self.mo_e = mo_e
-            dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
-            mo_ortho = np.array(self.mo_ortho)
-            mo_reg = einsum('ij,tjk->tik', X, mo_ortho)
-            self.dm_reg = dm_reg
-            self.mo_reg = mo_reg
+            self.regular()
             #if old_suhf is not None:
             dE = E_suhf - old_suhf
             ddm = dm_ortho - old_dm
@@ -788,6 +781,17 @@ class SUHF():
     def get_EX(self):
         Jg, Kg = self.get_JKg()
         return get_EX(self, self.no, self.Pg, Kg, self.xg)[1]
+
+    def regular(self):
+        X = self.X
+        dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
+        #mo_ortho = np.array(self.mo_ortho)
+        mo_reg = einsum('ij,tjk->tik', X, self.mo_ortho)
+        self.dm_reg = dm_reg
+        self.mo_reg = mo_reg
+        if self.debug or self.printmo:
+            print('dm_reg\n', dm_reg)
+            print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
         
 
 def conv_check(E_suhf, dE, ddm, thresh, cyc):

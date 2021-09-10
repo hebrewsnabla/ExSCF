@@ -32,6 +32,7 @@ def kernel(pdft, suhf):
     print('E_xcdft %.6f' % exc)
 
 def new_decomp(suhf, dm1):
+    print('E_suhf %.6f' % suhf.E_suhf)
     enuc = suhf.energy_nuc
     print('E_nuc %.6f' % enuc)
     dm1t = dm1[0] + dm1[1]
