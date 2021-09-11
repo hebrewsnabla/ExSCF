@@ -1,4 +1,7 @@
-version 0.4.0 (Jul 26, 2021)
+version 0.4.1 (Sep 11, 2021)
+* PAV-SUHF and PAV-SUDFT with `noiter`
+
+version 0.4.0 (Jul 27, 2021)
 --------------------------
 * DeltaSCF
   + add mo_occ, move util -> suscf
