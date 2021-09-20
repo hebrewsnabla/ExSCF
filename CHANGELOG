@@ -1,5 +1,6 @@
 version 0.4.1 (Sep 11, 2021)
 * PAV-SUHF and PAV-SUDFT with `noiter`
+* PAV-SUMP2
 
 version 0.4.0 (Jul 27, 2021)
 --------------------------

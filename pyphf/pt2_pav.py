@@ -35,6 +35,7 @@ class EMP2():
         suhf = self.suhf
         #ump2 = mp.UMP2(suhf.guesshf)
         #ump2.kernel()
+        self.e_elec_hf = suhf.guesshf.energy_elec()[0]
         ghf = copy.copy(suhf.guesshf).to_ghf()
         self.ghf = ghf
         gmp2 = mp.GMP2(ghf)
@@ -43,6 +44,10 @@ class EMP2():
         energy_00 = suhf.ciH
         norm_00 = suhf.ciS
         energy_01, norm_01 = get_e01(self, suhf, gmp2)
+        print('e01 %.6f, S00 %.6f, S01 %.6f' % (energy_01, norm_00, norm_01))
+        ecorr = energy_01 / (norm_00 + norm_01)
+        self.e_corr = ecorr
+        print('SUMP2 e_corr %.6f' % ecorr)
 
 def get_e01(spt2, suhf, gmp2):
     mo = suhf.mo_reg
@@ -59,6 +64,8 @@ def get_e01(spt2, suhf, gmp2):
     mo_o = ghf.mo_coeff[:,:nocc]
     eri_ao = suhf.mol.intor('int2e', aosym='s8')
     S = spt2.ao_ovlp
+    E01g = []
+    S01g = []
     for i, dg in enumerate(Dg):
         mg = einsum('ji,jk,kl->il', mo_o, dg, mo_o)
         u, s, vt = np.linalg.svd(mg)
@@ -73,8 +80,19 @@ def get_e01(spt2, suhf, gmp2):
         print(co_ovlp)
         u = util2.stack22( u_oo, np.zeros((nocc, nvir)), np.zeros((nvir, nocc)), np.eye(nvir))
         co_t2 = get_co_t2(gmp2.t2, v_oo)
-        eri_mo = get_mo_eri(spt2.ghf.mo_coeff, eri_ao,)
+        eri_mo = get_mo_eri(spt2.ghf.mo_coeff, eri_ao)
         co_eri = get_co_eri(eri_mo, u_oo, nocc)
+        term1 = get_term1(oo_diag, co_t2, ovlp_ov, spt2.e_elec_hf)
+        term2 = get_term2(co_eri, co_ovlp, oo_diag, co_t2, ovlp_vo, ovlp_ov)
+        e_01 = term1 + term2
+        norm_01 = term1 / spt2.e_elec_hf
+        E01g.append(e_01)
+        S01g.append(norm_01)
+    print('E01g', E01g)
+    print('S01g', S01g)
+    E01 = suhf.integr_beta(np.array(E01g))
+    S01 = suhf.integr_beta(np.array(S01g))
+    return E01, S01
 
 def get_co_t2(t2_mo, v_oo):
     return einsum('pi,qj, pqab -> ijab', v_oo, v_oo, t2_mo)
@@ -98,3 +116,90 @@ def get_mo_eri(mo_coeff, ao_eri):
     mo_eri = mo_eri.reshape(nmo, nmo, nmo, nmo)
 
     return mo_eri
+
+def get_term1(ovlp_oo_diag, co_t2, ovlp_ov, e_elec_hf):
+    ovlp_oo_inv = 1. / ovlp_oo_diag
+    term1 = 0.5 * e_elec_hf * np.prod(ovlp_oo_diag) * einsum('ijab,ia,jb,i,j->', co_t2, ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv)
+    return term1
+
+def get_term2(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov):
+    nocc, nvir = co_eri.shape[:2]
+    co_eri_oovv = co_eri.transpose(0,2,1,3) - co_eri.transpose(0,2,3,1)
+    ovlp_oo_inv = 1. / ovlp_oo_diag
+    
+    # Case 1: i = k, j = l
+    S_ijpr_matrix = get_S_ijpr_matrix(co_ovlp, ovlp_oo_diag, nocc, nvir)
+    sumc_ijad = einsum('ijcd,ijca->ijad', co_eri_oovv, S_ijpr_matrix)
+    sumb_ijad = einsum('ijab,ijdb->ijad', co_t2, S_ijpr_matrix)
+    sumadij = einsum('ijad,ijad,i,j->', sumc_ijad, sumb_ijad, ovlp_oo_inv, ovlp_oo_inv)
+    term21 = sumadij * 0.25 * np.prod(ovlp_oo_diag)
+    # Case 2: i = k, j != l
+    S_ipr_matrix = get_S_ipr_matrix(co_ovlp, ovlp_oo_diag, nocc, nvir)
+    # 1st term.
+    sumld_ic = einsum('ilcd,dl,l->ic', co_eri_oovv, ovlp_vo, ovlp_oo_inv)
+    sumjb_ia = einsum('ijab,jb,j->ia', co_t2, ovlp_ov, ovlp_oo_inv)
+    case2term1 = einsum('ic,ia,i,ica->', sumld_ic, sumjb_ia, ovlp_oo_inv, S_ipr_matrix)
+    # 2nd term.
+    sumd_ijc = einsum('ijcd,dj->ijc', co_eri_oovv, ovlp_vo)
+    sumb_ija = einsum('ijab,jb->ija', co_t2, ovlp_ov)
+    case2term2 = -einsum('ijc,ija,j,i,ica->', sumd_ijc, sumb_ija, 
+                              np.power(ovlp_oo_inv, 2), ovlp_oo_inv, S_ipr_matrix)
+    term22 = (case2term1 + case2term2) * np.prod(ovlp_oo_diag)
+    #Case 3: i != k, j != l        
+    # 1st term.
+    sumklcd = einsum('klcd,ck,dl,k,l->', co_eri_oovv, ovlp_vo, ovlp_vo, 
+                           ovlp_oo_inv, ovlp_oo_inv)
+    sumijab = einsum('ijab,ia,jb,i,j->', co_t2, ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv)
+    case3term1 = 0.25 * sumklcd * sumijab
+    # 2nd term.
+    sumlcd_i = einsum('ilcd,ci,dl,l->i', co_eri_oovv, ovlp_vo, ovlp_vo, ovlp_oo_inv)
+    sumjab_i = einsum('ijab,ia,jb,j->i', co_t2, ovlp_ov, ovlp_ov, ovlp_oo_inv)
+    case3term2 = -einsum('i,i,i->', sumlcd_i, sumjab_i, np.power(ovlp_oo_inv, 2))
+    # 3rd term.
+    sumcd_ij = einsum('ijcd,ci,dj->ij', co_eri_oovv, ovlp_vo, ovlp_vo)
+    sumab_ij = einsum('ijab,ia,jb->ij', co_t2, ovlp_ov, ovlp_ov)
+    case3term3 = 0.5 * einsum('ij,ij,i,j->', sumcd_ij, sumab_ij, 
+                               np.power(ovlp_oo_inv, 2), np.power(ovlp_oo_inv, 2))
+    
+    term23 = (case3term1 + case3term2 + case3term3) * np.prod(ovlp_oo_diag)
+
+    e_term2 = term21 + term22 + term23
+    return e_term2
+
+def get_S_ijpr_matrix(co_ovlp, ovlp_oo_diag, nocc, nvir):
+    S_ijpr_mat = np.empty((nocc, nocc, nvir, nvir))
+        
+    for i in range(nocc):
+        for j in range(nocc):
+            inds = (i, j)
+            _nocc = nocc - len(np.unique(inds))
+            co_ovlp_ij = np.delete(co_ovlp, inds, axis=0) # Delete rows i, j
+            co_ovlp_ij = np.delete(co_ovlp_ij, inds, axis=1) # Delete cols i, j
+            co_ovlp_ov_ij = co_ovlp_ij[:_nocc, _nocc:]
+            co_ovlp_vo_ij = co_ovlp_ij[_nocc:, :_nocc]
+            co_ovlp_oo_diag_ij = np.delete(ovlp_oo_diag, inds, axis=0) # Delete elements i, j
+            co_ovlp_oo_inv_ij = 1. / co_ovlp_oo_diag_ij
+            
+            # [ co_ovlp_ij.T ]_{pk} = [ co_ovlp_ij ]_{kp}
+            S_ijpr_mat[i, j] = (co_ovlp[nocc:, nocc:] - 
+                                einsum('pk,k,kr->pr', co_ovlp_vo_ij, co_ovlp_oo_inv_ij, co_ovlp_ov_ij))
+    
+    return S_ijpr_mat
+
+def get_S_ipr_matrix(co_ovlp, ovlp_oo_diag, nocc, nvir):
+    _nocc = nocc - 1
+    S_ipr_mat = np.empty((nocc, nvir, nvir))
+    
+    for i in range(nocc):
+        co_ovlp_i = np.delete(co_ovlp, i, axis=0) # Delete row i
+        co_ovlp_i = np.delete(co_ovlp_i, i, axis=1) # Delete col i
+        co_ovlp_ov_i = co_ovlp_i[:_nocc, _nocc:]
+        co_ovlp_vo_i = co_ovlp_i[_nocc:, :_nocc]
+        ovlp_oo_diag_i = np.delete(ovlp_oo_diag, i, axis=0) # Delete element i
+        ovlp_oo_inv_i = 1. / ovlp_oo_diag_i
+        
+        # [ co_ovlp_i.T ]_{pk} = [ co_ovlp_i ]_{kp}
+        S_ipr_mat[i] = (co_ovlp[nocc:, nocc:] - 
+                       einsum('pk,k,kr->pr', co_ovlp_vo_i, ovlp_oo_inv_i, co_ovlp_ov_i))
+    
+    return S_ipr_mat
