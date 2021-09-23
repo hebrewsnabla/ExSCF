@@ -2,7 +2,7 @@ import numpy as np
 #import sympy as sym
 import scipy
 from pyscf import gto, scf, mp, lib, ao2mo
-from pyphf import suscf, util2, noci
+from pyphf import suscf, util2, noci, pt2
 from pyphf.suscf import count0, eig
 #import os, sys
 from functools import partial, reduce
@@ -30,6 +30,7 @@ class EMP2():
         #self.vir = self.norb - occ
         S = suhf.ovlp
         self.ao_ovlp = scipy.linalg.block_diag(S, S)
+        self.vap = False
 
     def kernel(self):
         suhf = self.suhf
@@ -38,16 +39,32 @@ class EMP2():
         self.e_elec_hf = suhf.guesshf.energy_elec()[0]
         ghf = copy.copy(suhf.guesshf).to_ghf()
         self.ghf = ghf
+        ghf.converged=True
         gmp2 = mp.GMP2(ghf)
         gmp2.kernel()
         self.gmp2 = gmp2
         energy_00 = suhf.ciH
         norm_00 = suhf.ciS
+        if self.vap:
+            #F0 = pt2.defm_Fock(suhf.mol, suhf.hcore_ortho, suhf.dm_ortho, suhf.X )
+            F0 = suhf.guesshf.get_fock(dm=suhf.dm_reg)
+            F0mo = einsum('tji,tjk,tkl->til', suhf.mo_reg, F0, suhf.mo_reg)
+            print(F0mo)
+            self.F0mo = F0mo
         energy_01, norm_01 = get_e01(self, suhf, gmp2)
         print('e01 %.6f, S00 %.6f, S01 %.6f' % (energy_01, norm_00, norm_01))
         ecorr = energy_01 / (norm_00 + norm_01)
         self.e_corr = ecorr
         print('SUMP2 e_corr %.6f' % ecorr)
+
+def u2g_2d(umat):
+    shape = umat[0].shape
+    gmat = np.zeros((shape[0]*2, shape[1]*2))
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            gmat[2*i, 2*j] = umat[0,i,j]
+            gmat[2*i+1, 2*j+1] = umat[1,i,j]
+    return gmat
 
 def get_e01(spt2, suhf, gmp2):
     mo = suhf.mo_reg
@@ -64,6 +81,7 @@ def get_e01(spt2, suhf, gmp2):
     mo_o = ghf.mo_coeff[:,:nocc]
     eri_ao = suhf.mol.intor('int2e', aosym='s8')
     S = spt2.ao_ovlp
+    Fov = u2g_2d(spt2.F0mo)[:nocc, nocc:]
     E01g = []
     S01g = []
     for i, dg in enumerate(Dg):
@@ -77,14 +95,22 @@ def get_e01(spt2, suhf, gmp2):
         ovlp_oo = np.diag(oo_diag)
         ovlp_vv = reduce(np.dot, (mo_v.T, S, dg, mo_v))
         co_ovlp = util2.stack22(ovlp_oo, ovlp_ov, ovlp_vo, ovlp_vv)
-        print(co_ovlp)
+        #print(co_ovlp)
         u = util2.stack22( u_oo, np.zeros((nocc, nvir)), np.zeros((nvir, nocc)), np.eye(nvir))
         co_t2 = get_co_t2(gmp2.t2, v_oo)
         eri_mo = get_mo_eri(spt2.ghf.mo_coeff, eri_ao)
         co_eri = get_co_eri(eri_mo, u_oo, nocc)
+
         term1 = get_term1(oo_diag, co_t2, ovlp_ov, spt2.e_elec_hf)
+        if spt2.vap:
+            co_Fov = einsum('pi, pa -> ia', v_oo, Fov)
+            term15 = get_term15(co_eri, co_ovlp, oo_diag, co_t2, ovlp_vo, ovlp_ov, co_Fov)
+        else:
+            term15 = 0.0
         term2 = get_term2(co_eri, co_ovlp, oo_diag, co_t2, ovlp_vo, ovlp_ov)
-        e_01 = term1 + term2
+        #print('term1 %.6f, term2 %.6f' %(term1, term2))
+        print('term1 %.6f, term15 %.6f, term2 %.6f' %(term1, term15, term2))
+        e_01 = term1 + term15 + term2
         norm_01 = term1 / spt2.e_elec_hf
         E01g.append(e_01)
         S01g.append(norm_01)
@@ -121,6 +147,13 @@ def get_term1(ovlp_oo_diag, co_t2, ovlp_ov, e_elec_hf):
     ovlp_oo_inv = 1. / ovlp_oo_diag
     term1 = 0.5 * e_elec_hf * np.prod(ovlp_oo_diag) * einsum('ijab,ia,jb,i,j->', co_t2, ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv)
     return term1
+
+def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov):
+    #nocc, nvir = co_eri.shape[:2]
+    #co_eri_oovv = co_eri.transpose(0,2,1,3) - co_eri.transpose(0,2,3,1)
+    ovlp_oo_inv = 1. / ovlp_oo_diag
+    term15 = 0.5 *  np.prod(ovlp_oo_diag) * einsum('ijab,ia,jb,i,j,kc,k, kc->', co_t2, ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, ovlp_ov, ovlp_oo_inv, Fov)
+    return term15
 
 def get_term2(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov):
     nocc, nvir = co_eri.shape[:2]
