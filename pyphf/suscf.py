@@ -63,7 +63,7 @@ def find_NO(suhf, dm, mo_occ):
     ev_b, v_b = eig(dm[1]*(-1))
     pa = count0(ev_a)
     pb = count0(ev_b)
-    if suhf.debug:
+    if suhf.debug or suhf.printmo:
         print('NO eigenvalue')
         print(ev_a, '\n', ev_b)
 #    v_a1 = v_a[:,occa == 1]
@@ -85,7 +85,7 @@ def find_NO(suhf, dm, mo_occ):
     if cut_no:
         v = np.hstack((v_a1, v_b1, v_a2, v_b2))[:,:pa+pb]
     #v = np.hstack((v, np.zeros((v.shape[0], v.shape[0]-pa-pb))))
-    if suhf.debug:
+    if suhf.debug or suhf.printmo:
         print('NO vec')
         print(v)
     dm_expd = np.hstack(
@@ -480,12 +480,13 @@ class SUHF():
         self.ovlp = S
         Ca, Cb = self.guesshf.mo_coeff
         
-        Su, Ss, Sv = scipy.linalg.svd(S)
+        Su, Ss, Sv = scipy.linalg.svd(S, lapack_driver='gesvd')
         X = einsum('ij,j->ij', Su, Ss**(-0.5))
         self.X = X
         XS = np.dot(X.T,S)
         self.XS = XS
         if self.debug:
+            print('C (reg)\n', Ca, '\n', Cb)
             print('S\n', S)
             print('SVD: S^(-1/2)\n', X)
             print('S^(1/2)\n', XS)
@@ -632,8 +633,14 @@ class SUHF():
                 if self.dm_reg is None:
                     self.dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
                 ni = numint.NumInt()
-                n, exc, vxc = ni.nr_uks(self.mol, self.ksgrids, '%s'%self.xc, self.dm_reg)
+                n, exc, vxc = ni.nr_uks(self.mol, self.ksgrids, self.xc, self.dm_reg)
+                omega, alpha, hyb = ni.rsh_and_hybrid_coeff(self.xc, spin=self.mol.spin)
+                if omega > 1e-10: raise NotImplementedError('Range Separation not Implemented')
+                if hyb > 1e-10:
+                    ex_hf = self.get_EX()
+                    E_suhf -= (1-hyb)*ex_hf
                 E_suhf += exc
+                # dft for noiter only, Fock is not well defined
                 F_mod_ortho = F_mod_ortho + vxc
 
             self.E_suhf = E_suhf
