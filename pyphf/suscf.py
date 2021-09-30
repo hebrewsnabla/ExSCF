@@ -549,9 +549,18 @@ class SUHF():
         t_start = time.time()
         if not self.built:
             self.build()
-        np.set_printoptions(precision=6, linewidth=160, suppress=True)
+        prec = 6
+        linew = 160
+        supp = True
+        orbmax = 32
+        self.precise = False
         if self.debug:
-            np.set_printoptions(precision=10, linewidth=200, suppress=False)
+            linew = 200
+            orbmax = 60
+            if self.precise:
+                prec = 10
+                supp = False
+        np.set_printoptions(precision=prec, linewidth=linew, suppress=supp, threshold = orbmax**2)
         X = self.X
         na, nb = self.nelec
         norb = self.norb

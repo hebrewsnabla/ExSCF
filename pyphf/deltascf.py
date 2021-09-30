@@ -25,10 +25,11 @@ def set_occ(occ0, aexci=[[],[]], bexci=[[],[]]):
         occ[1][j] += 1
     print('Excitation: Alpha ',aexci[0], ' -> ', aexci[1])
     print('             Beta ',bexci[0], ' -> ', bexci[1])
-    print('Former occ pattern: Alpha', occ0[0])
-    print('                     Beta', occ0[1])
-    print('New occ pattern:    Alpha', occ[0])
-    print('                     Beta', occ[1])
+    length = max(aexci[1]+ bexci[1])
+    print('Former occ pattern: Alpha', occ0[0][:length])
+    print('                     Beta', occ0[1][:length])
+    print('New occ pattern:    Alpha', occ[0][:length])
+    print('                     Beta', occ[1][:length])
     return occ
 
 
@@ -49,15 +50,16 @@ def mom_occ(mf, occorb, setocc):
     #choose a subset of mo_coeff, which maximizes <old|now>
     ss_a = np.einsum('ij,ij->j', s_a, s_a)
     ss_b = np.einsum('ij,ij->j', s_b, s_b)
-    print('Overlap: ', ss_a, '\n', ss_b)
     idx_a = np.argsort(ss_a)[::-1]
     idx_b = np.argsort(ss_b)[::-1]
     mo_occ[0][idx_a[:nocc_a]] = 1.
     mo_occ[1][idx_b[:nocc_b]] = 1.
-    print(' New alpha occ pattern: ', mo_occ[0])
-    print(' New beta occ pattern:  ', mo_occ[1])
-    print(' Current alpha mo_energy(sorted): ', mo_energy[0])
-    print(' Current beta mo_energy(sorted):  ', mo_energy[1])
+    length = max(idx_a[:nocc_a]+ idx_b[:nocc_b])
+    print('Overlap: ', ss_a[:length], '\n', ss_b[:length])
+    print(' New alpha occ pattern: ', mo_occ[0][:length])
+    print(' New beta occ pattern:  ', mo_occ[1][:length])
+    print(' Current alpha mo_energy(sorted): ', mo_energy[0][:length])
+    print(' Current beta mo_energy(sorted):  ', mo_energy[1][:length])
     if (int(np.sum(mo_occ[0])) != nocc_a):
         raise ValueError('mom alpha electron occupation numbers do not match: %d, %d'%
                   (nocc_a, int(np.sum(mo_occ[0])))
