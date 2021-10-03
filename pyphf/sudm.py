@@ -1,5 +1,5 @@
 import numpy as np
-from pyphf import util2
+from pyphf import util2, wigner
 import sympy
 from sympy.physics.quantum.cg import CG
 import os
@@ -28,10 +28,25 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         print('time for xgg: %.3f' % (t3-t2))
     #wgtf0 = suhf.d
     S, Sz = suhf.S, suhf.Sz
+    weight_f0 = suhf.d
+    #weight_f0 = wigner.wigner(S, Sz, suhf.nbeta, suhf.grids)[2]
+    print('weight f0', weight_f0)
+    print('CG00, CG01')
     cgcoeff0, cgfloat0 = get_CG(S, Sz, 0, 0, S, Sz)
     cgcoeff1, cgfloat1 = get_CG(S, Sz, 1, 0, S, Sz)
     #cgcoeff2, cgfloat2 = get_CG(S, Sz, 2, 0, S, Sz)
     #print(type(cgfloat1))
+    if abs(Sz-1) <= S:
+        print('weight fp1')
+        weight_fp1 = wigner.wigner2(S*2,Sz, Sz-1, suhf.nbeta, suhf.grids)[2]
+        print('CG2p1, CG1p1')
+        _, cgf2p1 = get_CG(S, Sz, 2, -1, S, Sz-1)
+        _, cgf1p1 = get_CG(S, Sz, 1, -1, S, Sz-1)
+    #if abs(Sz-2) <= S:
+    #    weight_fp2 = wigner.wigner2(S*2,Sz, Sz-2, suhf.nbeta, suhf.grids)[2]
+    #    _, cgf2p2 = get_CG(S, Sz, 2, -2, S, Sz-2)
+    #    print('weight fp2', weight_fp2)
+
 
     xggint = suhf.integr_beta(np.array(xgg), fac='ci')
     print('xggint', xggint)
@@ -57,17 +72,30 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         pgg2_ao = (pggaa_ao - pggbb_ao)  * x / np.sqrt(2.0)
         pggba_ao = pggba_ao  * (-x)
         pggab_ao = pggab_ao  * x
-        #print(pgg1_ao)
-
+        if suhf.debug2:
+            print('pgg\n', pgg1_ao)
+            print(pggba_ao)
+        #onepdm_a = pggaa_ao * x
+        #onepdm_b = pggbb_ao * x
         # Here we assume S = Sz
-        onepdm_a = (pgg1_ao * cgfloat0 * cgfloat0 + pgg2_ao * cgfloat1 * cgfloat1) / np.sqrt(2.0)
-        onepdm_b = (pgg1_ao * cgfloat0 * cgfloat0 - pgg2_ao * cgfloat1 * cgfloat1) / np.sqrt(2.0)
+        j2s1c = pgg1_ao * cgfloat0
+        j2s2c = pgg2_ao * cgfloat1 
+        if abs(Sz-1) <= S:
+            j2s2c += pggba_ao * (-weight_fp1[i]*cgf1p1/weight_f0[i]) 
+            #onepdm_a += pggab_ao * (-weight_fm1*cgf1m1/weight_fp0) * cgfloat1 / np.sqrt(2.0)
+            #onepdm_b += -pggba_ao * (-weight_fp1[i]*cgf1p1/weight_f0[i]) * cgfloat1 / np.sqrt(2.0)
+        onepdm_a = (j2s1c * cgfloat0 + j2s2c * cgfloat1) / np.sqrt(2.0)
+        onepdm_b = (j2s1c * cgfloat0 - j2s2c * cgfloat1) / np.sqrt(2.0)
+        if suhf.debug2:
+            print('j2s1c, j2s2c\n', j2s1c* weight_f0[i], '\n', j2s2c* weight_f0[i])
         Onepdm_a.append(onepdm_a)
         Onepdm_b.append(onepdm_b)
         #print(onepdm_a.dtype)
     int1pdm_a = suhf.integr_beta(np.array(Onepdm_a), fac='ci') / xggint
     #print(type(int1pdm_a), int1pdm_a.dtype)
     int1pdm_b = suhf.integr_beta(np.array(Onepdm_b), fac='ci') / xggint
+    #int1pdm_a = (int1pdm_a + int1pdm_a.T)/2.0
+    #int1pdm_b = (int1pdm_b + int1pdm_b.T)/2.0
     if suhf.debug:
         print('SUHF DM alpha\n', int1pdm_a, '\nSUHF DM beta\n', int1pdm_b)
     return [int1pdm_a, int1pdm_b]

@@ -25,7 +25,7 @@ def set_occ(occ0, aexci=[[],[]], bexci=[[],[]]):
         occ[1][j] += 1
     print('Excitation: Alpha ',aexci[0], ' -> ', aexci[1])
     print('             Beta ',bexci[0], ' -> ', bexci[1])
-    length = max(aexci[1]+ bexci[1])
+    length = max(aexci[1]+ bexci[1]) + 1
     print('Former occ pattern: Alpha', occ0[0][:length])
     print('                     Beta', occ0[1][:length])
     print('New occ pattern:    Alpha', occ[0][:length])
