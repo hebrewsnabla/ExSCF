@@ -10,9 +10,12 @@ print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
 class PDFT():
-    def __init__(self, suhf):
+    def __init__(self, suhf, xc=None):
         self.suhf = suhf
-        self.xc = 'pbe'
+        if xc is not None:
+            self.xc = xc
+        else:
+            self.xc = 'pbe'
     def kernel(self):
         return kernel(self, self.suhf)
 

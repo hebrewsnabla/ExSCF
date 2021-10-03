@@ -639,15 +639,7 @@ class SUHF():
             Fbb = F_mod_ortho[norb:, norb:]
             F_mod_ortho = np.array([Faa,Fbb])
             if self.dft:
-                if self.dm_reg is None:
-                    self.dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
-                ni = numint.NumInt()
-                n, exc, vxc = ni.nr_uks(self.mol, self.ksgrids, self.xc, self.dm_reg)
-                omega, alpha, hyb = ni.rsh_and_hybrid_coeff(self.xc, spin=self.mol.spin)
-                if omega > 1e-10: raise NotImplementedError('Range Separation not Implemented')
-                if hyb > 1e-10:
-                    ex_hf = self.get_EX()
-                    E_suhf -= (1-hyb)*ex_hf
+                exc, vxc = self.ddft()
                 E_suhf += exc
                 # dft for noiter only, Fock is not well defined
                 F_mod_ortho = F_mod_ortho + vxc
@@ -784,6 +776,9 @@ class SUHF():
                 #util2.tofch(self.oldfch, mo_reg, self.mo_e, S, 'SUHFMO')
             t_nat = time.time()
             print('time for natorb: %.3f' % (t_nat-t_dm))
+            ss, s = scf.uhf.spin_square((self.mo_reg[0][:,self.mo_occ[0]>0],
+                                self.mo_reg[1][:,self.mo_occ[1]>0]), self.ovlp)
+            print('deformed <S^2> = %.8g  2S+1 = %.8g' % (ss, s))
 
         t_end = time.time()
         print('***** End of SUHF *****')
@@ -797,6 +792,23 @@ class SUHF():
     def get_EX(self):
         Jg, Kg = self.get_JKg()
         return get_EX(self, self.no, self.Pg, Kg, self.xg)[1]
+    def ddft(self, xc=None):
+        if self.dm_reg is None:
+            X = self.X
+            self.dm_reg = einsum('ij,tjk,lk->til', X, self.dm_ortho, X) # regular ao
+        ni = numint.NumInt()
+        if xc is not None:
+            self.ksgrids = sudft.set_grids(self.mol)
+        else:
+            xc = self.xc
+        n, exc, vxc = ni.nr_uks(self.mol, self.ksgrids, xc, self.dm_reg)
+        omega, alpha, hyb = ni.rsh_and_hybrid_coeff(xc, spin=self.mol.spin)
+        if omega > 1e-10: raise NotImplementedError('Range Separation not Implemented')
+        if hyb > 1e-10:
+            ex_hf = self.get_EX()
+            exc -= (1-hyb)*ex_hf
+        print('e_dft-e_hf(%s): %.6f ' % (xc,exc))
+        return exc, vxc
 
     def regular(self):
         X = self.X
@@ -809,7 +821,6 @@ class SUHF():
             print('dm_reg\n', dm_reg)
             print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
         
-
 def conv_check(E_suhf, dE, ddm, thresh, cyc):
     max_ddm = abs(ddm).max()
     norm_ddm = np.linalg.norm(ddm) / (ddm.shape[-1]*np.sqrt(2))
@@ -828,3 +839,5 @@ def lev_shift(s, dm, f, shift):
              scf.hf.level_shift(s, dm[1], f[1], shift)
              )
     return np.array(new_f)
+
+
