@@ -33,6 +33,17 @@ def kernel(pdft, suhf):
     ni = numint.NumInt()
     n, exc, vxc = ni.nr_uks(mol, grids, pdft.xc, dmdefm)
     print('E_xcdft %.6f' % exc)
+    if pdft.testd:
+        n2, exc2, vxc2 = ni.nr_uks(mol, grids, pdft.xc, dm1)
+        print('E_xcrho %.6f' % exc2)
+        natorb = suhf.natorb[2]
+        natocc = suhf.natocc[2]
+        ua = 0.5*(natocc + natocc**2 * (2.0 - natocc))
+        ub = 0.5*(natocc - natocc**2 * (2.0 - natocc))
+        dm_ua = einsum('ij,j,kj -> ik', natorb, ua, natorb)
+        dm_ub = einsum('ij,j,kj -> ik', natorb, ub, natorb)
+        n3, exc3, vxc3 = ni.nr_uks(mol, grids, pdft.xc, (dm_ua, dm_ub))
+        print('E_xcu   %.6f' % exc3)
 
 def new_decomp(suhf, dm1):
     print('E_suhf %.6f' % suhf.E_suhf)
