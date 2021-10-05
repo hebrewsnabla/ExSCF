@@ -42,10 +42,10 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         print('CG2p1, CG1p1')
         _, cgf2p1 = get_CG(S, Sz, 2, -1, S, Sz-1)
         _, cgf1p1 = get_CG(S, Sz, 1, -1, S, Sz-1)
-    #if abs(Sz-2) <= S:
-    #    weight_fp2 = wigner.wigner2(S*2,Sz, Sz-2, suhf.nbeta, suhf.grids)[2]
-    #    _, cgf2p2 = get_CG(S, Sz, 2, -2, S, Sz-2)
-    #    print('weight fp2', weight_fp2)
+    if abs(Sz-2) <= S:
+        weight_fp2 = wigner.wigner2(S*2,Sz, Sz-2, suhf.nbeta, suhf.grids)[2]
+        _, cgf2p2 = get_CG(S, Sz, 2, -2, S, Sz-2)
+        print('weight fp2', weight_fp2)
 
 
     xggint = suhf.integr_beta(np.array(xgg), fac='ci')
@@ -91,6 +91,10 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         Onepdm_a.append(onepdm_a)
         Onepdm_b.append(onepdm_b)
         #print(onepdm_a.dtype)
+        if suhf.do2pdm:
+            twopdm = make_2pdm((pggaa, pggbb, pggba, pggab), 
+                               x, norb, (cgfloat0, cgfloat1, cgf1p1, cgf2p1, cgf2p2)
+                               weight_f0, weight_fp1, weight_fm1)
     int1pdm_a = suhf.integr_beta(np.array(Onepdm_a), fac='ci') / xggint
     #print(type(int1pdm_a), int1pdm_a.dtype)
     int1pdm_b = suhf.integr_beta(np.array(Onepdm_b), fac='ci') / xggint
@@ -99,6 +103,58 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
     if suhf.debug:
         print('SUHF DM alpha\n', int1pdm_a, '\nSUHF DM beta\n', int1pdm_b)
     return [int1pdm_a, int1pdm_b]
+
+def contr1(p1,p2,p3,p4, fac):
+    j2p0 = einsum('il,jk->ijkl', p1, p2)
+    j2p0 -= einsum('ik,jl->ijkl', p3, p4)
+    j2p0 *= fac
+    return j2p0
+
+def make_2pdm(pgg, x, norb, cgf, wgtf0, wgtfp1, wgtfm1):
+    pggaa, pggbb, pggba, pggab = pgg
+    cgf00, cgf10, cgf1p1, cgf2p1, cgf2p2 = cgf
+    wgtfp1 /= wgtf0
+    wgtfm1 /= wgtf0
+    #i2pdm = np.zeros((norb,norb,norb,norb))
+    j2aaaa = contr1(pggaa, pggaa, pggaa, pggaa, x/2.0)
+    j2bbbb = contr1(pggbb, pggbb, pggbb, pggbb, x/2.0)
+    j2abba = contr1(pggaa, pggbb, pggba, pggab, x/2.0)
+    j2baab = contr1(pggbb, pggaa, pggab, pggba, x/2.0)
+    j2abab = contr1(pggba, pggab, pggaa, pggbb, x/2.0)
+    j2baba = contr1(pggab, pggba, pggbb, pggaa, x/2.0)
+    j2aabb = contr1(pggba, pggba, pggba, pggba, x/2.0)
+    j2bbaa = contr1(pggab, pggab, pggab, pggab, x/2.0)
+    j2aaab = contr1(pggba, pggaa, pggaa, pggba, x/2.0)
+    j2aaba = contr1(pggaa, pggba, pggba, pggaa, x/2.0)
+    j2abaa = contr1(pggaa, pggab, pggaa, pggab, x/2.0)
+    j2baaa = contr1(pggab, pggaa, pggab, pggaa, x/2.0)
+    j2bbba = contr1(pggab, pggbb, pggbb, pggab, x/2.0)
+    j2bbab = contr1(pggbb, pggab, pggab, pggbb, x/2.0)
+    j2babb = contr1(pggbb, pggba, pggbb, pggba, x/2.0)
+    j2abbb = contr1(pggba, pggbb, pggba, pggbb, x/2.0)
+    j2t10 = (j2aaaa + j2bbbb + j2abba + j2baab)*0.5
+    j2t20 = (j2aaaa - j2bbbb - j2abba + j2baab)*0.5
+    j2t2p1 = (j2aaba + j2babb)*(-1/np.sqrt(2.0))
+    j2t2m1 = (j2abaa + j2bbab)*(+1/np.sqrt(2.0))
+    j2t30 = (j2aaaa - j2bbbb + j2abba - j2baab)*0.5
+    j2t3p1 = (j2aaab + j2abbb)*(-1/np.sqrt(2.0))
+    j2t3m1 = (j2baaa + j2bbba)*(+1/np.sqrt(2.0))
+    j2t40 = (-j2aaaa - j2bbbb + j2abba + j2baab)/(2*np.sqrt(3.0)) + (j2abab + j2baba)*(-1/np.sqrt(3.0))
+    j2t60 = (j2aaaa + j2bbbb - j2abba - j2baab - j3abab - j2baba) / np.sqrt(6.0)
+    j2t6p1 = (-j2aaab + j2abbb - j2aaba + j2babb)*0.5
+    j2t6m1 = (j2baaa - j2bbba + j2abaa - j2bbab)*0.5
+    j2t6p2 = j2aabb
+    j2t6m2 = j2bbaa
+    j2t1c = j2t10 * cgf00
+    j2t2c = j2t20 * cgf10 - j2t2p1 * cgf1p1 * wgtfp1 - j2t2m1 * cgf1m1 * wgtfm1
+    j2t3c = j2t30 * cgf10 - j2t3p1 * cgf1p1 * wgtfp1 - j2t3m1 * cgf1m1 * wgtfm1
+    j2t4c = j2t40 * cgf00
+    j2t6c = j2t60 * cgf20 - j2t6p1 * cgf2p1 * wgtfp1 - j2t6m1 * cgf2m1 * wgtfm1 
+    j2t6c += j2t6p2 * cgf2p2 * wgtfp2 + j2t6m2 * cgf2m2 * wgtfm2
+    j2pdm0 = 
+    
+    
+
 
 def natorb(suhf, dm):
     #print(type(dm[0]), dm[0].dtype)
