@@ -34,7 +34,7 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
     print('CG00, CG01')
     cgcoeff0, cgfloat0 = get_CG(S, Sz, 0, 0, S, Sz)
     cgcoeff1, cgfloat1 = get_CG(S, Sz, 1, 0, S, Sz)
-    #cgcoeff2, cgfloat2 = get_CG(S, Sz, 2, 0, S, Sz)
+    cgcoeff2, cgfloat2 = get_CG(S, Sz, 2, 0, S, Sz)
     #print(type(cgfloat1))
     if abs(Sz-1) <= S:
         print('weight fp1')
@@ -58,6 +58,9 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
     norb = int(Pgg_ortho[0].shape[0]/2)
     Onepdm_a = []
     Onepdm_b = []
+    Twopdm_aa = []
+    Twopdm_bb = []
+    Twopdm_ab = []
     for i,pgg_ortho in enumerate(Pgg_ortho):
         x = xgg[i]
         pggaa = pgg_ortho[:norb, :norb]
@@ -92,14 +95,33 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         Onepdm_b.append(onepdm_b)
         #print(onepdm_a.dtype)
         if suhf.do2pdm:
-            twopdm = make_2pdm((pggaa, pggbb, pggba, pggab), 
-                               x, norb, (cgfloat0, cgfloat1, cgf1p1, cgf2p1, cgf2p2)
-                               weight_f0, weight_fp1, weight_fm1)
+            twopdm = make_2pdm((pggaa_ao, pggbb_ao, pggba_ao, pggab_ao), 
+                               x, norb, 
+                               (cgfloat0, cgfloat1, cgfloat2, cgf1p1, cgf2p1, cgf2p2, 0.0, 0.0, 0.0),
+                               (weight_f0[i], weight_fp1[i], 0.0, weight_fp2[i], 0.0)
+                              )
+            Twopdm_aa.append(twopdm[0])
+            Twopdm_bb.append(twopdm[1])
+            Twopdm_ab.append(twopdm[2])
     int1pdm_a = suhf.integr_beta(np.array(Onepdm_a), fac='ci') / xggint
     #print(type(int1pdm_a), int1pdm_a.dtype)
     int1pdm_b = suhf.integr_beta(np.array(Onepdm_b), fac='ci') / xggint
     #int1pdm_a = (int1pdm_a + int1pdm_a.T)/2.0
     #int1pdm_b = (int1pdm_b + int1pdm_b.T)/2.0
+    if suhf.do2pdm:
+        i2pdm_aa = suhf.integr_beta(np.array(Twopdm_aa), fac='ci') / xggint
+        i2pdm_bb = suhf.integr_beta(np.array(Twopdm_bb), fac='ci') / xggint
+        i2pdm_ab = suhf.integr_beta(np.array(Twopdm_ab), fac='ci') / xggint
+        for i in range(na):
+            for j in range(i,na):
+                for k in range(na):
+                    for l in range(k,na):
+                        print("aa %d %d %d %d %.6f" % (i,j,k,l,i2pdm_aa[i,j,k,l]))
+        for i in range(nb):
+            for j in range(i,nb):
+                for k in range(nb):
+                    for l in range(k,nb):
+                        print("bb %d %d %d %d %.6f" % (i,j,k,l,i2pdm_bb[i,j,k,l]))
     if suhf.debug:
         print('SUHF DM alpha\n', int1pdm_a, '\nSUHF DM beta\n', int1pdm_b)
     return [int1pdm_a, int1pdm_b]
@@ -110,12 +132,15 @@ def contr1(p1,p2,p3,p4, fac):
     j2p0 *= fac
     return j2p0
 
-def make_2pdm(pgg, x, norb, cgf, wgtf0, wgtfp1, wgtfm1):
+def make_2pdm(pgg, x, norb, cgf, wgt):
     pggaa, pggbb, pggba, pggab = pgg
-    cgf00, cgf10, cgf1p1, cgf2p1, cgf2p2 = cgf
+    cgf00, cgf10, cgf20, cgf1p1, cgf2p1, cgf2p2, cgf1m1, cgf2m1, cgf2m2 = cgf
+    wgtf0, wgtfp1, wgtfm1, wgtfp2, wgtfm2 = wgt
     wgtfp1 /= wgtf0
     wgtfm1 /= wgtf0
-    #i2pdm = np.zeros((norb,norb,norb,norb))
+    wgtfp2 /= wgtf0
+    wgtfm2 /= wgtf0
+    
     j2aaaa = contr1(pggaa, pggaa, pggaa, pggaa, x/2.0)
     j2bbbb = contr1(pggbb, pggbb, pggbb, pggbb, x/2.0)
     j2abba = contr1(pggaa, pggbb, pggba, pggab, x/2.0)
@@ -133,6 +158,7 @@ def make_2pdm(pgg, x, norb, cgf, wgtf0, wgtfp1, wgtfm1):
     j2babb = contr1(pggbb, pggba, pggbb, pggba, x/2.0)
     j2abbb = contr1(pggba, pggbb, pggba, pggbb, x/2.0)
     j2t10 = (j2aaaa + j2bbbb + j2abba + j2baab)*0.5
+    
     j2t20 = (j2aaaa - j2bbbb - j2abba + j2baab)*0.5
     j2t2p1 = (j2aaba + j2babb)*(-1/np.sqrt(2.0))
     j2t2m1 = (j2abaa + j2bbab)*(+1/np.sqrt(2.0))
@@ -140,19 +166,22 @@ def make_2pdm(pgg, x, norb, cgf, wgtf0, wgtfp1, wgtfm1):
     j2t3p1 = (j2aaab + j2abbb)*(-1/np.sqrt(2.0))
     j2t3m1 = (j2baaa + j2bbba)*(+1/np.sqrt(2.0))
     j2t40 = (-j2aaaa - j2bbbb + j2abba + j2baab)/(2*np.sqrt(3.0)) + (j2abab + j2baba)*(-1/np.sqrt(3.0))
-    j2t60 = (j2aaaa + j2bbbb - j2abba - j2baab - j3abab - j2baba) / np.sqrt(6.0)
+    j2t60 = (j2aaaa + j2bbbb - j2abba - j2baab - j2abab - j2baba) / np.sqrt(6.0)
     j2t6p1 = (-j2aaab + j2abbb - j2aaba + j2babb)*0.5
     j2t6m1 = (j2baaa - j2bbba + j2abaa - j2bbab)*0.5
     j2t6p2 = j2aabb
     j2t6m2 = j2bbaa
     j2t1c = j2t10 * cgf00
-    j2t2c = j2t20 * cgf10 - j2t2p1 * cgf1p1 * wgtfp1 - j2t2m1 * cgf1m1 * wgtfm1
-    j2t3c = j2t30 * cgf10 - j2t3p1 * cgf1p1 * wgtfp1 - j2t3m1 * cgf1m1 * wgtfm1
+    j2t2c = j2t20 * cgf10 - j2t2p1 * cgf1p1 * wgtfp1 #- j2t2m1 * cgf1m1 * wgtfm1
+    j2t3c = j2t30 * cgf10 - j2t3p1 * cgf1p1 * wgtfp1 #- j2t3m1 * cgf1m1 * wgtfm1
     j2t4c = j2t40 * cgf00
-    j2t6c = j2t60 * cgf20 - j2t6p1 * cgf2p1 * wgtfp1 - j2t6m1 * cgf2m1 * wgtfm1 
-    j2t6c += j2t6p2 * cgf2p2 * wgtfp2 + j2t6m2 * cgf2m2 * wgtfm2
-    j2pdm0 = 
-    
+    j2t6c = j2t60 * cgf20 - j2t6p1 * cgf2p1 * wgtfp1 #- j2t6m1 * cgf2m1 * wgtfm1 
+    j2t6c += j2t6p2 * cgf2p2 * wgtfp2 #+ j2t6m2 * cgf2m2 * wgtfm2
+    # 2pdm aaaa, bbbb, aabb
+    j2pdm0 = j2t1c * cgf00/2.0 - j2t4c * cgf00 / (2.0*np.sqrt(3.0)) + j2t2c * cgf10/2.0 + j2t3c * cgf10/2.0 + j2t6c * cgf20/np.sqrt(6.0)
+    j2pdm1 = j2t1c * cgf00/2.0 - j2t4c * cgf00 / (2.0*np.sqrt(3.0)) - j2t2c * cgf10/2.0 - j2t3c * cgf10/2.0 + j2t6c * cgf20/np.sqrt(6.0)
+    j2pdm2 = j2t1c * cgf00/2.0 + j2t4c * cgf00 / (2.0*np.sqrt(3.0)) - j2t2c * cgf10/2.0 + j2t3c * cgf10/2.0 - j2t6c * cgf20/np.sqrt(6.0)
+    return j2pdm0, j2pdm1, j2pdm2
     
 
 

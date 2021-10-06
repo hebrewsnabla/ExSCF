@@ -188,8 +188,10 @@ def integr_beta(q, d, grids, weights, fac='normal', xg=None, ciS=None):
         int_q = einsum('i,i,ij,i->j', weights, sinbeta, q, d)
     elif q.ndim==3:
         int_q = einsum('i,i,ijk,i->jk', weights, sinbeta, q, d)
+    elif q.ndim==5:
+        int_q = einsum('i,i,ijklm,i->jklm', weights, sinbeta, q, d)
     else:
-        raise(ValueError, 'q must have dimension 1, 2, or 3')
+        raise(ValueError, 'q must have dimension 1, 2, 3 or 5')
     return int_q
 
 
