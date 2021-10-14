@@ -43,10 +43,17 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         print('CG2p1, CG1p1')
         _, cgf2p1 = get_CG(S, Sz, 2, -1, S, Sz-1)
         _, cgf1p1 = get_CG(S, Sz, 1, -1, S, Sz-1)
+    else:
+        weight_fp1 = weight_f0 * 0.0
+        cgf1p1 = cgf2p1 = 0.0
+    
     if abs(Sz-2) <= S:
         print('weight fp2')
         weight_fp2 = wigner.wigner2(S*2,Sz-2, Sz, suhf.nbeta, suhf.grids)[2]
         _, cgf2p2 = get_CG(S, Sz, 2, -2, S, Sz-2)
+    else:
+        weight_fp2 = weight_f0 * 0.0
+        cgf2p2 = 0.0
 
 
     xggint = suhf.integr_beta(np.array(xgg), fac='ci')
@@ -118,6 +125,7 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         i2pdm_aa = suhf.integr_beta(np.array(Twopdm_aa), fac='ci') / xggint
         i2pdm_bb = suhf.integr_beta(np.array(Twopdm_bb), fac='ci') / xggint
         i2pdm_ab = suhf.integr_beta(np.array(Twopdm_ab), fac='ci') / xggint
+        suhf.suhf_2pdm = (i2pdm_aa, i2pdm_ab, i2pdm_bb)
         for i in range(na):
             for j in range(i,na):
                 for k in range(na):
