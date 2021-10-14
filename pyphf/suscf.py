@@ -110,8 +110,8 @@ def get_Ng(grids, no, dm, occ):
         dg1 = np.eye(norb) * np.cos(beta/2)
         dg2 = np.eye(norb) * (-np.sin(beta/2))
         dg = np.vstack((
-            np.hstack((dg1, -dg2)),
-            np.hstack((dg2, dg1))
+            np.hstack((dg1, dg2)),
+            np.hstack((-dg2, dg1))
         ))
         #print(dg.shape)
         #print(dg)
@@ -507,6 +507,7 @@ class SUHF():
         self.nbeta = 8
         self.grids, self.weights = wigner.get_beta(self.nbeta)
         print('grids: ', self.grids, '\nweights: ', self.weights)
+        self.sinbeta = np.sin(self.grids)
         spin = self.mol.spin
         na, nb = self.guesshf.nelec
         self.nelec = na, nb

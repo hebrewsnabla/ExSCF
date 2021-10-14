@@ -28,6 +28,7 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         print('time for xgg: %.3f' % (t3-t2))
     #wgtf0 = suhf.d
     S, Sz = suhf.S, suhf.Sz
+    print('S, Sz', S, Sz)
     weight_f0 = suhf.d
     #weight_f0 = wigner.wigner(S, Sz, suhf.nbeta, suhf.grids)[2]
     print('weight f0', weight_f0)
@@ -38,14 +39,14 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
     #print(type(cgfloat1))
     if abs(Sz-1) <= S:
         print('weight fp1')
-        weight_fp1 = wigner.wigner2(S*2,Sz, Sz-1, suhf.nbeta, suhf.grids)[2]
+        weight_fp1 = wigner.wigner2(S*2,Sz-1, Sz, suhf.nbeta, suhf.grids)[2]
         print('CG2p1, CG1p1')
         _, cgf2p1 = get_CG(S, Sz, 2, -1, S, Sz-1)
         _, cgf1p1 = get_CG(S, Sz, 1, -1, S, Sz-1)
     if abs(Sz-2) <= S:
-        weight_fp2 = wigner.wigner2(S*2,Sz, Sz-2, suhf.nbeta, suhf.grids)[2]
+        print('weight fp2')
+        weight_fp2 = wigner.wigner2(S*2,Sz-2, Sz, suhf.nbeta, suhf.grids)[2]
         _, cgf2p2 = get_CG(S, Sz, 2, -2, S, Sz-2)
-        print('weight fp2', weight_fp2)
 
 
     xggint = suhf.integr_beta(np.array(xgg), fac='ci')
@@ -68,16 +69,21 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         pggba = pgg_ortho[norb:, :norb]
         pggbb = pgg_ortho[norb:, norb:]
 
-        pggaa_ao, pggab_ao, pggba_ao, pggbb_ao = list(map(ortho2reg, [pggaa, pggab, pggba, pggbb]))
+        pggaa_ao_, pggab_ao_, pggba_ao_, pggbb_ao_ = list(map(ortho2reg, [pggaa, pggab, pggba, pggbb]))
+        #print('xgg', x)
+        #print('pgg\n', pggaa_ao, '\n', pggbb_ao, '\n', pggab_ao, '\n', pggba_ao)
         #print(pggbb_ao.dtype)
         #pgg_ao = util2.stack22(pggaa_ao, pggab_ao, pggba_ao, pggbb_ao)
-        pgg1_ao = (pggaa_ao + pggbb_ao)  * x / np.sqrt(2.0)
-        pgg2_ao = (pggaa_ao - pggbb_ao)  * x / np.sqrt(2.0)
-        pggba_ao = pggba_ao  * (-x)
-        pggab_ao = pggab_ao  * x
+        pgg1_ao = (pggaa_ao_ + pggbb_ao_)  * x / np.sqrt(2.0)
+        pgg2_ao = (pggaa_ao_ - pggbb_ao_)  * x / np.sqrt(2.0)
+        pggba_ao = pggba_ao_  * (-x)
+        pggab_ao = pggab_ao_  * x
         if suhf.debug2:
+            #print('pgg_ortho\n', pgg_ortho)
             print('pgg\n', pgg1_ao)
+            print(pgg2_ao)
             print(pggba_ao)
+            print(pggab_ao)
         #onepdm_a = pggaa_ao * x
         #onepdm_b = pggbb_ao * x
         # Here we assume S = Sz
@@ -95,7 +101,7 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         Onepdm_b.append(onepdm_b)
         #print(onepdm_a.dtype)
         if suhf.do2pdm:
-            twopdm = make_2pdm((pggaa_ao, pggbb_ao, pggba_ao, pggab_ao), 
+            twopdm = make_2pdm((pggaa_ao_, pggbb_ao_, pggba_ao_, pggab_ao_), 
                                x, norb, 
                                (cgfloat0, cgfloat1, cgfloat2, cgf1p1, cgf2p1, cgf2p2, 0.0, 0.0, 0.0),
                                (weight_f0[i], weight_fp1[i], 0.0, weight_fp2[i], 0.0)
@@ -129,6 +135,8 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
 def contr1(p1,p2,p3,p4, fac):
     j2p0 = einsum('il,jk->ijkl', p1, p2)
     j2p0 -= einsum('ik,jl->ijkl', p3, p4)
+    #j2p0 = einsum('li,kj->ijkl', p1, p2)
+    #j2p0 -= einsum('ki,lj->ijkl', p3, p4)
     j2p0 *= fac
     return j2p0
 
@@ -157,6 +165,11 @@ def make_2pdm(pgg, x, norb, cgf, wgt):
     j2bbab = contr1(pggbb, pggab, pggab, pggbb, x/2.0)
     j2babb = contr1(pggbb, pggba, pggbb, pggba, x/2.0)
     j2abbb = contr1(pggba, pggbb, pggba, pggbb, x/2.0)
+    #print('aaaa',j2aaaa[0,2,0,2])
+    #print('bbbb',j2bbbb[0,2,0,2])
+    #print('abba',j2abba[0,2,0,2])
+    #print('aaba',j2aaba[0,2,0,2])
+    #print('babb',j2babb[0,2,0,2])
     j2t10 = (j2aaaa + j2bbbb + j2abba + j2baab)*0.5
     
     j2t20 = (j2aaaa - j2bbbb - j2abba + j2baab)*0.5
@@ -177,10 +190,17 @@ def make_2pdm(pgg, x, norb, cgf, wgt):
     j2t4c = j2t40 * cgf00
     j2t6c = j2t60 * cgf20 - j2t6p1 * cgf2p1 * wgtfp1 #- j2t6m1 * cgf2m1 * wgtfm1 
     j2t6c += j2t6p2 * cgf2p2 * wgtfp2 #+ j2t6m2 * cgf2m2 * wgtfm2
+    #print('j2t20, j2t2p1', j2t20[0,2,0,2], j2t2p1[0,2,0,2])
+    #print(j2t1c[0,2,0,2]*wgtf0)
+    #print(j2t4c[0,2,0,2]*wgtf0)
+    #print(j2t2c[0,2,0,2]*wgtf0)
+    #print(j2t3c[0,2,0,2]*wgtf0)
+    #print(j2t6c[0,2,0,2]*wgtf0)
     # 2pdm aaaa, bbbb, aabb
     j2pdm0 = j2t1c * cgf00/2.0 - j2t4c * cgf00 / (2.0*np.sqrt(3.0)) + j2t2c * cgf10/2.0 + j2t3c * cgf10/2.0 + j2t6c * cgf20/np.sqrt(6.0)
     j2pdm1 = j2t1c * cgf00/2.0 - j2t4c * cgf00 / (2.0*np.sqrt(3.0)) - j2t2c * cgf10/2.0 - j2t3c * cgf10/2.0 + j2t6c * cgf20/np.sqrt(6.0)
     j2pdm2 = j2t1c * cgf00/2.0 + j2t4c * cgf00 / (2.0*np.sqrt(3.0)) - j2t2c * cgf10/2.0 + j2t3c * cgf10/2.0 - j2t6c * cgf20/np.sqrt(6.0)
+    #print('j2pdm0', j2pdm0[0,2,0,2]*wgtf0)
     return j2pdm0, j2pdm1, j2pdm2
     
 
@@ -219,8 +239,9 @@ def get_CG(j1, m1, j2, m2, j, m):
     j1, m1, j2, m2, j, m = list(map(sympy.Rational, [j1, m1, j2, m2, j, m]))
     CGfunc = CG(j1, m1, j2, m2, j, m)
     CGcoeff =  CGfunc.doit()
-    print('Clebsch-Gordan coeff: < {} {} {} {} | {} {} > = {}'.format(j1,m1,j2,m2,j,m,CGcoeff))
-    return CGcoeff, float(CGcoeff.evalf())
+    CGfloat = float(CGcoeff.evalf())
+    print('Clebsch-Gordan coeff: < {} {} {} {} | {} {} > = {} = {:.6f}'.format(j1,m1,j2,m2,j,m,CGcoeff, CGfloat))
+    return CGcoeff, CGfloat
 
 
 def get_Ngg(Dg, dm_no, occ):
@@ -236,8 +257,10 @@ def get_Ngg(Dg, dm_no, occ):
 def get_Pgg(Dg, dm_no, Ngg, occ, no):
     Pgg = []
     Pgg_ortho = []
+    print('no\n', no)
     for i, dg in enumerate(Dg):
         pgg = einsum('ij,jk,kl,ln->in', dg, dm_no[:,:occ], Ngg[i], dm_no[:occ,:])
+        #pgg = einsum('ij,kj->ik', pgg, dg)
         Pgg.append(pgg)
         #print('pgg')
         #print(pgg)
@@ -252,5 +275,5 @@ def get_xgg(Ngg, C_oo):
         detn = np.linalg.det(ngg)
         x = 1.0 / (detC * detn * detC)
         xgg.append(x)
-    #print('xgg', xgg)
+    print('xgg', xgg)
     return xgg
