@@ -126,16 +126,18 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         i2pdm_bb = suhf.integr_beta(np.array(Twopdm_bb), fac='ci') / xggint
         i2pdm_ab = suhf.integr_beta(np.array(Twopdm_ab), fac='ci') / xggint
         suhf.suhf_2pdm = (i2pdm_aa, i2pdm_ab, i2pdm_bb)
-        for i in range(na):
-            for j in range(i,na):
-                for k in range(na):
-                    for l in range(k,na):
-                        print("aa %d %d %d %d %.6f" % (i,j,k,l,i2pdm_aa[i,j,k,l]))
-        for i in range(nb):
-            for j in range(i,nb):
-                for k in range(nb):
-                    for l in range(k,nb):
-                        print("bb %d %d %d %d %.6f" % (i,j,k,l,i2pdm_bb[i,j,k,l]))
+        if suhf.debug2:
+            nmo = i2pdm_aa.shape[0]
+            for i in range(nmo):
+                for j in range(i,nmo):
+                    for k in range(nmo):
+                        for l in range(k,nmo):
+                            print("aa %d %d %d %d %.6f" % (i,j,k,l,i2pdm_aa[i,j,k,l]))
+            for i in range(nmo):
+                for j in range(i,nmo):
+                    for k in range(nmo):
+                        for l in range(k,nmo):
+                            print("bb %d %d %d %d %.6f" % (i,j,k,l,i2pdm_bb[i,j,k,l]))
     if suhf.debug:
         print('SUHF DM alpha\n', int1pdm_a, '\nSUHF DM beta\n', int1pdm_b)
     return [int1pdm_a, int1pdm_b]
@@ -265,7 +267,7 @@ def get_Ngg(Dg, dm_no, occ):
 def get_Pgg(Dg, dm_no, Ngg, occ, no):
     Pgg = []
     Pgg_ortho = []
-    print('no\n', no)
+    #print('no\n', no)
     for i, dg in enumerate(Dg):
         pgg = einsum('ij,jk,kl,ln->in', dg, dm_no[:,:occ], Ngg[i], dm_no[:occ,:])
         #pgg = einsum('ij,kj->ik', pgg, dg)

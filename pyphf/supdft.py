@@ -53,11 +53,33 @@ def kernel(pdft, suhf):
         E_ot = get_pd(suhf, pdft.xc)
         print('E_ot %.6f' %E_ot)
 
+def check_2pdm(adm2s, dm1s, suhf):
+    na = adm2s[0].shape[0]
+    for i in range(na):
+        for j in range(i,na):
+            for k in range(na):
+                for l in range(k,na):
+                    if abs(adm2s[0][i,l,j,k]) > 1e-4:
+                        print("aa %d %d %d %d %.6f" % (i,j,k,l,adm2s[0][i,l,j,k]))
+                    if abs(adm2s[1][i,l,j,k]) > 1e-4:
+                        print("ab %d %d %d %d %.6f" % (i,j,k,l,adm2s[1][i,l,j,k]))
+                    if abs(adm2s[2][i,l,j,k]) > 1e-4:
+                        print("bb %d %d %d %d %.6f" % (i,j,k,l,adm2s[2][i,l,j,k]))
+    mol = suhf.mol
+    h = mol.intor("int1e_kin") + mol.intor("int1e_nuc")
+    g = mol.intor("int2e")
+    print(dm1s[0])
+    e = einsum("pq, qp ->", h, 2*dm1s[0]) + 0.5 * einsum("pqrs, qrps ->", g, 4*(adm2s[0] + adm2s[1] + adm2s[2])) + mol.energy_nuc()
+    print('redo e: %.6f' % e)
+    
 def get_pd(suhf, ot):
     ot = _init_ot_grids (ot, suhf.mol)
     dm1s = np.array(suhf.suhf_dm)
     adm1s = dm1s
     adm2s = suhf.suhf_2pdm
+    if suhf.debug2:
+        check_2pdm(adm2s, dm1s, suhf)
+    adm2s = adm2s[0].transpose(0,3,1,2)*2.0, adm2s[1].transpose(0,3,1,2)*2.0, adm2s[2].transpose(0,3,1,2)*2.0
     adm2s = get_2CDMs_from_2RDMs (adm2s, adm1s)
     adm2_ss = adm2s[0] + adm2s[2]
     adm2_os = adm2s[1]
@@ -66,11 +88,11 @@ def get_pd(suhf, ot):
     mo = np.eye(dm1s[0].shape[1])
     #dm1s = np.dot (adm1s, mo.T)
     #dm1s = np.dot (mo, dm1s).transpose (1,0,2)
-    print(dm1s)
+    #print(dm1s)
     #dm1s += np.dot (mo_core, moH_core)[None,:,:]
     return get_E_ot(ot, dm1s, adm2, mo)
 
-def _init_ot_grids (my_ot, mol, grids_level=None):
+def _init_ot_grids (my_ot, mol, grids_level=4):
     if isinstance (my_ot, (str, np.string_)):
         ks = dft.RKS (mol)
         if my_ot[:1].upper () == 'T':
@@ -86,11 +108,11 @@ def _init_ot_grids (my_ot, mol, grids_level=None):
     else:
         otfnal = my_ot
     #self.grids = self.otfnal.grids
-    #if grids_level is not None:
-    #    self.grids.level = grids_level
-    #    assert (self.grids.level == self.otfnal.grids.level)
+    if grids_level is not None:
+        otfnal.grids.level = grids_level
+        #assert (self.grids.level == self.otfnal.grids.level)
     # Make sure verbose and stdout don't accidentally change (i.e., in scanner mode)
-    #otfnal.verbose = verbose
+    otfnal.verbose = 5
     #self.otfnal.stdout = self.stdout
     return otfnal
 
