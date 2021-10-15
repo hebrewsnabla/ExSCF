@@ -1,6 +1,11 @@
-version 0.4.1 (Sep 11, 2021)
+
+version 0.4.1 (Oct 15, 2021)
+--------------------------
 * PAV-SUHF and PAV-SUDFT with `noiter`
 * PAV-SUMP2
+* fix bug in 1pdm trace of doublet, triplet, ...
+* SUHF 2pdm
+* SU-DDFT and SU-PDFT
 
 version 0.4.0 (Jul 27, 2021)
 --------------------------
@@ -11,7 +16,7 @@ version 0.4.0 (Jul 27, 2021)
   + UHF chkfile
 * PT2 and NOCI
   + determinant overlap <0|P|ia>, <0|P|ia,jb>
-* SUPDFT
+* SUPDFT decomposition
 
 version 0.3.2 (May 28, 2021)
 --------------------------

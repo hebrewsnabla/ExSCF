@@ -15,15 +15,17 @@ Of course we need numpy, scipy, etc., but these are also required by PySCF, so t
 * add `/path/to/ExSCF` to your `PYTHONPATH`
 
 ## Features
-**Theoretial features**:
+**Theoretical features**:
 * SUHF (Spin-projected Unrestricted Hartree-Fock)
   + energy
-  + density, natural orbital
+  + 1pdm, natural orbitals, 2pdm
 
  not fully tested:
 * SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
 * CAS+*f*DFT, CAS-DFT2
 * DeltaSCF with MOM
+* SU-PDFT
+* PAV-SUMP2
 
 **Technical features**:
 * guess
@@ -36,6 +38,8 @@ Of course we need numpy, scipy, etc., but these are also required by PySCF, so t
 * interface (require MOKIT)
   + read guess MO from fch (`guess.from_fch_simp`)
   + dump MO, NO to fch (`tofch = True`)
+
+more guess strategies are included in [pyAutoMR](https://github.com/hebrewsnabla/pyAutoMR).
 
 ## Quick Start
 ```
@@ -53,7 +57,6 @@ mf2.kernel()
 For bug report or comments, please contact the author via srwang20@fudan.edu.cn or open an issue.
 
 ## TODO
-* SU-PDFT
 * SUPT2
 * TD-SUHF
 * SUHF gradient
