@@ -83,8 +83,9 @@ class EMP2():
                 self.F0mo = u2g_2d(F0mo, orbspin)
             print('F0mo',self.F0mo)
         if self.use_det:
-            get_e01 = get_e01_det
-        energy_01, norm_01 = get_e01(self, suhf, gmp2)
+            energy_01, norm_01 = get_e01_det(self, suhf, gmp2)
+        else:
+            energy_01, norm_01 = get_e01(self, suhf, gmp2)
         print('e01 %.6f, S00 %.6f, S01 %.6f' % (energy_01, norm_00, norm_01))
         #ecorr = energy_01 / (norm_00 + norm_01)
         ecorr = - self.e_elec_hf * norm_01/norm_00 + energy_01 / norm_00
@@ -342,13 +343,17 @@ def get_e01(spt2, suhf, gmp2):
     if spt2.vap:
         Fov = spt2.F0mo[:nocc, nocc:]
         print('Fov before', Fov)
-        mo_o = np.dot(mo_o, spt2.vsc[0])
-        mo_v = np.dot(mo_v, spt2.vsc[1])
-        mo_coeff = np.hstack((mo_o, mo_v))
-        gmp2.kernel(mo_energy= spt2.F0mo.diagonal() , mo_coeff=np.hstack((mo_o, mo_v)))
-        print('GMP2 after SC', gmp2.e_corr)
-        print('mo_e', spt2.F0mo.diagonal())
-        print('mo_sc\n', np.hstack((mo_o, mo_v)))
+        if spt2.do_sc:
+            mo_o = np.dot(mo_o, spt2.vsc[0])
+            mo_v = np.dot(mo_v, spt2.vsc[1])
+            mo_coeff = np.hstack((mo_o, mo_v))
+            gmp2.kernel(mo_energy= spt2.F0mo.diagonal() , mo_coeff=mo_coeff)
+            print('GMP2 after SC', gmp2.e_corr)
+            print('mo_e', spt2.F0mo.diagonal())
+            print('mo_sc\n', np.hstack((mo_o, mo_v)))
+        else:
+            mo_coeff = ghf.mo_coeff
+            gmp2.kernel(mo_energy= spt2.F0mo.diagonal() , mo_coeff=mo_coeff)
     else:
         mo_coeff = ghf.mo_coeff
     #exit()
@@ -356,6 +361,8 @@ def get_e01(spt2, suhf, gmp2):
     S01g = []
     diagv = spt2.do_biort
     for i, dg in enumerate(Dg):
+        ovlp0 = reduce(np.dot,( mo_coeff.T ,S, dg, mo_coeff))
+        print('ovlp before', ovlp0)
         mg = reduce(np.dot,( mo_o.T ,S, dg, mo_o))
         print(mg)
         u, s, vt = svd(mg)
@@ -454,14 +461,15 @@ def get_term1(ovlp_oo_diag, co_t2, ovlp_ov, e_elec_hf):
     #np.set_printoptions(precision=10, linewidth=200, suppress=True)
     occ = co_t2.shape[0]
     vir = co_t2.shape[2]
-#    for i in range(occ):
-#        for j in range(occ):
-#            for a in range(vir):
-#                for b in range(vir):
-#                    t2 = co_t2[i,j,a,b]
-#                    n = ovlp_ov[i,a]*ovlp_ov[j,b]*ovlp_oo_inv[i]*ovlp_oo_inv[j]
-#                    if abs(t2*n) > 1e-4:
-#                        print(i,j,a,b,' %2.6f %2.6f  %2.6f'%( t2, n, t2*n) )
+    print(ovlp_ov)
+    for i in range(occ):
+        for j in range(occ):
+            for a in range(vir):
+                for b in range(vir):
+                    t2 = co_t2[i,j,a,b]
+                    n = ovlp_ov[i,a]*ovlp_ov[j,b]*ovlp_oo_inv[i]*ovlp_oo_inv[j]
+                    if abs(n) > 1e-4:
+                        print(i,j,a,b,' %2.6f %2.6f  %2.6f'%( t2, n, t2*n) )
     return term1*e_elec_hf
 
 def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov, ovlp_vv):
