@@ -383,6 +383,7 @@ class SUHF():
 
         self.dft = False
         self.makedm = True
+        self.do2pdm = False
         self.tofch = False
         self.oldfch = None
         self.dumpchk = False
