@@ -1,4 +1,8 @@
 
+version 0.4.2 (Nov 14, 2021)
+--------------------------
+* EMP2(0)
+
 version 0.4.1 (Oct 15, 2021)
 --------------------------
 * PAV-SUHF and PAV-SUDFT with `noiter`

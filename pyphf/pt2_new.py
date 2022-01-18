@@ -478,9 +478,12 @@ def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov, ovlp
     ovlp_oo_inv = 1. / ovlp_oo_diag
     term15 = 0.0
     # Case 1: i = k
-    term15 -= 0.5 * np.prod(ovlp_oo_diag) * einsum('ijab,ca,jb,i,j, ic->', co_t2, ovlp_vv, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, Fov)
+    c1 = -0.5 * np.prod(ovlp_oo_diag) * einsum('ijab,ca,jb,i,j, ic->', co_t2, ovlp_vv, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, Fov)
+    c1b = -0.5 * np.prod(ovlp_oo_diag) * einsum('ijab,ja,cb,i,j, ic->', co_t2, ovlp_ov, ovlp_vv, ovlp_oo_inv, ovlp_oo_inv, Fov)
     # Case 2: i != k
-    term15 += 0.5 *  np.prod(ovlp_oo_diag) * einsum('ijab,ia,jb,i,j,kc,k, kc->', co_t2, ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, ovlp_ov, ovlp_oo_inv, Fov)
+    c2 = 0.5 *  np.prod(ovlp_oo_diag) * einsum('ijab,ia,jb,i,j,kc,k, kc->', co_t2, ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, ovlp_ov, ovlp_oo_inv, Fov)
+    term15 = c1 + c2
+    print('c1, c1b, c2 %.6f %.6f', (c1, c1b, c2))
     return term15
 
 def get_term2(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov):
