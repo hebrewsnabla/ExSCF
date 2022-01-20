@@ -41,6 +41,7 @@ class EMP2():
         self.use_det = False
         self.do_sc = True
         self.do_biort = True
+        self.do_15 = False
 
     def kernel(self):
         np.set_printoptions(precision=6, linewidth=160, suppress=True)
@@ -297,7 +298,7 @@ def get_e01_det(spt2, suhf, gmp2):
     return E01, S01
 
 def get_term15_det( t2, dg, mo_coeff, nocc, nvir, mo_occ, S, Fov):
-    # St[klcd] = S[klcd, ijab] * t[ijab]
+    # St[kc] = S[kc, ijab] * t[ijab]
     St = np.zeros((nocc, nvir))
     for k in range(nocc):
         for c in range(nvir):
@@ -405,7 +406,7 @@ def get_e01(spt2, suhf, gmp2):
         co_eri = get_co_eri(eri_mo, u_oo, nocc, u_vv)
 
         term1 = get_term1(oo_diag, co_t2, ovlp_ov, spt2.e_elec_hf)
-        if spt2.vap:
+        if spt2.vap and spt2.do_15:
             co_Fov = einsum('pi, pa -> ia', u_oo, Fov)
             if diagv: co_Fov = np.dot(co_Fov, v_vv)
             print('Fov\n', co_Fov)
@@ -474,6 +475,8 @@ def get_term1(ovlp_oo_diag, co_t2, ovlp_ov, e_elec_hf):
 
 def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov, ovlp_vv):
     #nocc, nvir = co_eri.shape[:2]
+    nocc = co_eri.shape[0]
+    nvir = co_eri.shape[2]
     #co_eri_oovv = co_eri.transpose(0,2,1,3) - co_eri.transpose(0,2,3,1)
     ovlp_oo_inv = 1. / ovlp_oo_diag
     term15 = 0.0
@@ -482,15 +485,34 @@ def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov, ovlp
     #           co_t2, ovlp_vv, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, Fov)
     #c1b = -0.5 * np.prod(ovlp_oo_diag) * einsum('ijab,ja,cb,i,j, ic->', 
     #           co_t2, ovlp_ov, ovlp_vv, ovlp_oo_inv, ovlp_oo_inv, Fov)
-    temp1 = einsum('kc,ja,kb,k->jcab', ovlp_ov, ovlp_ov, ovlp_ov, ovlp_oo_inv) \
-       - einsum('jc,ja,jb,j->jcab', ovlp_ov, ovlp_ov, ovlp_ov, ovlp_oo_inv)
-    temp2 = temp1.transpose(0,1,3,2)*(-1)
-    c1 =  np.prod(ovlp_oo_diag) * einsum('ijab, jcab,i,j, ic', co_t2,
-        temp1+temp2, ovlp_oo_inv, ovlp_oo_inv, Fov)
+    #temp1 = einsum('kc,kb,k->cab', ovlp_ov, ovlp_ov, ovlp_oo_inv) \
+    #   - einsum('jc,jb,j->cab', ovlp_ov, ovlp_ov, ovlp_ov, ovlp_oo_inv)
+    #temp2 = temp1.transpose(0,1,3,2)*(-1)
+    #print(temp1)
+    temp1 = get_S_ijpr_matrix(co_ovlp, ovlp_oo_diag, nocc, nvir)
+    c1 =  0.5 * np.prod(ovlp_oo_diag) * einsum('ijab, ijbc, ja, i,j, ic', co_t2,
+        temp1, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, Fov)
+
+    for i in range(nocc):
+        for j in range(nocc):
+            for a in range(nvir):
+                for b in range(nvir):
+                    for c in range(nvir):
+                        t2 = co_t2[i,j,a,b]
+                        n1 = temp1[i,j,b,c]
+                        n2 = ovlp_ov[j,a]
+                        n = n1*n2*ovlp_oo_inv[i]*ovlp_oo_inv[j]*Fov[i,c]
+                        n *= np.prod(ovlp_oo_diag)
+                        if abs(t2*n) > 1e-5:
+                            print(i,j,a+nocc,b+nocc,c+nocc, 
+                                  ' %2.6f %2.6f %2.6f  %2.6f %2.6f'%( t2, n, t2*n, n1, n2) )
 
     # Case 2: i != k
-    c2 = 0.5 *  np.prod(ovlp_oo_diag) * einsum('ijab,ia,jb,i,j,kc,k, kc->', 
-      co_t2, ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, ovlp_ov, ovlp_oo_inv, Fov)
+    temp3 = einsum('ia,jb,i,j,kc,k, kc->ijab', 
+      ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, ovlp_ov, ovlp_oo_inv, Fov)
+    c2 = 0.5 *  np.prod(ovlp_oo_diag) * einsum('ijab,ijab->', 
+      co_t2, temp3)
+
     term15 = c1 + c2
     print('c1, c2 %.6f %.6f'% (c1, c2))
     return term15
@@ -540,6 +562,25 @@ def get_term2(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov):
     print('term2.x %.6f, %.6f, %.6f' % (term21, term22, term23))
     e_term2 = term21 + term22 + term23
     return e_term2
+
+def get_S_ijbc(co_ovlp, ovlp_oo_diag, nocc, nvir):
+    S_ijpr_mat = np.empty((nocc, nocc, nvir, nvir))
+        
+    for i in range(nocc):
+        for j in range(nocc):
+            inds = (i, j)
+            _nocc = nocc - len(np.unique(inds))
+            co_ovlp_ij = np.delete(co_ovlp, inds, axis=0) # Delete rows i, j
+            co_ovlp_ij = np.delete(co_ovlp_ij, inds, axis=1) # Delete cols i, j
+            co_ovlp_ov_ij = co_ovlp_ij[:_nocc, _nocc:]
+            co_ovlp_vo_ij = co_ovlp_ij[_nocc:, :_nocc]
+            co_ovlp_oo_diag_ij = np.delete(ovlp_oo_diag, inds, axis=0) # Delete elements i, j
+            co_ovlp_oo_inv_ij = 1. / co_ovlp_oo_diag_ij
+            
+            # [ co_ovlp_ij.T ]_{pk} = [ co_ovlp_ij ]_{kp}
+            S_ijpr_mat[i, j] = einsum('pk,k,kr->pr', co_ovlp_vo_ij, co_ovlp_oo_inv_ij, co_ovlp_ov_ij)
+    
+    return S_ijpr_mat
 
 def get_S_ijpr_matrix(co_ovlp, ovlp_oo_diag, nocc, nvir):
     S_ijpr_mat = np.empty((nocc, nocc, nvir, nvir))

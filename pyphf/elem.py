@@ -63,8 +63,12 @@ def ci_cross(dg, mo, exci1, exci2, mo_occ, S, leftexci=None):
     C2_expd = permute(permute(mo, exci1), exci2)[:,mo_occ==1]
     mg = reduce(np.dot, (C1_expd.T, S, dg, C2_expd))
     s = np.linalg.det(mg)
-    if abs(s) > 1e-8 and leftexci is None:
-        print(exci1, exci2, s)
+    if leftexci is None:
+        if abs(s) > 1e-6:
+            print(exci1, exci2, s)
+    elif ld is None:
+        if abs(s) > 1e-6:
+            print(kc, exci1, exci2, s)
     return s
 
 def permute(mo, exci):
