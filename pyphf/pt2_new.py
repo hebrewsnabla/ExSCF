@@ -1,14 +1,15 @@
 import numpy as np
 #import sympy as sym
-import scipy
+#import scipy
 from scipy import linalg
 from pyscf import gto, scf, mp, lib, ao2mo
 from pyphf import suscf, util2, noci, pt2
 from pyphf.suscf import count0, eig
 from pyphf.elem import make_s02, make_s22
+from pyphf.timing import timing
 #import os, sys
 from functools import partial, reduce
-import time
+#import time
 import copy
 
 print = partial(print, flush=True)
@@ -27,7 +28,7 @@ class EMP2():
         #self.cut_no = False
         self.verbose = suhf.verbose
         self.debug = suhf.debug
-        #self.debug = False
+        self.debug2 = suhf.debug2
         self.output = None
 
         self.norb = suhf.norb
@@ -36,14 +37,21 @@ class EMP2():
         #self.occ = na + nb
         #self.vir = self.norb - occ
         S = suhf.ovlp
-        self.ao_ovlp = scipy.linalg.block_diag(S, S)
+        self.ao_ovlp = linalg.block_diag(S, S)
         self.vap = True
         self.use_det = False
         self.do_sc = True
         self.do_biort = True
         self.do_15 = False
 
+    def dump_flags(self):
+        print('\n******** %s ********' % self.__class__)
+        print('Do semi-canonicalization: %r' % self.do_sc)
+        print('Do biorthogonalization: %r' % self.do_biort)
+
+
     def kernel(self):
+        self.dump_flags()
         np.set_printoptions(precision=6, linewidth=160, suppress=True)
         if self.debug:
             np.set_printoptions(precision=10, linewidth=200, suppress=False)
@@ -74,7 +82,8 @@ class EMP2():
             #F0 = pt2.defm_Fock(suhf.mol, suhf.hcore_ortho, suhf.dm_ortho, suhf.X )
             F0 = suhf.guesshf.get_fock(dm=suhf.dm_reg)
             F0mo = einsum('tji,tjk,tkl->til', suhf.mo_reg, F0, suhf.mo_reg)
-            print('F0mo',F0mo)
+            if self.debug:
+                print('F0mo',F0mo)
             if do_sc:
                 na, nb = suhf.nelec
                 F0mo_sc, voo_sc, vvv_sc = semi_cano(F0mo, na, nb, orbspin)
@@ -82,16 +91,21 @@ class EMP2():
                 self.vsc = (voo_sc, vvv_sc)
             else:
                 self.F0mo = u2g_2d(F0mo, orbspin)
-            print('F0mo',self.F0mo)
+            if self.debug:
+                print('F0mo',self.F0mo)
         if self.use_det:
             energy_01, norm_01 = get_e01_det(self, suhf, gmp2)
         else:
-            energy_01, norm_01 = get_e01(self, suhf, gmp2)
+            energy_01, norm_01, e01terms = get_e01(self, suhf, gmp2)
         print('e01 %.6f, S00 %.6f, S01 %.6f' % (energy_01, norm_00, norm_01))
+        #print(e01terms)
+        print('e01.02 %.6f, e01.12 %.6f, e01.22 %.6f' % (e01terms[0], e01terms[1], e01terms[2]))
         #ecorr = energy_01 / (norm_00 + norm_01)
         ecorr = - self.e_elec_hf * norm_01/norm_00 + energy_01 / norm_00
         self.e_corr = ecorr
+        ecorr_approx = - self.e_elec_hf * norm_01/norm_00 + (e01terms[0] + gmp2.e_corr) / norm_00
         print('SUMP2 e_corr %.6f' % ecorr)
+        print('approx. SUMP2 e_corr %.6f' % ecorr_approx)
 
 def semi_cano(F, na, nb, orbspin):
     orbspin_o = orbspin[:na+nb]
@@ -325,6 +339,7 @@ def get_term2_det(eri_mo, t2, dg, mo_coeff, nocc, nvir, mo_occ, S):
     return term2
                     
 
+@timing
 def get_e01(spt2, suhf, gmp2):
     mo = suhf.mo_reg
     grids = suhf.grids
@@ -338,34 +353,37 @@ def get_e01(spt2, suhf, gmp2):
     ghf = spt2.ghf
     mo_v = ghf.mo_coeff[:,nocc:]
     mo_o = ghf.mo_coeff[:,:nocc]
-    print('mo\n', ghf.mo_coeff)
+    if spt2.debug:
+        print('mo\n', ghf.mo_coeff)
     #eri_ao = suhf.mol.intor('int2e', aosym='s8')
     S = spt2.ao_ovlp
     if spt2.vap:
         Fov = spt2.F0mo[:nocc, nocc:]
-        print('Fov before', Fov)
+        if spt2.debug:
+            print('Fov before', Fov)
         if spt2.do_sc:
             mo_o = np.dot(mo_o, spt2.vsc[0])
             mo_v = np.dot(mo_v, spt2.vsc[1])
             mo_coeff = np.hstack((mo_o, mo_v))
-            gmp2.kernel(mo_energy= spt2.F0mo.diagonal() , mo_coeff=mo_coeff)
-            print('GMP2 after SC', gmp2.e_corr)
-            print('mo_e', spt2.F0mo.diagonal())
-            print('mo_sc\n', np.hstack((mo_o, mo_v)))
+            mo_energy = spt2.F0mo.diagonal()
         else:
             mo_coeff = ghf.mo_coeff
-            gmp2.kernel(mo_energy= spt2.F0mo.diagonal() , mo_coeff=mo_coeff)
+            mo_energy = spt2.F0mo.diagonal()
+        do_gmp2(gmp2, mo_coeff, mo_energy, spt2.debug)
     else:
         mo_coeff = ghf.mo_coeff
     #exit()
     E01g = []
     S01g = []
+    E01gterm = []
     diagv = spt2.do_biort
     for i, dg in enumerate(Dg):
         ovlp0 = reduce(np.dot,( mo_coeff.T ,S, dg, mo_coeff))
-        print('ovlp before', ovlp0)
+        if spt2.debug:
+            print('ovlp before', ovlp0)
         mg = reduce(np.dot,( mo_o.T ,S, dg, mo_o))
-        print(mg)
+        if spt2.debug:
+            print(mg)
         u, s, vt = svd(mg)
         u_oo = u
         oo_diag = s
@@ -376,7 +394,8 @@ def get_e01(spt2, suhf, gmp2):
         ovlp_vv = reduce(np.dot, (mo_v.T, S, dg, mo_v))
         co_or = reduce(np.dot, (dg, mo_o, v_oo))
         co_ol = np.dot(mo_o, u_oo)
-        print('co\n', co_or, '\n', co_ol)
+        if spt2.debug:
+            print('co\n', co_or, '\n', co_ol)
         u_vv = v_vv = None
         if spt2.vap and diagv:
             u2, s2, vt2 = svd(ovlp_vv)
@@ -390,10 +409,10 @@ def get_e01(spt2, suhf, gmp2):
             co_vl = np.dot(mo_v, u_vv)
             co_r = np.hstack((co_or, co_vr))
         co_ovlp = util2.stack22(ovlp_oo, ovlp_ov, ovlp_vo, ovlp_vv)
-        #if spt2.debug:
-        print('co_ovlp\n', co_ovlp)
-        print(v_oo, '\n', u_oo)
-        print(v_vv, '\n', u_vv)
+        if spt2.debug:
+            print('co_ovlp\n', co_ovlp)
+            print(v_oo, '\n', u_oo)
+            print(v_vv, '\n', u_vv)
         u = util2.stack22( u_oo, np.zeros((nocc, nvir)), np.zeros((nvir, nocc)), np.eye(nvir))
         co_t2 = get_co_t2(gmp2.t2, v_oo, v_vv)
         if False:
@@ -402,14 +421,15 @@ def get_e01(spt2, suhf, gmp2):
             print('fockg', fockg)
             co_t2 = gmp2.kernel(mo_energy= fockg.diagonal() , mo_coeff=co_r)[1]
         #eri_mo = get_mo_eri(np.hstack((mo_o, mo_v)), eri_ao)
-        eri_mo = gmp2.ao2mo(mo_coeff)
+        eri_mo = get_mo_eri(gmp2, mo_coeff)
         co_eri = get_co_eri(eri_mo, u_oo, nocc, u_vv)
 
-        term1 = get_term1(oo_diag, co_t2, ovlp_ov, spt2.e_elec_hf)
+        term1 = get_term1(oo_diag, co_t2, ovlp_ov, spt2.e_elec_hf, spt2.debug2)
         if spt2.vap and spt2.do_15:
             co_Fov = einsum('pi, pa -> ia', u_oo, Fov)
             if diagv: co_Fov = np.dot(co_Fov, v_vv)
-            print('Fov\n', co_Fov)
+            if spt2.debug:
+                print('Fov\n', co_Fov)
             term15 = get_term15(co_eri, co_ovlp, oo_diag, co_t2, ovlp_vo, ovlp_ov, co_Fov, ovlp_vv)
         else:
             term15 = 0.0
@@ -420,18 +440,32 @@ def get_e01(spt2, suhf, gmp2):
         norm_01 = term1 / spt2.e_elec_hf
         E01g.append(e_01)
         S01g.append(norm_01)
+        E01gterm.append(np.array([term1, term15, term2]))
     print('E01g', E01g)
     print('S01g', S01g)
     E01 = suhf.integr_beta(np.array(E01g))
     S01 = suhf.integr_beta(np.array(S01g))
-    return E01, S01
+    E01term = suhf.integr_beta(np.array(E01gterm))
+    #print(E01term)
+    return E01, S01, E01term
 
+@timing
+def do_gmp2(gmp2, mo_coeff, mo_energy, dbg):
+    gmp2.kernel(mo_energy=mo_energy , mo_coeff=mo_coeff)
+    print('GMP2 after SC', gmp2.e_corr)
+    if dbg:
+        print('mo_e', mo_energy)
+        print('mo_sc\n', mo_coeff)
+
+
+@timing
 def get_co_t2(t2_mo, v_oo, v_vv=None):
     co_t2 = einsum('pi,qj, pqab -> ijab', v_oo, v_oo, t2_mo)
     if v_vv is not None:
         co_t2 = einsum('ac, bd, ijab  -> ijcd', v_vv, v_vv, co_t2)
     return co_t2
 
+@timing
 def get_co_eri(eri_mo, u_oo, nocc, u_vv=None):
     mo_eri_oovv = eri_mo.oovv
     
@@ -442,35 +476,39 @@ def get_co_eri(eri_mo, u_oo, nocc, u_vv=None):
         co_eri_oovv = einsum('ac,bd,ijab -> ijcd', u_vv, u_vv, co_eri_oovv)
     return co_eri_oovv
 
-def get_mo_eri(mo_coeff, ao_eri):
-    nao = mo_coeff.shape[0]//2
-    nmo = mo_coeff.shape[1]
-    moa = mo_coeff[:nao]
-    mob = mo_coeff[nao:]
-    mo_eri = ao2mo.kernel(ao_eri, (moa,moa,moa,moa), compact=False)
-    mo_eri += ao2mo.kernel(ao_eri, (mob,mob,mob,mob), compact=False)
-    mo_eri += ao2mo.kernel(ao_eri, (moa,moa,mob,mob), compact=False)
-    mo_eri += ao2mo.kernel(ao_eri, (mob,mob,moa,moa), compact=False)
-    mo_eri = mo_eri.reshape(nmo, nmo, nmo, nmo)
+@timing
+def get_mo_eri(gmp2, mo_coeff):
+#    nao = mo_coeff.shape[0]//2
+#    nmo = mo_coeff.shape[1]
+#    moa = mo_coeff[:nao]
+#    mob = mo_coeff[nao:]
+#    mo_eri = ao2mo.kernel(ao_eri, (moa,moa,moa,moa), compact=False)
+#   mo_eri += ao2mo.kernel(ao_eri, (mob,mob,mob,mob), compact=False)
+#   mo_eri += ao2mo.kernel(ao_eri, (moa,moa,mob,mob), compact=False)
+#   mo_eri += ao2mo.kernel(ao_eri, (mob,mob,moa,moa), compact=False)
+#    mo_eri = mo_eri.reshape(nmo, nmo, nmo, nmo)
+    eri_mo = gmp2.ao2mo(mo_coeff)
+    return eri_mo
 
-    return mo_eri
-
-def get_term1(ovlp_oo_diag, co_t2, ovlp_ov, e_elec_hf):
+@timing
+def get_term1(ovlp_oo_diag, co_t2, ovlp_ov, e_elec_hf, dbg):
     ovlp_oo_inv = 1. / ovlp_oo_diag
     term1 = 0.5 * np.prod(ovlp_oo_diag) * einsum('ijab,ia,jb,i,j->', co_t2, ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv)
     #print(term1)
     #np.set_printoptions(precision=10, linewidth=200, suppress=True)
-    occ = co_t2.shape[0]
-    vir = co_t2.shape[2]
-    print(ovlp_ov)
-    for i in range(occ):
-        for j in range(occ):
-            for a in range(vir):
-                for b in range(vir):
-                    t2 = co_t2[i,j,a,b]
-                    n = ovlp_ov[i,a]*ovlp_ov[j,b]*ovlp_oo_inv[i]*ovlp_oo_inv[j]
-                    if abs(n) > 1e-4:
-                        print(i,j,a,b,' %2.6f %2.6f  %2.6f'%( t2, n, t2*n) )
+    if dbg:
+        occ = co_t2.shape[0]
+        vir = co_t2.shape[2]
+        print(ovlp_ov)
+        for i in range(occ):
+            for j in range(occ):
+                for a in range(vir):
+                    for b in range(vir):
+                        t2 = co_t2[i,j,a,b]
+                        n = ovlp_ov[i,a]*ovlp_ov[j,b]*ovlp_oo_inv[i]*ovlp_oo_inv[j]
+                        if abs(n) > 1e-4:
+                            print(i,j,a,b,' %2.6f %2.6f  %2.6f'%( t2, n, t2*n) )
+
     return term1*e_elec_hf
 
 def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov, ovlp_vv):
@@ -517,6 +555,7 @@ def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov, ovlp
     print('c1, c2 %.6f %.6f'% (c1, c2))
     return term15
 
+@timing
 def get_term2(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov):
     nocc = co_eri.shape[0]
     nvir = co_eri.shape[2]
