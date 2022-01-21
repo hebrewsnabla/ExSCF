@@ -1,10 +1,11 @@
 from pyphf import suscf, jk, sudft
+from pyphf.timing import timing
 from pyscf import dft
 import pyscf.dft.numint as numint
 
 import numpy as np
 from functools import partial
-import time
+#import time
 
 from mrh.my_pyscf.mcpdft.mcpdft import get_E_ot
 from mrh.util.rdm import get_2CDM_from_2RDM, get_2CDMs_from_2RDMs
@@ -21,6 +22,8 @@ class PDFT():
         else:
             self.xc = 'pbe'
         self.dens = 'dd'
+        self.testd = False
+
     def kernel(self):
         return kernel(self, self.suhf)
 
@@ -72,6 +75,7 @@ def check_2pdm(adm2s, dm1s, suhf):
     e = einsum("pq, qp ->", h, 2*dm1s[0]) + 0.5 * einsum("pqrs, qrps ->", g, 4*(adm2s[0] + adm2s[1] + adm2s[2])) + mol.energy_nuc()
     print('redo e: %.6f' % e)
     
+@timing
 def get_pd(suhf, ot):
     ot = _init_ot_grids (ot, suhf.mol)
     dm1s = np.array(suhf.suhf_dm)
