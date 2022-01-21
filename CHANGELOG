@@ -1,7 +1,8 @@
 
-version 0.4.2 (Nov 14, 2021)
+version 0.4.2 (Jan 21, 2022)
 --------------------------
 * EMP2(0)
+  + fast implementation with biortho 
 
 version 0.4.1 (Oct 15, 2021)
 --------------------------

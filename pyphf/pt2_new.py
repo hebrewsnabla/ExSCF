@@ -430,7 +430,7 @@ def get_e01(spt2, suhf, gmp2):
             if diagv: co_Fov = np.dot(co_Fov, v_vv)
             if spt2.debug:
                 print('Fov\n', co_Fov)
-            term15 = get_term15(co_eri, co_ovlp, oo_diag, co_t2, ovlp_vo, ovlp_ov, co_Fov, ovlp_vv)
+            term15 = get_term15(co_eri, co_ovlp, oo_diag, co_t2, ovlp_vo, ovlp_ov, co_Fov, ovlp_vv, spt2.debug2)
         else:
             term15 = 0.0
         term2 = get_term2(co_eri, co_ovlp, oo_diag, co_t2, ovlp_vo, ovlp_ov)
@@ -511,7 +511,8 @@ def get_term1(ovlp_oo_diag, co_t2, ovlp_ov, e_elec_hf, dbg):
 
     return term1*e_elec_hf
 
-def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov, ovlp_vv):
+@timing
+def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov, ovlp_vv, dbg):
     #nocc, nvir = co_eri.shape[:2]
     nocc = co_eri.shape[0]
     nvir = co_eri.shape[2]
@@ -530,21 +531,22 @@ def get_term15(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov, Fov, ovlp
     temp1 = get_S_ijpr_matrix(co_ovlp, ovlp_oo_diag, nocc, nvir)
     c1 =  0.5 * np.prod(ovlp_oo_diag) * einsum('ijab, ijbc, ja, i,j, ic', co_t2,
         temp1, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, Fov)
-
-    for i in range(nocc):
-        for j in range(nocc):
-            for a in range(nvir):
-                for b in range(nvir):
-                    for c in range(nvir):
-                        t2 = co_t2[i,j,a,b]
-                        n1 = temp1[i,j,b,c]
-                        n2 = ovlp_ov[j,a]
-                        n = n1*n2*ovlp_oo_inv[i]*ovlp_oo_inv[j]*Fov[i,c]
-                        n *= np.prod(ovlp_oo_diag)
-                        if abs(t2*n) > 1e-5:
-                            print(i,j,a+nocc,b+nocc,c+nocc, 
-                                  ' %2.6f %2.6f %2.6f  %2.6f %2.6f'%( t2, n, t2*n, n1, n2) )
-
+    
+    if dbg:
+        for i in range(nocc):
+            for j in range(nocc):
+                for a in range(nvir):
+                    for b in range(nvir):
+                        for c in range(nvir):
+                            t2 = co_t2[i,j,a,b]
+                            n1 = temp1[i,j,b,c]
+                            n2 = ovlp_ov[j,a]
+                            n = n1*n2*ovlp_oo_inv[i]*ovlp_oo_inv[j]*Fov[i,c]
+                            n *= np.prod(ovlp_oo_diag)
+                            if abs(t2*n) > 1e-5:
+                                print(i,j,a+nocc,b+nocc,c+nocc, 
+                                      ' %2.6f %2.6f %2.6f  %2.6f %2.6f'%( t2, n, t2*n, n1, n2) )
+    
     # Case 2: i != k
     temp3 = einsum('ia,jb,i,j,kc,k, kc->ijab', 
       ovlp_ov, ovlp_ov, ovlp_oo_inv, ovlp_oo_inv, ovlp_ov, ovlp_oo_inv, Fov)
