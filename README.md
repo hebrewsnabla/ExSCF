@@ -7,6 +7,7 @@ ExSCF is a program for methods based on Projected Hartree-Fock, which aims to ac
 * libxc
 * [MOKIT](https://gitlab.com/jxzou/mokit) (optional, for read/write fch and CASDFT)
 * [pyAutoMR](https://github.com/hebrewsnabla/pyAutoMR) (optional, for CASDFT)
+* [mrh](https://github.com/MatthewRHermes/mrh) (optional, for SU-PDFT)
 
 Of course we need numpy, scipy, etc., but these are also required by PySCF, so they are not listed here.
 
@@ -24,8 +25,8 @@ Of course we need numpy, scipy, etc., but these are also required by PySCF, so t
 * SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
 * CAS+*f*DFT, CAS-DFT2
 * DeltaSCF with MOM
-* SU-PDFT
-* PAV-SUMP2
+* SU-PDFT, SU-DDFT
+* PAV-SUMP2, SUMP2(0)
 
 **Technical features**:
 * guess

@@ -27,6 +27,7 @@ class PDFT():
     def kernel(self):
         return kernel(self, self.suhf)
 
+@timing
 def kernel(pdft, suhf):
     print('\n******** %s ********' % pdft.__class__)
     mol = suhf.mol

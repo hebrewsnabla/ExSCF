@@ -13,7 +13,8 @@ from functools import partial, reduce
 import copy
 
 print = partial(print, flush=True)
-einsum = partial(np.einsum, optimize=True)
+einsum = lib.einsum
+#einsum = partial(np.einsum, optimize=True)
 #svd = partial(linalg.svd, lapack_driver='gesvd')
 
 def svd(m):
@@ -43,14 +44,17 @@ class EMP2():
         self.do_sc = True
         self.do_biort = True
         self.do_15 = False
+        #self.use_tblis = False
 
     def dump_flags(self):
         print('\n******** %s ********' % self.__class__)
         print('Do semi-canonicalization: %r' % self.do_sc)
         print('Do biorthogonalization: %r' % self.do_biort)
+        print('Found TBLIS: %r' % lib.numpy_helper.FOUND_TBLIS)
 
 
     def kernel(self):
+
         self.dump_flags()
         np.set_printoptions(precision=6, linewidth=160, suppress=True)
         if self.debug:
