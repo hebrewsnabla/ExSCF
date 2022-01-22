@@ -4,9 +4,7 @@ ExSCF is a program for methods based on Projected Hartree-Fock, which aims to ac
 ## Pre-requisites
 * sympy
 * [PySCF](https://github.com/pyscf/pyscf) (1.7.6 recommended)
-* libxc
-* [MOKIT](https://gitlab.com/jxzou/mokit) (optional, for read/write fch and CASDFT)
-* [pyAutoMR](https://github.com/hebrewsnabla/pyAutoMR) (optional, for CASDFT)
+* [MOKIT](https://gitlab.com/jxzou/mokit) (optional, for read/write fch)
 
 Of course we need numpy, scipy, etc., but these are also required by PySCF, so they are not listed here.
 
@@ -19,9 +17,6 @@ Of course we need numpy, scipy, etc., but these are also required by PySCF, so t
 * SUHF (Spin-projected Unrestricted Hartree-Fock)
   + energy
   + density, natural orbital
-
- not fully tested:
-* SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
 
 **Technical features**:
 * guess
