@@ -20,7 +20,7 @@ class PDFT():
         if xc is not None:
             self.xc = xc
         else:
-            self.xc = 'pbe'
+            self.xc = None
         self.dens = 'dd'
         self.testd = False
 
@@ -29,7 +29,13 @@ class PDFT():
 
 @timing
 def kernel(pdft, suhf):
+    if pdft.xc is None:
+        if pdft.dens == 'dd':
+            pdft.xc = 'pbe'
+        else:
+            pdft.xc = 'tpbe'
     print('\n******** %s ********' % pdft.__class__)
+    print('method: SU%s-%s' % (pdft.dens.upper(), pdft.xc.upper()))
     mol = suhf.mol
     dm1 = suhf.suhf_dm
     print('energy decomposition')

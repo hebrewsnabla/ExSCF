@@ -243,6 +243,8 @@ def natorb(suhf, dm):
     occ_ab, [core, act, ext] = dump_occ(natocc_ab, 2.0)
     print('SUHF NO occ total: ', occ_ab)
     print('core %d, active %d, external %d' % (core, act, ext))
+    suhf.core = core
+    suhf.act = act
     return [natorb_a, natorb_b, natorb_ab], [natocc_a, natocc_b, natocc_ab]
 
 def get_CG(j1, m1, j2, m2, j, m):

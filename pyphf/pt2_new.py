@@ -57,8 +57,8 @@ class EMP2():
 
         self.dump_flags()
         np.set_printoptions(precision=6, linewidth=160, suppress=True)
-        if self.debug:
-            np.set_printoptions(precision=10, linewidth=200, suppress=False)
+        #if self.debug:
+        #    np.set_printoptions(precision=10, linewidth=200, suppress=False)
         suhf = self.suhf
         #ump2 = mp.UMP2(suhf.guesshf)
         #ump2.kernel()
@@ -82,17 +82,21 @@ class EMP2():
         energy_00 = suhf.ciH
         norm_00 = suhf.ciS
         do_sc = self.do_sc
+        na, nb = suhf.nelec
         if self.vap:
             #F0 = pt2.defm_Fock(suhf.mol, suhf.hcore_ortho, suhf.dm_ortho, suhf.X )
             F0 = suhf.guesshf.get_fock(dm=suhf.dm_reg)
             F0mo = einsum('tji,tjk,tkl->til', suhf.mo_reg, F0, suhf.mo_reg)
+            dump_Fock(F0mo[0], suhf.core, suhf.act, na)
+            dump_Fock(F0mo[1], suhf.core, suhf.act, nb)
+            
             if self.debug:
                 print('F0mo',F0mo)
             if do_sc:
-                na, nb = suhf.nelec
                 F0mo_sc, voo_sc, vvv_sc = semi_cano(F0mo, na, nb, orbspin)
                 self.F0mo = F0mo_sc
                 self.vsc = (voo_sc, vvv_sc)
+                dump_Fock(self.F0mo, 2*suhf.core, 2*suhf.act, na+nb)
             else:
                 self.F0mo = u2g_2d(F0mo, orbspin)
             if self.debug:
@@ -105,11 +109,20 @@ class EMP2():
         #print(e01terms)
         print('e01.02 %.6f, e01.12 %.6f, e01.22 %.6f' % (e01terms[0], e01terms[1], e01terms[2]))
         #ecorr = energy_01 / (norm_00 + norm_01)
-        ecorr = - self.e_elec_hf * norm_01/norm_00 + energy_01 / norm_00
+        ecorr1 = - self.e_elec_hf * norm_01/norm_00 
+        ecorr2 = energy_01 / norm_00
+        print('-E0<0|P|1>/<0|P|0> = %.6f, <0|HP|1>/<0|P|0> = %.6f' % (ecorr1, ecorr2))
+        ecorr = ecorr1 + ecorr2
         self.e_corr = ecorr
         ecorr_approx = - self.e_elec_hf * norm_01/norm_00 + (e01terms[0] + gmp2.e_corr) / norm_00
         print('SUMP2 e_corr %.6f' % ecorr)
         print('approx. SUMP2 e_corr %.6f' % ecorr_approx)
+
+def dump_Fock(F, core, act, occ):
+    offdiago = abs(np.triu(F[:occ,:occ],1)).max()
+    offdiagv = abs(np.triu(F[occ:,occ:],1)).max()
+    print('max offdiag ', offdiago, offdiagv)
+    print(F[core:core+act, core:core+act])
 
 def semi_cano(F, na, nb, orbspin):
     orbspin_o = orbspin[:na+nb]
@@ -373,6 +386,8 @@ def get_e01(spt2, suhf, gmp2):
         else:
             mo_coeff = ghf.mo_coeff
             mo_energy = spt2.F0mo.diagonal()
+        e_elec_hf = ghf.energy_elec(ghf.make_rdm1(mo_coeff=mo_coeff))[0]
+        print('e_elec_hf', e_elec_hf)
         do_gmp2(gmp2, mo_coeff, mo_energy, spt2.debug)
     else:
         mo_coeff = ghf.mo_coeff
@@ -456,7 +471,7 @@ def get_e01(spt2, suhf, gmp2):
 @timing
 def do_gmp2(gmp2, mo_coeff, mo_energy, dbg):
     gmp2.kernel(mo_energy=mo_energy , mo_coeff=mo_coeff)
-    print('GMP2 after SC', gmp2.e_corr)
+    #print('GMP2 after SC', gmp2.e_corr)
     if dbg:
         print('mo_e', mo_energy)
         print('mo_sc\n', mo_coeff)
@@ -575,6 +590,23 @@ def get_term2(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov):
     sumb_ijad = einsum('ijab,ijdb->ijad', co_t2, S_ijpr_matrix)
     sumadij = einsum('ijad,ijad,i,j->', sumc_ijad, sumb_ijad, ovlp_oo_inv, ovlp_oo_inv)
     term21 = sumadij * 0.25 * np.prod(ovlp_oo_diag)
+    if True:
+        for i in range(nocc):
+            for j in range(nocc):
+                for a in range(nvir):
+                    #for b in range(nvir):
+                    #    for c in range(nvir):
+                    for d in range(nvir):
+                        #eri = co_eri_oovv[i,j,c,d]
+                        #t2 = co_t2[i,j,a,b]
+                        n1 = sumc_ijad[i,j,a,d]
+                        n2 = sumb_ijad[i,j,a,d]
+                        n = n1*n2*ovlp_oo_inv[i]*ovlp_oo_inv[j]
+                        n *= np.prod(ovlp_oo_diag)
+                        if abs(n) > 1e-5:
+                            print(i,j,a+nocc,#b+nocc,c+nocc, 
+                            d+nocc,
+                              ' %2.6f %2.6f %2.6f  '%( n, n1, n2) )
     # Case 2: i = k, j != l
     S_ipr_matrix = get_S_ipr_matrix(co_ovlp, ovlp_oo_diag, nocc, nvir)
     # 1st term.
