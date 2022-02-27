@@ -45,6 +45,7 @@ class EMP2():
         self.do_biort = True
         self.do_15 = False
         #self.use_tblis = False
+        self.frozen = 0
 
     def dump_flags(self):
         print('\n******** %s ********' % self.__class__)
@@ -62,18 +63,21 @@ class EMP2():
         suhf = self.suhf
         #ump2 = mp.UMP2(suhf.guesshf)
         #ump2.kernel()
-        if isinstance(suhf.guesshf, scf.uhf.UHF):
-            self.e_elec_hf = suhf.guesshf.energy_elec()[0]
-        else:
-            suhf.guesshf.xc = 'hf'
-            self.e_elec_hf = suhf.guesshf.energy_elec()[0]
+        #if isinstance(suhf.guesshf, scf.uhf.UHF):
+        #    self.e_elec_hf = suhf.guesshf.energy_elec()[0]
+        #else:
+        #    suhf.guesshf.xc = 'hf'
+        #    self.e_elec_hf = suhf.guesshf.energy_elec()[0]
 
-        ghf = copy.copy(suhf.guesshf).to_ghf()
-        self.ghf = ghf
+        _hf = copy.copy(suhf.guesshf)
+        _hf.mo_coeff = suhf.mo_reg
+        ghf = _hf.to_ghf()
         ghf.converged=True
+        self.ghf = ghf
         orbspin = ghf.mo_coeff.orbspin
-        #print('mo orbspin\n', orbspin)
+        print('mo orbspin\n', orbspin)
         gmp2 = mp.GMP2(ghf)
+        gmp2.frozen = self.frozen
         if not self.vap:
             gmp2.kernel()
         #e0gmp = gmp2.kernel()[0]
@@ -85,7 +89,7 @@ class EMP2():
         na, nb = suhf.nelec
         if self.vap:
             #F0 = pt2.defm_Fock(suhf.mol, suhf.hcore_ortho, suhf.dm_ortho, suhf.X )
-            F0 = suhf.guesshf.get_fock(dm=suhf.dm_reg)
+            F0 = _hf.get_fock(dm=suhf.dm_reg)
             F0mo = einsum('tji,tjk,tkl->til', suhf.mo_reg, F0, suhf.mo_reg)
             dump_Fock(F0mo[0], suhf.core, suhf.act, na)
             dump_Fock(F0mo[1], suhf.core, suhf.act, nb)
@@ -109,14 +113,16 @@ class EMP2():
         #print(e01terms)
         print('e01.02 %.6f, e01.12 %.6f, e01.22 %.6f' % (e01terms[0], e01terms[1], e01terms[2]))
         #ecorr = energy_01 / (norm_00 + norm_01)
-        ecorr1 = - self.e_elec_hf * norm_01/norm_00 
+        E0 = suhf.E_suhf - suhf.energy_nuc
+        ecorr1 = - E0 * norm_01/norm_00 
         ecorr2 = energy_01 / norm_00
+        print('E0 %.6f' % E0)
         print('-E0<0|P|1>/<0|P|0> = %.6f, <0|HP|1>/<0|P|0> = %.6f' % (ecorr1, ecorr2))
         ecorr = ecorr1 + ecorr2
         self.e_corr = ecorr
-        ecorr_approx = - self.e_elec_hf * norm_01/norm_00 + (e01terms[0] + gmp2.e_corr) / norm_00
+        #ecorr_approx = - self.e_elec_hf * norm_01/norm_00 + (e01terms[0] + gmp2.e_corr) / norm_00
         print('SUMP2 e_corr %.6f' % ecorr)
-        print('approx. SUMP2 e_corr %.6f' % ecorr_approx)
+        #print('approx. SUMP2 e_corr %.6f' % ecorr_approx)
 
 def dump_Fock(F, core, act, occ):
     offdiago = abs(np.triu(F[:occ,:occ],1)).max()
@@ -142,6 +148,7 @@ def _semi_cano(F, na):
     Fov = F[:na,na:]
     Fvo = F[na:,:na]
     Fvv = F[na:,na:]
+    print('Foo,Fvv', '\n', Foo, '\n', Fvv)
     u, s, vt = svd(Foo)
     if Foo[0,0]*s[0] < 0:
         s = -s
@@ -166,8 +173,8 @@ def _semi_cano(F, na):
     Fscoo = np.diag(s)
     #ovlp_vv = reduce(np.dot, (mo_v.T, S, dg, mo_v))
     Fsc = util2.stack22(Fscoo, Fscov, Fscvo, Fscvv)
-    print(Fsc)
-    print(v_oo, '\n', v_vv)
+    #print(Fsc)
+    #print(v_oo, '\n', v_vv)
     return Fsc, v_oo, v_vv
 
 def u2g_2d(umat, orbspin):
@@ -387,11 +394,17 @@ def get_e01(spt2, suhf, gmp2):
             mo_coeff = ghf.mo_coeff
             mo_energy = spt2.F0mo.diagonal()
         e_elec_hf = ghf.energy_elec(ghf.make_rdm1(mo_coeff=mo_coeff))[0]
+        spt2.e_elec_hf = e_elec_hf
         print('e_elec_hf', e_elec_hf)
         do_gmp2(gmp2, mo_coeff, mo_energy, spt2.debug)
     else:
         mo_coeff = ghf.mo_coeff
     #exit()
+    if spt2.frozen > 0:
+        frozen = spt2.frozen
+        mo_coeff = gmp2.mo_coeff
+        mo_o = mo_o[:, frozen:]
+        nocc = nocc - frozen
     E01g = []
     S01g = []
     E01gterm = []
@@ -470,7 +483,9 @@ def get_e01(spt2, suhf, gmp2):
 
 @timing
 def do_gmp2(gmp2, mo_coeff, mo_energy, dbg):
-    gmp2.kernel(mo_energy=mo_energy , mo_coeff=mo_coeff)
+    gmp2._scf.mo_coeff = mo_coeff
+    gmp2._scf.mo_energy = mo_energy
+    gmp2.kernel()
     #print('GMP2 after SC', gmp2.e_corr)
     if dbg:
         print('mo_e', mo_energy)
@@ -590,7 +605,7 @@ def get_term2(co_eri, co_ovlp, ovlp_oo_diag, co_t2, ovlp_vo, ovlp_ov):
     sumb_ijad = einsum('ijab,ijdb->ijad', co_t2, S_ijpr_matrix)
     sumadij = einsum('ijad,ijad,i,j->', sumc_ijad, sumb_ijad, ovlp_oo_inv, ovlp_oo_inv)
     term21 = sumadij * 0.25 * np.prod(ovlp_oo_diag)
-    if True:
+    if False:
         for i in range(nocc):
             for j in range(nocc):
                 for a in range(nvir):
