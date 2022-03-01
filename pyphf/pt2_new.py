@@ -71,6 +71,8 @@ class EMP2():
 
         _hf = copy.copy(suhf.guesshf)
         _hf.mo_coeff = suhf.mo_reg
+        _hf.mo_energy = suhf.mo_e
+        _hf.mo_occ = suhf.mo_occ
         ghf = _hf.to_ghf()
         ghf.converged=True
         self.ghf = ghf

@@ -366,6 +366,7 @@ class SUHF():
 
     def __init__(self, guesshf=None):
         self.guesshf = guesshf
+        self.nbeta = 8
 
         self.cut_no = False
         #self.use_no = True
@@ -505,7 +506,7 @@ class SUHF():
             print(self.dm_ortho)
         self.norb = len(self.dm_ortho[0])
 
-        self.nbeta = 8
+        #self.nbeta = 8
         self.grids, self.weights = wigner.get_beta(self.nbeta)
         print('grids: ', self.grids, '\nweights: ', self.weights)
         self.sinbeta = np.sin(self.grids)
