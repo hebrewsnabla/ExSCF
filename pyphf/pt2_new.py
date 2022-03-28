@@ -27,6 +27,7 @@ class EMP2():
         self.mol = suhf.mol
 
         #self.cut_no = False
+        self.max_memory = suhf.max_memory
         self.verbose = suhf.verbose
         self.debug = suhf.debug
         self.debug2 = suhf.debug2
@@ -49,6 +50,7 @@ class EMP2():
 
     def dump_flags(self):
         print('\n******** %s ********' % self.__class__)
+        print('max_memory: %r' % self.max_memory)
         print('Do semi-canonicalization: %r' % self.do_sc)
         print('Do biorthogonalization: %r' % self.do_biort)
         print('Found TBLIS: %r' % lib.numpy_helper.FOUND_TBLIS)
@@ -70,15 +72,17 @@ class EMP2():
         #    self.e_elec_hf = suhf.guesshf.energy_elec()[0]
 
         _hf = copy.copy(suhf.guesshf)
-        _hf.mo_coeff = suhf.mo_reg
-        _hf.mo_energy = suhf.mo_e
-        _hf.mo_occ = suhf.mo_occ
+        if self.vap:
+            _hf.mo_coeff = suhf.mo_reg
+            _hf.mo_energy = suhf.mo_e
+            _hf.mo_occ = suhf.mo_occ
         ghf = _hf.to_ghf()
         ghf.converged=True
         self.ghf = ghf
         orbspin = ghf.mo_coeff.orbspin
         print('mo orbspin\n', orbspin)
         gmp2 = mp.GMP2(ghf)
+        gmp2.max_memory = self.max_memory
         gmp2.frozen = self.frozen
         if not self.vap:
             gmp2.kernel()
@@ -401,6 +405,9 @@ def get_e01(spt2, suhf, gmp2):
         do_gmp2(gmp2, mo_coeff, mo_energy, spt2.debug)
     else:
         mo_coeff = ghf.mo_coeff
+        e_elec_hf = ghf.energy_elec(ghf.make_rdm1(mo_coeff=mo_coeff))[0]
+        spt2.e_elec_hf = e_elec_hf
+        print('e_elec_hf', e_elec_hf)
     #exit()
     if spt2.frozen > 0:
         frozen = spt2.frozen
@@ -412,6 +419,7 @@ def get_e01(spt2, suhf, gmp2):
     E01gterm = []
     diagv = spt2.do_biort
     for i, dg in enumerate(Dg):
+        #print('current memory %d at beginning of iter %d' % (lib.current_memory()[0], i))
         ovlp0 = reduce(np.dot,( mo_coeff.T ,S, dg, mo_coeff))
         if spt2.debug:
             print('ovlp before', ovlp0)
@@ -449,6 +457,7 @@ def get_e01(spt2, suhf, gmp2):
             print(v_vv, '\n', u_vv)
         u = util2.stack22( u_oo, np.zeros((nocc, nvir)), np.zeros((nvir, nocc)), np.eye(nvir))
         co_t2 = get_co_t2(gmp2.t2, v_oo, v_vv)
+        #print('current memory %d after co_t2 at iter %d' % (lib.current_memory()[0], i))
         if False:
             dmg = ghf.make_rdm1(mo_coeff = co_r)
             fockg = ghf.get_fock(dm=dmg)
@@ -456,7 +465,9 @@ def get_e01(spt2, suhf, gmp2):
             co_t2 = gmp2.kernel(mo_energy= fockg.diagonal() , mo_coeff=co_r)[1]
         #eri_mo = get_mo_eri(np.hstack((mo_o, mo_v)), eri_ao)
         eri_mo = get_mo_eri(gmp2, mo_coeff)
+        #print('current memory %d after eri_mo at iter %d' % (lib.current_memory()[0], i))
         co_eri = get_co_eri(eri_mo, u_oo, nocc, u_vv)
+        #print('current memory %d after co_eri at iter %d' % (lib.current_memory()[0], i))
 
         term1 = get_term1(oo_diag, co_t2, ovlp_ov, spt2.e_elec_hf, spt2.debug2)
         if spt2.vap and spt2.do_15:
@@ -475,6 +486,7 @@ def get_e01(spt2, suhf, gmp2):
         E01g.append(e_01)
         S01g.append(norm_01)
         E01gterm.append(np.array([term1, term15, term2]))
+        #co_t2 = co_eri = None
     print('E01g', E01g)
     print('S01g', S01g)
     E01 = suhf.integr_beta(np.array(E01g))

@@ -377,6 +377,7 @@ class SUHF():
         self.restart = False
         self.conv_tol = 1e-7 # For RMSD
         self.max_cycle = 70
+        self.max_memory = max(guesshf.max_memory, 4000)
         self.noiter = False
         self.diis_on = True
         self.diis_start_cyc = None
@@ -623,8 +624,9 @@ class SUHF():
                 print('P(g) (NO)\n', Pg[0])
             t05 = time.time()
             print('time for NO, Ng: %.3f' % (t05-t01))
-            Gg, Pg_ortho, Pgao, Ggao = jk.get_Gg(self.mol, Pg, self.no, X, dm_last=old_Pgao, Ggao_last=old_Ggao, opt=self.vhfopt)
+            Gg, Gg_ortho, Pg_ortho, Pgao, Ggao = jk.get_Gg(self.mol, Pg, self.no, X, dm_last=old_Pgao, Ggao_last=old_Ggao, opt=self.vhfopt)
             self.Gg = Gg
+            self.Gg_ortho
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
@@ -723,8 +725,9 @@ class SUHF():
                 print('D(g) (NO)\n', Dg[0])
                 print('N(g) (NO)\n', Ng[0])
                 print('P(g) (NO)\n', Pg[0])
-            Gg, Pg_ortho, _, _ = jk.get_Gg(self.mol, Pg, self.no, X, opt=self.vhfopt)
+            Gg, Gg_ortho, Pg_ortho, _, _ = jk.get_Gg(self.mol, Pg, self.no, X, opt=self.vhfopt)
             self.Gg = Gg
+            self.Gg_ortho
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
@@ -825,6 +828,17 @@ class SUHF():
         if self.debug or self.printmo:
             print('dm_reg\n', dm_reg)
             print('mo_reg\n', mo_reg[0], '\n', mo_reg[1])
+
+    def get_Fg(self):
+        X = self.X
+        Fg_ortho = []
+        Fg_reg = []
+        for g in self.Gg_ortho:
+            f_ortho = self.hcore_ortho + g
+            f_reg = einsum('ij,tjk,lk->til', X, f_ortho)
+            Fg_ortho.append(f_ortho)
+            Fg_reg.append(f_reg)
+        return Fg_ortho, Fg_reg
         
 def conv_check(E_suhf, dE, ddm, thresh, cyc):
     max_ddm = abs(ddm).max()

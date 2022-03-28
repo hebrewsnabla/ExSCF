@@ -88,7 +88,7 @@ def get_Gg(mol, Pg, no, X, dm_last=None, Ggao_last=None, opt=None):
     Pg_ortho = no2ortho(Pg, no)
     Gg_ortho, Pgao, Ggao = get_Gg_ortho(mol, Pg_ortho, X, dm_last, Ggao_last, opt)
     Gg = ortho2no(Gg_ortho, no)
-    return Gg, Pg_ortho, Pgao, Ggao
+    return Gg, Gg_ortho, Pg_ortho, Pgao, Ggao
 
 
 def get_Gg_ortho(mol, Pg_ortho, X, dm_last=None, Ggao_last=None, opt=None):
