@@ -1,8 +1,10 @@
 
-version 0.4.2 (Jan 21, 2022)
+version 0.4.2 (Mar 28, 2022)
 --------------------------
 * EMP2(0)
-  + fast implementation with biortho 
+  + fast implementation with biortho
+  + enable TBLIS in EMP2 
+  + Fix bug when vap
 
 version 0.4.1 (Oct 15, 2021)
 --------------------------
