@@ -220,19 +220,24 @@ def natorb(suhf, dm):
     XS = suhf.XS
     X = suhf.X
     dmab = dm[0] + dm[1]
+    dm_s = dm[0] - dm[1]
     # P = S^0.5 * dm * S^0.5
     P0 = einsum('ij,jk,lk->il', XS, dm[0], XS)
     P1 = einsum('ij,jk,lk->il', XS, dm[1], XS)
     Pab = P0 + P1
+    P_s = P0 - P1
     natocc_a, natorb_a = np.linalg.eigh(-P0)
     natocc_b, natorb_b = np.linalg.eigh(-P1)
     natocc_ab, natorb_ab = np.linalg.eigh(-Pab)
+    natocc_s, natorb_s = np.linalg.eigh(-P_s)
     natorb_a = np.dot(X, natorb_a)
     natorb_b = np.dot(X, natorb_b)
     natorb_ab = np.dot(X, natorb_ab)
+    natorb_s = np.dot(X, natorb_s)
     natocc_a = -1 * natocc_a
     natocc_b = -1 * natocc_b
     natocc_ab = -1 * natocc_ab
+    natocc_s = -1 * natocc_s
     if suhf.debug:
         print('SUHF natural orbitals alpha\n', natorb_a)
         print('SUHF natural orbitals beta\n', natorb_b)
@@ -242,6 +247,7 @@ def natorb(suhf, dm):
     print('SUHF NO occ beta:  ', dump_occ(natocc_b, 1.0)[0])
     occ_ab, [core, act, ext] = dump_occ(natocc_ab, 2.0)
     print('SUHF NO occ total: ', occ_ab)
+    print('SUHF NO occ spin: ', natocc_s)
     print('core %d, active %d, external %d' % (core, act, ext))
     suhf.core = core
     suhf.act = act

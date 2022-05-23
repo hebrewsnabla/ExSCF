@@ -7,10 +7,12 @@ import numpy as np
 from functools import partial
 #import time
 
-from mrh.my_pyscf.mcpdft.mcpdft import get_E_ot
-from mrh.util.rdm import get_2CDM_from_2RDM, get_2CDMs_from_2RDMs
-from mrh.my_pyscf.mcpdft.otfnal import transfnal, ftransfnal
-
+try:
+    from mrh.my_pyscf.mcpdft.mcpdft import get_E_ot
+    from mrh.util.rdm import get_2CDM_from_2RDM, get_2CDMs_from_2RDMs
+    from mrh.my_pyscf.mcpdft.otfnal import transfnal, ftransfnal
+except:
+    print('Warning: mrh not found')
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 

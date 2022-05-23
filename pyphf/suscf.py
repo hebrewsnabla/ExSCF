@@ -626,7 +626,7 @@ class SUHF():
             print('time for NO, Ng: %.3f' % (t05-t01))
             Gg, Gg_ortho, Pg_ortho, Pgao, Ggao = jk.get_Gg(self.mol, Pg, self.no, X, dm_last=old_Pgao, Ggao_last=old_Ggao, opt=self.vhfopt)
             self.Gg = Gg
-            self.Gg_ortho
+            self.Gg_ortho = Gg_ortho
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
@@ -727,7 +727,7 @@ class SUHF():
                 print('P(g) (NO)\n', Pg[0])
             Gg, Gg_ortho, Pg_ortho, _, _ = jk.get_Gg(self.mol, Pg, self.no, X, opt=self.vhfopt)
             self.Gg = Gg
-            self.Gg_ortho
+            self.Gg_ortho = Gg_ortho
             if self.debug:
                 print('Pg_ortho\n', Pg_ortho[0])
                 print('G(g) (NO)\n' , Gg[0])
