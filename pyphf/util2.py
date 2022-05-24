@@ -78,7 +78,7 @@ def dump_moe(moe, na, nb):
     print('Beta energies:  ', eb[bmin:nb], '<- HOMO')
     print('         LUMO-> ', eb[nb:bmax])
 
-def dump_occ(occ, full=1.0):
+def dump_occ(occ, full=1.0, ratio=0.99):
     s = ''
     core = 0
     act = 0
@@ -86,9 +86,9 @@ def dump_occ(occ, full=1.0):
     for i in occ:
         if i>1e-6:
             s += '%.6f  '%i
-            if i>(full*0.99):
+            if i>(full*ratio):
                 core += 1
-            elif i>(full*0.01):
+            elif i>(full*(1-ratio)):
                 act +=1
             else:
                 ext +=1

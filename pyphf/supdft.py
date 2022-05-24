@@ -1,4 +1,4 @@
-from pyphf import suscf, jk, sudft
+from pyphf import suscf, jk, sudft, sudm, util2
 from pyphf.timing import timing
 from pyscf import dft
 import pyscf.dft.numint as numint
@@ -25,6 +25,7 @@ class PDFT():
             self.xc = None
         self.dens = 'dd'
         self.testd = False
+        self.usemo = False
 
     def kernel(self):
         return kernel(self, self.suhf)
@@ -62,7 +63,7 @@ def kernel(pdft, suhf):
             n3, exc3, vxc3 = ni.nr_uks(mol, grids, pdft.xc, (dm_ua, dm_ub))
             print('E_xcu   %.6f' % exc3)
     elif pdft.dens == 'pd':
-        E_ot = get_pd(suhf, pdft.xc)
+        E_ot = get_pd(suhf, pdft.xc, pdft.usemo)
         print('E_ot %.6f' %E_ot)
 
 def check_2pdm(adm2s, dm1s, suhf):
@@ -85,20 +86,31 @@ def check_2pdm(adm2s, dm1s, suhf):
     print('redo e: %.6f' % e)
     
 @timing
-def get_pd(suhf, ot):
+def get_pd(suhf, ot, usemo):
     ot = _init_ot_grids (ot, suhf.mol)
     dm1s = np.array(suhf.suhf_dm)
-    adm1s = dm1s
-    adm2s = suhf.suhf_2pdm
-    if suhf.debug2:
-        check_2pdm(adm2s, dm1s, suhf)
-    adm2s = adm2s[0].transpose(0,3,1,2)*2.0, adm2s[1].transpose(0,3,1,2)*2.0, adm2s[2].transpose(0,3,1,2)*2.0
+    if usemo:
+        _, [core, act, ext] = util2.dump_occ(suhf.natocc[2], 2.0, 0.99999)
+        act_idx = slice(core, core+act)
+        adm1s, adm2s = sudm.make_rdm12_no(suhf)
+        adm1s = adm1s[:,act_idx, act_idx]
+        adm2s = adm2s[:,act_idx, act_idx, act_idx, act_idx]
+        print(adm1s.shape, adm2s.shape)
+    else:
+        adm1s = dm1s
+        adm2s = suhf.suhf_2pdm
+        if suhf.debug2:
+            check_2pdm(adm2s, dm1s, suhf)
+        adm2s = adm2s[0].transpose(0,3,1,2)*2.0, adm2s[1].transpose(0,3,1,2)*2.0, adm2s[2].transpose(0,3,1,2)*2.0
     adm2s = get_2CDMs_from_2RDMs (adm2s, adm1s)
     adm2_ss = adm2s[0] + adm2s[2]
     adm2_os = adm2s[1]
     adm2 = adm2_ss + adm2_os + adm2_os.transpose (2,3,0,1)
     #mo = suhf.natorb[2]
-    mo = np.eye(dm1s[0].shape[1])
+    if usemo:
+        mo = suhf.natorb[2][:,act_idx]
+    else:
+        mo = np.eye(dm1s[0].shape[1])
     #dm1s = np.dot (adm1s, mo.T)
     #dm1s = np.dot (mo, dm1s).transpose (1,0,2)
     #print(dm1s)

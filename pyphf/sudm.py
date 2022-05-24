@@ -5,9 +5,13 @@ from sympy.physics.quantum.cg import CG
 import os
 from functools import partial
 import time
+from pyphf.timing import timing
 
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
+
+def verify_rdm12_relation(rdm1, rdm2, nelec):
+    return np.allclose(rdm1, (nelec - 1)**-1 * rdm2.diagonal(axis1=-1, axis2=-2).sum(axis=-1))
 
 def make_1pdm(suhf, Dg, dm_no, C_no):
     print('******* suhf density *****')
@@ -19,8 +23,11 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
     Ngg = get_Ngg(Dg, dm_no, occ)
     t1 = time.time()
     Pgg, Pgg_ortho = get_Pgg(Dg, dm_no, Ngg, occ, no)
+    print(Pgg[0])
+    suhf.Pgg_ortho = Pgg_ortho
     t2 = time.time()
     xgg = get_xgg(Ngg, C_oo)
+    suhf.xgg = xgg
     t3 = time.time()
     if suhf.debug:
         print('time for Ngg: %.3f' % (t1-t0))
@@ -28,33 +35,9 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
         print('time for xgg: %.3f' % (t3-t2))
     #wgtf0 = suhf.d
     S, Sz = suhf.S, suhf.Sz
-    print('S, Sz', S, Sz)
-    weight_f0 = suhf.d
-    #weight_f0 = wigner.wigner(S, Sz, suhf.nbeta, suhf.grids)[2]
-    print('weight f0', weight_f0)
-    print('CG00, CG01')
-    cgcoeff0, cgfloat0 = get_CG(S, Sz, 0, 0, S, Sz)
-    cgcoeff1, cgfloat1 = get_CG(S, Sz, 1, 0, S, Sz)
-    cgcoeff2, cgfloat2 = get_CG(S, Sz, 2, 0, S, Sz)
-    #print(type(cgfloat1))
-    if abs(Sz-1) <= S:
-        print('weight fp1')
-        weight_fp1 = wigner.wigner2(S*2,Sz-1, Sz, suhf.nbeta, suhf.grids)[2]
-        print('CG2p1, CG1p1')
-        _, cgf2p1 = get_CG(S, Sz, 2, -1, S, Sz-1)
-        _, cgf1p1 = get_CG(S, Sz, 1, -1, S, Sz-1)
-    else:
-        weight_fp1 = weight_f0 * 0.0
-        cgf1p1 = cgf2p1 = 0.0
-    
-    if abs(Sz-2) <= S:
-        print('weight fp2')
-        weight_fp2 = wigner.wigner2(S*2,Sz-2, Sz, suhf.nbeta, suhf.grids)[2]
-        _, cgf2p2 = get_CG(S, Sz, 2, -2, S, Sz-2)
-    else:
-        weight_fp2 = weight_f0 * 0.0
-        cgf2p2 = 0.0
-
+    wght, cgf = do_cg(S, Sz, suhf.d, suhf.nbeta, suhf.grids)
+    weight_f0, weight_fp1, weight_fp2 = wght
+    cgfloat0, cgfloat1, cgfloat2, cgf1p1, cgf2p1, cgf2p2 = cgf
 
     xggint = suhf.integr_beta(np.array(xgg), fac='ci')
     print('xggint', xggint)
@@ -141,6 +124,134 @@ def make_1pdm(suhf, Dg, dm_no, C_no):
     if suhf.debug:
         print('SUHF DM alpha\n', int1pdm_a, '\nSUHF DM beta\n', int1pdm_b)
     return [int1pdm_a, int1pdm_b]
+
+def do_cg(S, Sz, d, nbeta, grids):
+    print('S, Sz', S, Sz)
+    weight_f0 = d
+    #weight_f0 = wigner.wigner(S, Sz, suhf.nbeta, suhf.grids)[2]
+    print('weight f0', weight_f0)
+    print('CG00, CG01')
+    cgcoeff0, cgfloat0 = get_CG(S, Sz, 0, 0, S, Sz)
+    cgcoeff1, cgfloat1 = get_CG(S, Sz, 1, 0, S, Sz)
+    cgcoeff2, cgfloat2 = get_CG(S, Sz, 2, 0, S, Sz)
+    #print(type(cgfloat1))
+    if abs(Sz-1) <= S:
+        print('weight fp1')
+        weight_fp1 = wigner.wigner2(S*2,Sz-1, Sz, nbeta, grids)[2]
+        print('CG2p1, CG1p1')
+        _, cgf2p1 = get_CG(S, Sz, 2, -1, S, Sz-1)
+        _, cgf1p1 = get_CG(S, Sz, 1, -1, S, Sz-1)
+    else:
+        weight_fp1 = weight_f0 * 0.0
+        cgf1p1 = cgf2p1 = 0.0
+    
+    if abs(Sz-2) <= S:
+        print('weight fp2')
+        weight_fp2 = wigner.wigner2(S*2,Sz-2, Sz, nbeta, grids)[2]
+        _, cgf2p2 = get_CG(S, Sz, 2, -2, S, Sz-2)
+    else:
+        weight_fp2 = weight_f0 * 0.0
+        cgf2p2 = 0.0
+    wght = weight_f0, weight_fp1, weight_fp2
+    cgf = cgfloat0, cgfloat1, cgfloat2, cgf1p1, cgf2p1, cgf2p2
+    return wght, cgf
+
+@timing
+def make_rdm12_no(suhf):
+    natorb = suhf.natorb[2]
+    #print(np.dot(natorb.T, natorb))
+    noinv = np.linalg.inv(natorb)
+    rdm2 = suhf.suhf_2pdm
+    #rdm2tot = rdm2[0] + rdm2[2] + rdm2[1] + rdm2[1].transpose(2,3,0,1)
+    #rdm2tot = rdm2[0].transpose(0,2,1,3) + rdm2[2].transpose(0,2,1,3) + rdm2[1].transpose(0,2,1,3) + rdm2[1].transpose(1,3,0,2)
+    #rdm2tot_no = einsum('pi, qj, ijkl, rk, sl -> pqrs', noinv, noinv, rdm2tot, noinv, noinv).transpose(0,3,1,2)
+    def ao2mo(dm2):
+        return  einsum('pi, qj, ijkl, rk, sl -> pqrs', noinv, noinv, dm2, noinv, noinv).transpose(0,3,1,2)*2.0
+    rdm2_no = ao2mo(rdm2[0]), ao2mo(rdm2[1]), ao2mo(rdm2[2])
+    rdm1_no = einsum('pi, tik, rk -> tpr', noinv, np.array(suhf.suhf_dm), noinv)
+    #print(rdm1_no[:10,:10])
+    #print(rdm2_no[0,0,:10,:10])
+    #print(rdm2_no[0,:10,:10,0])
+    #print(rdm2_no[0,0,0,0], rdm2_no[0,0,1,1], rdm2_no[0,1,1,0])
+    #nelec = suhf.nelec[0] + suhf.nelec[1]
+    #rdm1_no2 = (nelec - 1)**-1 * rdm2_no.diagonal(axis1=-1, axis2=-2).sum(axis=-1)
+    #print(rdm1_no2[:10,:10])
+    return rdm1_no, np.array(rdm2_no)
+
+
+def make_2pdm_natorb(suhf):
+    t0 = time.time()
+    #no = suhf.no
+    na,nb = suhf.nelec
+    occ = na+nb
+    #C_oo = C_no[:occ,:occ]
+    #Ngg = get_Ngg(Dg, dm_no, occ)
+    #Pgg, Pgg_ortho = get_Pgg(Dg, dm_no, Ngg, occ, no)
+    Pgg_ortho = suhf.Pgg_ortho
+    #xgg = get_xgg(Ngg, C_oo)
+    xgg = suhf.xgg
+    #wgtf0 = suhf.d
+    S, Sz = suhf.S, suhf.Sz
+    wght, cgf = do_cg(S, Sz, suhf.d, suhf.nbeta, suhf.grids)
+    weight_f0, weight_fp1, weight_fp2 = wght
+    cgfloat0, cgfloat1, cgfloat2, cgf1p1, cgf2p1, cgf2p2 = cgf
+
+    xggint = suhf.integr_beta(np.array(xgg), fac='ci')
+    print('xggint', xggint)
+
+    X = suhf.X
+    def ortho2reg(dm):
+        return util2.reg2ortho(dm, X, False)
+    natorb = suhf.natorb[2]
+    def reg2natorb(dm):
+        return util2.reg2ortho(dm, natorb, True)
+
+    norb = int(Pgg_ortho[0].shape[0]/2)
+    Twopdm_aa = []
+    Twopdm_bb = []
+    Twopdm_ab = []
+    for i,pgg_ortho in enumerate(Pgg_ortho):
+        x = xgg[i]
+        pggaa = pgg_ortho[:norb, :norb]
+        pggab = pgg_ortho[:norb, norb:]
+        pggba = pgg_ortho[norb:, :norb]
+        pggbb = pgg_ortho[norb:, norb:]
+
+        pggaa_ao_, pggab_ao_, pggba_ao_, pggbb_ao_ = list(map(ortho2reg, [pggaa, pggab, pggba, pggbb]))
+        pggaa_no_, pggab_no_, pggba_no_, pggbb_no_ = list(map(reg2natorb, [pggaa_ao_, pggab_ao_, pggba_ao_, pggbb_ao_]))
+        twopdm = make_2pdm((pggaa_no_, pggbb_no_, pggba_no_, pggab_no_), 
+                               x, norb, 
+                               (cgfloat0, cgfloat1, cgfloat2, cgf1p1, cgf2p1, cgf2p2, 0.0, 0.0, 0.0),
+                               (weight_f0[i], weight_fp1[i], 0.0, weight_fp2[i], 0.0)
+                              )
+        Twopdm_aa.append(twopdm[0])
+        Twopdm_bb.append(twopdm[1])
+        Twopdm_ab.append(twopdm[2])
+    print(pggaa_no_[0])
+    i2pdm_aa = suhf.integr_beta(np.array(Twopdm_aa), fac='ci') / xggint
+    i2pdm_bb = suhf.integr_beta(np.array(Twopdm_bb), fac='ci') / xggint
+    i2pdm_ab = suhf.integr_beta(np.array(Twopdm_ab), fac='ci') / xggint
+    suhf.suhf_2pdm_no = (i2pdm_aa, i2pdm_ab, i2pdm_bb)
+    natocc = suhf.natocc[2]
+    occ, [core, act, ext] = util2.dump_occ(natocc, 2.0, 0.99999)
+    if suhf.debug2:
+        nmo = i2pdm_aa.shape[0]
+        for i in range(core, core+act):
+            for j in range(i,core+act):
+                for k in range(core, core+act):
+                    for l in range(k,core+act):
+                        print("aa %d %d %d %d %.6f" % (i,j,k,l,i2pdm_aa[i,j,k,l]))
+        #for i in range(0):
+        #    for j in range(0):
+        #        for k in range(core, core+act):
+        #            for l in range(k,core+act):
+        #                print("aa %d %d %d %d %.6f" % (i,j,k,l,i2pdm_aa[i,j,k,l]))
+        #for k in range(core, core+act):
+        #    for l in range(k,core+act):
+        #        print("dbg rdm1 %d %d %.6f" % (k,l,suhf.suhf_dm[0][k,l]))
+        print(i2pdm_aa[0,0])
+        print(suhf.suhf_dm[0])
+    return suhf.suhf_2pdm_no
 
 def contr1(p1,p2,p3,p4, fac):
     j2p0 = einsum('il,jk->ijkl', p1, p2)
