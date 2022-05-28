@@ -92,9 +92,9 @@ def get_pd(suhf, ot, usemo):
     if usemo:
         _, [core, act, ext] = util2.dump_occ(suhf.natocc[2], 2.0, 0.99999)
         act_idx = slice(core, core+act)
-        adm1s, adm2s = sudm.make_rdm12_no(suhf)
+        adm1s, adm2s = sudm.make_rdm12_no_native(suhf)
         adm1s = adm1s[:,act_idx, act_idx]
-        adm2s = adm2s[:,act_idx, act_idx, act_idx, act_idx]
+        #adm2s = adm2s[:,act_idx, act_idx, act_idx, act_idx]
         print(adm1s.shape, adm2s.shape)
     else:
         adm1s = dm1s

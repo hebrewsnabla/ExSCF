@@ -130,7 +130,7 @@ def do_cg(S, Sz, d, nbeta, grids):
     weight_f0 = d
     #weight_f0 = wigner.wigner(S, Sz, suhf.nbeta, suhf.grids)[2]
     print('weight f0', weight_f0)
-    print('CG00, CG01')
+    #print('CG00, CG01')
     cgcoeff0, cgfloat0 = get_CG(S, Sz, 0, 0, S, Sz)
     cgcoeff1, cgfloat1 = get_CG(S, Sz, 1, 0, S, Sz)
     cgcoeff2, cgfloat2 = get_CG(S, Sz, 2, 0, S, Sz)
@@ -157,7 +157,11 @@ def do_cg(S, Sz, d, nbeta, grids):
     return wght, cgf
 
 @timing
-def make_rdm12_no(suhf):
+def make_rdm12_no(suhf, debug=None):
+    if suhf.debug:
+        debug = True
+    if debug is None:
+        debug = False
     natorb = suhf.natorb[2]
     #print(np.dot(natorb.T, natorb))
     noinv = np.linalg.inv(natorb)
@@ -170,16 +174,36 @@ def make_rdm12_no(suhf):
     rdm2_no = ao2mo(rdm2[0]), ao2mo(rdm2[1]), ao2mo(rdm2[2])
     rdm1_no = einsum('pi, tik, rk -> tpr', noinv, np.array(suhf.suhf_dm), noinv)
     #print(rdm1_no[:10,:10])
-    #print(rdm2_no[0,0,:10,:10])
-    #print(rdm2_no[0,:10,:10,0])
-    #print(rdm2_no[0,0,0,0], rdm2_no[0,0,1,1], rdm2_no[0,1,1,0])
+    if debug:
+        print(rdm2_no[0][0,0,:10,:10])
+        print(rdm2_no[0][0,:10,:10,0])
+        print(rdm2_no[0][0,0,0,0], rdm2_no[0][0,0,1,1], rdm2_no[0][0,1,1,0])
     #nelec = suhf.nelec[0] + suhf.nelec[1]
     #rdm1_no2 = (nelec - 1)**-1 * rdm2_no.diagonal(axis1=-1, axis2=-2).sum(axis=-1)
     #print(rdm1_no2[:10,:10])
+    #rdm2_no2 = make_2pdm_natorb(suhf)[0].transpose(0,3,1,2)
+    #print(rdm2_no2[0,0,:10,:10])
+    #print(rdm2_no2[0,:10,:10,0])
+    #print(rdm2_no2[0,0,0,0], rdm2_no2[0,0,1,1], rdm2_no2[0,1,1,0])
     return rdm1_no, np.array(rdm2_no)
 
+def make_rdm12_no_native(suhf):
+    natorb = suhf.natorb[2]
+    #print(np.dot(natorb.T, natorb))
+    noinv = np.linalg.inv(natorb)
+    rdm1_no = einsum('pi, tik, rk -> tpr', noinv, np.array(suhf.suhf_dm), noinv)
+    natocc = suhf.natocc[2]
+    occ, [core, act, ext] = util2.dump_occ(natocc, 2.0, 0.99999)
+    act_idx = slice(core, core+act)
+    rdm2_no = make_2pdm_natorb(suhf, act_idx)
+    def trans(dm2):
+        return dm2.transpose(0,3,1,2)*2.0
+    rdm2_no_trans = trans(rdm2_no[0]), trans(rdm2_no[1]), trans(rdm2_no[2])
+    return rdm1_no, np.array(rdm2_no_trans)
 
-def make_2pdm_natorb(suhf):
+
+
+def make_2pdm_natorb(suhf, act_idx):
     t0 = time.time()
     #no = suhf.no
     na,nb = suhf.nelec
@@ -203,8 +227,9 @@ def make_2pdm_natorb(suhf):
     def ortho2reg(dm):
         return util2.reg2ortho(dm, X, False)
     natorb = suhf.natorb[2]
+    noinv = np.linalg.inv(natorb)[act_idx,:]
     def reg2natorb(dm):
-        return util2.reg2ortho(dm, natorb, True)
+        return util2.reg2ortho(dm, noinv, False)
 
     norb = int(Pgg_ortho[0].shape[0]/2)
     Twopdm_aa = []
@@ -232,23 +257,15 @@ def make_2pdm_natorb(suhf):
     i2pdm_bb = suhf.integr_beta(np.array(Twopdm_bb), fac='ci') / xggint
     i2pdm_ab = suhf.integr_beta(np.array(Twopdm_ab), fac='ci') / xggint
     suhf.suhf_2pdm_no = (i2pdm_aa, i2pdm_ab, i2pdm_bb)
-    natocc = suhf.natocc[2]
-    occ, [core, act, ext] = util2.dump_occ(natocc, 2.0, 0.99999)
-    if suhf.debug2:
-        nmo = i2pdm_aa.shape[0]
-        for i in range(core, core+act):
-            for j in range(i,core+act):
-                for k in range(core, core+act):
-                    for l in range(k,core+act):
-                        print("aa %d %d %d %d %.6f" % (i,j,k,l,i2pdm_aa[i,j,k,l]))
-        #for i in range(0):
-        #    for j in range(0):
-        #        for k in range(core, core+act):
-        #            for l in range(k,core+act):
-        #                print("aa %d %d %d %d %.6f" % (i,j,k,l,i2pdm_aa[i,j,k,l]))
-        #for k in range(core, core+act):
-        #    for l in range(k,core+act):
-        #        print("dbg rdm1 %d %d %.6f" % (k,l,suhf.suhf_dm[0][k,l]))
+    #natocc = suhf.natocc[2]
+    #occ, [core, act, ext] = util2.dump_occ(natocc, 2.0, 0.99999)
+    if suhf.debug:
+    #    nmo = i2pdm_aa.shape[0]
+    #    for i in range(core, core+act):
+    #        for j in range(i,core+act):
+    #            for k in range(core, core+act):
+    #                for l in range(k,core+act):
+    #                    print("aa %d %d %d %d %.6f" % (i,j,k,l,i2pdm_aa[i,j,k,l]))
         print(i2pdm_aa[0,0])
         print(suhf.suhf_dm[0])
     return suhf.suhf_2pdm_no
@@ -358,7 +375,7 @@ def natorb(suhf, dm):
     print('SUHF NO occ beta:  ', dump_occ(natocc_b, 1.0)[0])
     occ_ab, [core, act, ext] = dump_occ(natocc_ab, 2.0)
     print('SUHF NO occ total: ', occ_ab)
-    print('SUHF NO occ spin: ', natocc_s)
+    #print('SUHF NO occ spin: ', natocc_s)
     print('core %d, active %d, external %d' % (core, act, ext))
     suhf.core = core
     suhf.act = act
