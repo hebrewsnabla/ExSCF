@@ -252,7 +252,7 @@ def make_2pdm_natorb(suhf, act_idx):
         Twopdm_aa.append(twopdm[0])
         Twopdm_bb.append(twopdm[1])
         Twopdm_ab.append(twopdm[2])
-    print(pggaa_no_[0])
+    #print(pggaa_no_[0])
     i2pdm_aa = suhf.integr_beta(np.array(Twopdm_aa), fac='ci') / xggint
     i2pdm_bb = suhf.integr_beta(np.array(Twopdm_bb), fac='ci') / xggint
     i2pdm_ab = suhf.integr_beta(np.array(Twopdm_ab), fac='ci') / xggint

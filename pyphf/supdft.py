@@ -25,8 +25,8 @@ class PDFT():
             self.xc = None
         self.dens = 'dd'
         self.testd = False
-        self.usemo = False
-
+        self.usemo = True
+        self.do_split = False
     def kernel(self):
         return kernel(self, self.suhf)
 
@@ -63,8 +63,7 @@ def kernel(pdft, suhf):
             n3, exc3, vxc3 = ni.nr_uks(mol, grids, pdft.xc, (dm_ua, dm_ub))
             print('E_xcu   %.6f' % exc3)
     elif pdft.dens == 'pd':
-        E_ot = get_pd(suhf, pdft.xc, pdft.usemo)
-        print('E_ot %.6f' %E_ot)
+        E_ot = get_pd(suhf, pdft.xc, pdft.usemo, pdft.do_split)
 
 def check_2pdm(adm2s, dm1s, suhf):
     na = adm2s[0].shape[0]
@@ -86,8 +85,10 @@ def check_2pdm(adm2s, dm1s, suhf):
     print('redo e: %.6f' % e)
     
 @timing
-def get_pd(suhf, ot, usemo):
+def get_pd(suhf, ot, usemo, do_split):
     ot = _init_ot_grids (ot, suhf.mol)
+    if do_split:
+        xfnal, cfnal = ot.split_x_c()
     dm1s = np.array(suhf.suhf_dm)
     if usemo:
         _, [core, act, ext] = util2.dump_occ(suhf.natocc[2], 2.0, 0.99999)
@@ -115,7 +116,17 @@ def get_pd(suhf, ot, usemo):
     #dm1s = np.dot (mo, dm1s).transpose (1,0,2)
     #print(dm1s)
     #dm1s += np.dot (mo_core, moH_core)[None,:,:]
-    return get_E_ot(ot, dm1s, adm2, mo)
+    if do_split:
+        E_otx =  get_E_ot(xfnal, dm1s, adm2, mo)
+        E_otc =  get_E_ot(cfnal, dm1s, adm2, mo)
+        print('E_otx %.6f' %E_otx)
+        print('E_otc %.6f' %E_otc)
+        E_ot = E_otx + E_otc
+        print('E_ot %.6f' %E_ot)
+    else:
+        E_ot =  get_E_ot(ot, dm1s, adm2, mo)
+        print('E_ot %.6f' %E_ot)
+    return E_ot
 
 def _init_ot_grids (my_ot, mol, grids_level=4):
     if isinstance (my_ot, (str, np.string_)):

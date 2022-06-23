@@ -786,6 +786,7 @@ class SUHF():
             print('time for natorb: %.3f' % (t_nat-t_dm))
             ss, s = scf.uhf.spin_square((self.mo_reg[0][:,self.mo_occ[0]>0],
                                 self.mo_reg[1][:,self.mo_occ[1]>0]), self.ovlp)
+            self.fake_s = s
             print('deformed <S^2> = %.8g  2S+1 = %.8g' % (ss, s))
 
         t_end = time.time()
