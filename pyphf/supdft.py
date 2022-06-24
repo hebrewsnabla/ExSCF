@@ -2,32 +2,45 @@ from pyphf import suscf, jk, sudft, sudm, util2
 from pyphf.timing import timing
 from pyscf import dft
 import pyscf.dft.numint as numint
-
+from automr import mcpdft
+from automr.mcpdft import sum_adm2
 import numpy as np
 from functools import partial
 #import time
 
 try:
-    from mrh.my_pyscf.mcpdft.mcpdft import get_E_ot
+    from mrh.my_pyscf.mcpdft.mcpdft import _PDFT
     from mrh.util.rdm import get_2CDM_from_2RDM, get_2CDMs_from_2RDMs
-    from mrh.my_pyscf.mcpdft.otfnal import transfnal, ftransfnal
+    from mrh.my_pyscf.mcpdft.otfnal import energy_ot as get_E_ot
+    #from mrh.my_pyscf.mcpdft.otfnal import transfnal, ftransfnal, get_transfnal
 except:
     print('Warning: mrh not found')
 print = partial(print, flush=True)
 einsum = partial(np.einsum, optimize=True)
 
-class PDFT():
-    def __init__(self, suhf, xc=None):
+class PDFT(mcpdft.PDFT):
+    def __init__(self, suhf, xc, dens, grids_level=4):
         self.suhf = suhf
-        if xc is not None:
-            self.xc = xc
-        else:
-            self.xc = None
-        self.dens = 'dd'
+        self.mol = suhf.mol
+        self.verbose = 5
+        self.stdout = suhf.stdout
+        #if xc is not None:
+        self.xc = xc
+        #else:
+        #    self.xc = None
+        self.dens = dens
         self.testd = False
         self.usemo = True
         self.do_split = False
+        self.grids_level = grids_level
+
     def kernel(self):
+        if self.dens == 'pd':
+            self._init_ot(self.xc)
+        grids_attr = {}
+        if self.grids_level is not None:
+            grids_attr['level'] = self.grids_level
+        self._init_grids(grids_attr)
         return kernel(self, self.suhf)
 
 @timing
@@ -47,7 +60,8 @@ def kernel(pdft, suhf):
     new_decomp(suhf, dm1)
     if pdft.dens == 'dd':
         dmdefm = suhf.dm_reg
-        grids = sudft.set_grids(mol)
+        #grids = sudft.set_grids(mol)
+        grids = pdft.grids
         ni = numint.NumInt()
         n, exc, vxc = ni.nr_uks(mol, grids, pdft.xc, dmdefm)
         print('E_xcdft %.6f' % exc)
@@ -63,7 +77,8 @@ def kernel(pdft, suhf):
             n3, exc3, vxc3 = ni.nr_uks(mol, grids, pdft.xc, (dm_ua, dm_ub))
             print('E_xcu   %.6f' % exc3)
     elif pdft.dens == 'pd':
-        E_ot = get_pd(suhf, pdft.xc, pdft.usemo, pdft.do_split)
+        #pdft._init_ot_grids(pdft.xc)
+        E_ot = get_pd(suhf, pdft.otfnal, pdft.usemo, pdft.do_split)
 
 def check_2pdm(adm2s, dm1s, suhf):
     na = adm2s[0].shape[0]
@@ -86,7 +101,7 @@ def check_2pdm(adm2s, dm1s, suhf):
     
 @timing
 def get_pd(suhf, ot, usemo, do_split):
-    ot = _init_ot_grids (ot, suhf.mol)
+    #ot = _init_ot_grids (ot, suhf.mol)
     if do_split:
         xfnal, cfnal = ot.split_x_c()
     dm1s = np.array(suhf.suhf_dm)
@@ -103,13 +118,11 @@ def get_pd(suhf, ot, usemo, do_split):
         if suhf.debug2:
             check_2pdm(adm2s, dm1s, suhf)
         adm2s = adm2s[0].transpose(0,3,1,2)*2.0, adm2s[1].transpose(0,3,1,2)*2.0, adm2s[2].transpose(0,3,1,2)*2.0
-    adm2s = get_2CDMs_from_2RDMs (adm2s, adm1s)
-    adm2_ss = adm2s[0] + adm2s[2]
-    adm2_os = adm2s[1]
-    adm2 = adm2_ss + adm2_os + adm2_os.transpose (2,3,0,1)
+    adm2 = sum_adm2(adm2s)
     #mo = suhf.natorb[2]
     if usemo:
-        mo = suhf.natorb[2][:,act_idx]
+        #mo = suhf.natorb[2][:,act_idx]
+        mo = suhf.natorb[2]
     else:
         mo = np.eye(dm1s[0].shape[1])
     #dm1s = np.dot (adm1s, mo.T)
@@ -117,60 +130,39 @@ def get_pd(suhf, ot, usemo, do_split):
     #print(dm1s)
     #dm1s += np.dot (mo_core, moH_core)[None,:,:]
     if do_split:
-        E_otx =  get_E_ot(xfnal, dm1s, adm2, mo)
-        E_otc =  get_E_ot(cfnal, dm1s, adm2, mo)
+        E_otx =  get_E_ot(xfnal, adm1s, adm2, mo, core)
+        E_otc =  get_E_ot(cfnal, adm1s, adm2, mo, core)
         print('E_otx %.6f' %E_otx)
         print('E_otc %.6f' %E_otc)
         E_ot = E_otx + E_otc
         print('E_ot %.6f' %E_ot)
+        return E_ot, E_otx, E_otc
     else:
         E_ot =  get_E_ot(ot, dm1s, adm2, mo)
         print('E_ot %.6f' %E_ot)
-    return E_ot
+        return E_ot
 
-def _init_ot_grids (my_ot, mol, grids_level=4):
-    if isinstance (my_ot, (str, np.string_)):
-        ks = dft.RKS (mol)
-        if my_ot[:1].upper () == 'T':
-            ks.xc = my_ot[1:]
-            otfnal = transfnal (ks)
-        elif my_ot[:2].upper () == 'FT':
-            ks.xc = my_ot[2:]
-            otfnal = ftransfnal (ks)
-        else:
-            raise NotImplementedError (('On-top pair-density exchange-correlation functional names other than '
-                '"translated" (t) or "fully-translated" (ft). Nonstandard functionals can be specified by passing '
-                'an object of class otfnal in place of a string.'))
-    else:
-        otfnal = my_ot
-    #self.grids = self.otfnal.grids
-    if grids_level is not None:
-        otfnal.grids.level = grids_level
-        #assert (self.grids.level == self.otfnal.grids.level)
-    # Make sure verbose and stdout don't accidentally change (i.e., in scanner mode)
-    otfnal.verbose = 5
-    #self.otfnal.stdout = self.stdout
-    return otfnal
 
 def new_decomp(suhf, dm1):
-    print('E_suhf %.6f' % suhf.E_suhf)
     enuc = suhf.energy_nuc
-    print('E_nuc %.6f' % enuc)
     dm1t = dm1[0] + dm1[1]
     Ecore = np.trace(np.dot(suhf.hcore_reg, dm1t))
-    print('E_core %.6f' % Ecore)
     vj, vk = jk.get_jk(suhf.mol, dm1)
     veffj = vj[0] + vj[1] 
     veffk = -vk
     Ej = np.trace(np.dot(veffj, dm1[0]) + np.dot(veffj, dm1[1])) * 0.5
     Ek = np.trace(np.dot(veffk[0], dm1[0]) + np.dot(veffk[1], dm1[1])) * 0.5
-    print('E_j %.6f' % Ej)
-    print('E_k %.6f' % Ek)
     Ejk = Ej + Ek
-    if suhf.debug:
-        print('E_jk %.6f' % Ejk)
     Ec = suhf.E_suhf - enuc - Ecore - Ejk
-    print('E_c %.6f' % Ec)
+    print('E_suhf : %15.8f' % suhf.E_suhf)
+    print('E_nn   : %15.8f' % enuc)
+    print('E_core : %15.8f' % Ecore)
+    print('E_j    : %15.8f' % Ej)
+    print('E_k    : %15.8f' % Ek)
+    if suhf.debug:
+        print('E_jk   : %15.8f' % Ejk)
+    print('E_c    : %15.8f' % Ec)
+    return enuc, Ecore, Ej, Ek, Ec
 
 def old_decomp(suhf, dm1):
     dm1t = dm1[0] + dm1[1]

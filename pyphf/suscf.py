@@ -433,6 +433,7 @@ class SUHF():
         if self.guesshf is not None:
             hf = self.guesshf
             self.mol = hf.mol
+            self.stdout = self.guesshf.stdout
             if self.dumpchk:
                 self.chkfile0 = self.output + '_ges.pchk'
                 chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
