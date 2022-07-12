@@ -1,18 +1,9 @@
 
-version 0.4.2 (Mar 28, 2022)
---------------------------
-* EMP2(0)
-  + fast implementation with biortho
-  + enable TBLIS in EMP2 
-  + Fix bug when vap
-
-version 0.4.1 (Oct 15, 2021)
+version 0.4.0-dev (Jul 12, 2022)
 --------------------------
 * PAV-SUHF and PAV-SUDFT with `noiter`
-* PAV-SUMP2
 * fix bug in 1pdm trace of doublet, triplet, ...
-* SUHF 2pdm
-* SU-DDFT and SU-PDFT
+* SUHF AO/MO 2pdm
 
 version 0.4.0 (Jul 27, 2021)
 --------------------------

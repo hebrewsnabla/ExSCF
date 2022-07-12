@@ -3,11 +3,10 @@ ExSCF is a program for methods based on Projected Hartree-Fock, which aims to ac
 
 ## Pre-requisites
 * sympy
-* [PySCF](https://github.com/pyscf/pyscf) (1.7.6 recommended)
+* [PySCF](https://github.com/pyscf/pyscf)
 * libxc
-* [MOKIT](https://gitlab.com/jxzou/mokit) (optional, for read/write fch and CASDFT)
-* [pyAutoMR](https://github.com/hebrewsnabla/pyAutoMR) (optional, for CASDFT)
-* [mrh](https://github.com/MatthewRHermes/mrh) (optional, for SU-PDFT)
+* [MOKIT](https://gitlab.com/jxzou/mokit) (optional, for read/write fch)
+* [pyAutoMR](https://github.com/hebrewsnabla/pyAutoMR) (optional, for generate guess)
 
 Of course we need numpy, scipy, etc., but these are also required by PySCF, so they are not listed here.
 
@@ -17,16 +16,18 @@ Of course we need numpy, scipy, etc., but these are also required by PySCF, so t
 
 ## Features
 **Theoretical features**:
-* SUHF (Spin-projected Unrestricted Hartree-Fock)
+* SUHF (Spin-projected Unrestricted Hartree-Fock) (10.1063/1.4705280)
   + energy
   + 1pdm, natural orbitals, 2pdm
 
  not fully tested:
-* SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT
+* SUHF+DFT, SUHF+*f*DFT, SUHF+*fc*DFT (10.1063/1.4796545)
 * CAS+*f*DFT, CAS-DFT2
 * DeltaSCF with MOM
-* SU-PDFT, SU-DDFT
-* PAV-SUMP2, SUMP2(0)
+
+ in developing:
+* SU-PDFT
+* EMP2(0) (10.1063/1.4898804)
 
 **Technical features**:
 * guess
