@@ -1,4 +1,9 @@
 
+version 0.4.3 (Jun 23, 2022)
+--------------------------
+* MO-based 2pdm; faster PDFT
+* split xc in PDFT
+
 version 0.4.2 (Mar 28, 2022)
 --------------------------
 * EMP2(0)

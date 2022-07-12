@@ -3,7 +3,7 @@ ExSCF is a program for methods based on Projected Hartree-Fock, which aims to ac
 
 ## Pre-requisites
 * sympy
-* [PySCF](https://github.com/pyscf/pyscf) (1.7.6 recommended)
+* [PySCF](https://github.com/pyscf/pyscf)
 * libxc
 * [MOKIT](https://gitlab.com/jxzou/mokit) (optional, for read/write fch and CASDFT)
 * [pyAutoMR](https://github.com/hebrewsnabla/pyAutoMR) (optional, for CASDFT)
