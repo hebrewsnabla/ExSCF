@@ -132,14 +132,14 @@ def get_pd(suhf, ot, usemo, do_split):
     if do_split:
         E_otx =  get_E_ot(xfnal, adm1s, adm2, mo, core)
         E_otc =  get_E_ot(cfnal, adm1s, adm2, mo, core)
-        print('E_otx %.6f' %E_otx)
-        print('E_otc %.6f' %E_otc)
+        print('E_otx  : %15.8f' %E_otx)
+        print('E_otc  : %15.8f' %E_otc)
         E_ot = E_otx + E_otc
-        print('E_ot %.6f' %E_ot)
+        print('E_ot   : %15.8f' %E_ot)
         return E_ot, E_otx, E_otc
     else:
         E_ot =  get_E_ot(ot, dm1s, adm2, mo)
-        print('E_ot %.6f' %E_ot)
+        print('E_ot   : %15.8f' %E_ot)
         return E_ot
 
 
@@ -207,10 +207,10 @@ def get_H(suhf, hcore_ortho, no, Pg, Gg, Jg, Kg, xg):
     H1k = suhf.integr_beta(trHg1k, fac='xg')
     #H0 = suhf.integr_beta(trHg, fac='xg')
     #print('H ', H0, H1, H1j, H1k)
-    print('E_core %.6f' % H0)
-    print('E_jk %.6f' % H1)
-    print('E_j %.6f' % H1j)
-    print('E_k %.6f' % H1k)
+    print('E_core : %15.8f' % H0)
+    print('E_jk   : %15.8f' % H1)
+    print('E_j    : %15.8f' % H1j)
+    print('E_k    : %15.8f' % H1k)
     #print('ciH', ciH0, ciH1, ciH1j, ciH1k)
     #suhf.trHg = trHg
     return H0, H1, H1j, H1k

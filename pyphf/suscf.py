@@ -377,7 +377,6 @@ class SUHF():
         self.restart = False
         self.conv_tol = 1e-7 # For RMSD
         self.max_cycle = 70
-        self.max_memory = max(guesshf.max_memory, 4000)
         self.noiter = False
         self.diis_on = True
         self.diis_start_cyc = None
@@ -436,6 +435,9 @@ class SUHF():
             self.stdout = self.guesshf.stdout
             if self.dumpchk:
                 self.chkfile0 = self.output + '_ges.pchk'
+                #print(hf.mo_energy)
+                #print(hf.mo_coeff)
+                #print(hf.mo_occ)
                 chkfile.dump_scf(hf.mol, self.chkfile0, hf.e_tot, hf.mo_energy,
                                  hf.mo_coeff, hf.mo_occ)
                 print('chkfile0: %s # the file store hf for guess' % self.chkfile0)
@@ -466,6 +468,7 @@ class SUHF():
         #self.chkfile2 = self.output + '_no.pchk'
         #print('chkfile2: %s # the file store suhf NO' % self.chkfile2)
 
+        self.max_memory = max(hf.max_memory, 4000)
         if self.diis_on:
             #assert issubclass(mf.DIIS, lib.diis.DIIS)
             self.diis_space = 8
